@@ -1,0 +1,487 @@
+// Prisma Schema for SIMONA Fashion
+// Supports MongoDB, PostgreSQL, MySQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb" // Change to "postgresql" or "mysql" if needed
+  url      = env("DATABASE_URL")
+}
+
+// ==================== CATEGORIES ====================
+
+model Category {
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  name          String        @unique
+  slug          String        @unique
+  description   String?
+  image         String?
+  isActive      Boolean       @default(true)
+  order         Int           @default(0)
+  
+  subcategories Subcategory[]
+  products      Product[]
+  
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model Subcategory {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  slug        String    @unique
+  description String?
+  image       String?
+  isActive    Boolean   @default(true)
+  order       Int       @default(0)
+  
+  categoryId  String    @db.ObjectId
+  category    Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  
+  products    Product[]
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([categoryId])
+}
+
+// ==================== PRODUCTS ====================
+
+model Product {
+  id              String          @id @default(auto()) @map("_id") @db.ObjectId
+  name            String
+  slug            String          @unique
+  description     String
+  shortDescription String?
+  
+  // Pricing
+  price           Float
+  compareAtPrice  Float?          // Original price for showing discounts
+  costPrice       Float?          // For profit calculation
+  
+  // Inventory
+  sku             String?         @unique
+  barcode         String?
+  trackInventory  Boolean         @default(true)
+  
+  // Status
+  isActive        Boolean         @default(true)
+  isFeatured      Boolean         @default(false)
+  isNew           Boolean         @default(false)
+  isBestseller    Boolean         @default(false)
+  
+  // SEO
+  metaTitle       String?
+  metaDescription String?
+  
+  // Relations
+  categoryId      String          @db.ObjectId
+  category        Category        @relation(fields: [categoryId], references: [id])
+  
+  subcategoryId   String?         @db.ObjectId
+  subcategory     Subcategory?    @relation(fields: [subcategoryId], references: [id])
+  
+  // Product variants (colors, sizes)
+  variants        ProductVariant[]
+  
+  // Reviews
+  reviews         Review[]
+  
+  // Wishlist
+  wishlistItems   WishlistItem[]
+  
+  // Cart
+  cartItems       CartItem[]
+  
+  // Order items
+  orderItems      OrderItem[]
+  
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([categoryId])
+  @@index([subcategoryId])
+  @@index([isActive, isFeatured])
+}
+
+// ==================== PRODUCT VARIANTS (Colors) ====================
+
+model ProductVariant {
+  id          String              @id @default(auto()) @map("_id") @db.ObjectId
+  
+  // Color information
+  colorName   String              // e.g., "Roșu", "Negru", "Alb"
+  colorCode   String              // e.g., "#FF0000", "#000000", "#FFFFFF"
+  
+  // Price override (optional)
+  price       Float?              // If this color has different price
+  
+  // Stock for this color
+  isActive    Boolean             @default(true)
+  
+  productId   String              @db.ObjectId
+  product     Product             @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  // Images for this color variant
+  images      VariantImage[]
+  
+  // Sizes available for this color
+  sizes       VariantSize[]
+  
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  @@index([productId])
+}
+
+// ==================== VARIANT IMAGES ====================
+
+model VariantImage {
+  id          String          @id @default(auto()) @map("_id") @db.ObjectId
+  
+  url         String          // Image URL
+  altText     String?         // Alt text for SEO
+  type        ImageType       @default(FRONT) // FRONT, BACK, DETAIL, MODEL
+  order       Int             @default(0)
+  
+  variantId   String          @db.ObjectId
+  variant     ProductVariant  @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime        @default(now())
+
+  @@index([variantId])
+}
+
+enum ImageType {
+  FRONT
+  BACK
+  DETAIL
+  MODEL
+  LIFESTYLE
+}
+
+// ==================== VARIANT SIZES ====================
+
+model VariantSize {
+  id          String          @id @default(auto()) @map("_id") @db.ObjectId
+  
+  size        String          // e.g., "XS", "S", "M", "L", "XL", "XXL" or "36", "38", "40"
+  stock       Int             @default(0)
+  sku         String?         // Unique SKU for this size+color combination
+  
+  variantId   String          @db.ObjectId
+  variant     ProductVariant  @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  
+  // Cart items
+  cartItems   CartItem[]
+  
+  // Order items
+  orderItems  OrderItem[]
+  
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([variantId])
+}
+
+// ==================== USERS ====================
+
+model User {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  email         String    @unique
+  password      String?   // Hashed password (null for OAuth users)
+  firstName     String?
+  lastName      String?
+  phone         String?
+  avatar        String?
+  
+  role          UserRole  @default(CUSTOMER)
+  isActive      Boolean   @default(true)
+  emailVerified DateTime?
+  
+  // Relations
+  addresses     Address[]
+  orders        Order[]
+  reviews       Review[]
+  wishlist      WishlistItem[]
+  cart          CartItem[]
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+enum UserRole {
+  CUSTOMER
+  ADMIN
+  MODERATOR
+}
+
+// ==================== ADDRESSES ====================
+
+model Address {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  
+  firstName   String
+  lastName    String
+  company     String?
+  address1    String
+  address2    String?
+  city        String
+  county      String    // Județ
+  postalCode  String
+  country     String    @default("România")
+  phone       String
+  
+  isDefault   Boolean   @default(false)
+  type        AddressType @default(SHIPPING)
+  
+  userId      String    @db.ObjectId
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  orders      Order[]
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([userId])
+}
+
+enum AddressType {
+  SHIPPING
+  BILLING
+}
+
+// ==================== CART ====================
+
+model CartItem {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  
+  quantity    Int         @default(1)
+  
+  userId      String      @db.ObjectId
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  productId   String      @db.ObjectId
+  product     Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  sizeId      String      @db.ObjectId
+  size        VariantSize @relation(fields: [sizeId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@unique([userId, productId, sizeId])
+  @@index([userId])
+}
+
+// ==================== WISHLIST ====================
+
+model WishlistItem {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  
+  userId      String    @db.ObjectId
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  productId   String    @db.ObjectId
+  product     Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime  @default(now())
+
+  @@unique([userId, productId])
+  @@index([userId])
+}
+
+// ==================== ORDERS ====================
+
+model Order {
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  orderNumber     String        @unique
+  
+  // Pricing
+  subtotal        Float
+  shippingCost    Float         @default(0)
+  discount        Float         @default(0)
+  tax             Float         @default(0)
+  total           Float
+  
+  // Status
+  status          OrderStatus   @default(PENDING)
+  paymentStatus   PaymentStatus @default(PENDING)
+  paymentMethod   String?
+  
+  // Notes
+  customerNote    String?
+  adminNote       String?
+  
+  // Relations
+  userId          String        @db.ObjectId
+  user            User          @relation(fields: [userId], references: [id])
+  
+  shippingAddressId String      @db.ObjectId
+  shippingAddress Address       @relation(fields: [shippingAddressId], references: [id])
+  
+  items           OrderItem[]
+  
+  // Tracking
+  trackingNumber  String?
+  shippedAt       DateTime?
+  deliveredAt     DateTime?
+  
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+model OrderItem {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  
+  quantity    Int
+  price       Float       // Price at time of order
+  total       Float
+  
+  // Product snapshot (in case product is deleted)
+  productName String
+  productSlug String
+  colorName   String
+  sizeName    String
+  imageUrl    String?
+  
+  orderId     String      @db.ObjectId
+  order       Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  productId   String      @db.ObjectId
+  product     Product     @relation(fields: [productId], references: [id])
+  
+  sizeId      String      @db.ObjectId
+  size        VariantSize @relation(fields: [sizeId], references: [id])
+  
+  createdAt   DateTime    @default(now())
+
+  @@index([orderId])
+}
+
+// ==================== REVIEWS ====================
+
+model Review {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  
+  rating      Int       // 1-5
+  title       String?
+  comment     String
+  
+  isApproved  Boolean   @default(false)
+  
+  userId      String    @db.ObjectId
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  productId   String    @db.ObjectId
+  product     Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([userId, productId])
+  @@index([productId])
+}
+
+// ==================== COUPONS ====================
+
+model Coupon {
+  id              String      @id @default(auto()) @map("_id") @db.ObjectId
+  
+  code            String      @unique
+  description     String?
+  
+  type            CouponType
+  value           Float       // Percentage or fixed amount
+  
+  minOrderAmount  Float?
+  maxDiscount     Float?      // Max discount for percentage coupons
+  
+  usageLimit      Int?        // Total usage limit
+  usageCount      Int         @default(0)
+  perUserLimit    Int?        // Usage limit per user
+  
+  startDate       DateTime?
+  endDate         DateTime?
+  
+  isActive        Boolean     @default(true)
+  
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+enum CouponType {
+  PERCENTAGE
+  FIXED_AMOUNT
+  FREE_SHIPPING
+}
+
+// ==================== ADMIN USERS ====================
+
+model AdminUser {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   @unique
+  password  String   // bcrypt hash
+  name      String   @default("Admin")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ==================== BLOG POSTS ====================
+
+model BlogPost {
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  
+  title       String
+  slug        String        @unique
+  excerpt     String
+  image       String?       // Hero image URL
+  category    String        // e.g., "Tendințe", "Sfaturi de Stil"
+  date        DateTime
+  readTime    String        // e.g., "5 min"
+  author      String        @default("Simona")
+  isFeatured  Boolean       @default(false)
+  isActive    Boolean       @default(true)
+  
+  sections    BlogSection[]
+  
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model BlogSection {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  
+  heading     String
+  body        String
+  image       String?   // Optional section image
+  order       Int       @default(0)
+  
+  postId      String    @db.ObjectId
+  post        BlogPost  @relation(fields: [postId], references: [id], onDelete: Cascade)
+  
+  @@index([postId])
+}
