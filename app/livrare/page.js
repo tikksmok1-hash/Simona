@@ -70,7 +70,7 @@ const faqs = [
   },
   {
     q: 'Pot schimba adresa de livrare după plasarea comenzii?',
-    a: 'Poți modifica adresa în primele 2 ore de la plasarea comenzii contactând echipa noastră la simona.md_info@mail.ru sau apelând 062 000 160.',,
+    a: 'Poți modifica adresa în primele 2 ore de la plasarea comenzii contactând echipa noastră la simona.md_info@mail.ru sau apelând 062 000 160.',
   },
   {
     q: 'Ce se întâmplă dacă nu sunt acasă?',
