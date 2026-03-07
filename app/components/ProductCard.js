@@ -231,13 +231,13 @@ export default function ProductCard({ product, priority = false }) {
       </div>
 
       {/* Mobile Size Buttons — pinned to bottom, hidden on desktop */}
-      <div className="md:hidden border-t border-neutral-100 px-3 py-2.5">
+      <div className="md:hidden border-t border-neutral-100 px-3 py-2">
         {isOutOfStock ? (
           <p className="text-[10px] text-neutral-400 tracking-widest uppercase text-center py-1">Stoc epuizat</p>
         ) : (
           <>
             <p className="text-[9px] text-neutral-400 tracking-widest uppercase mb-1.5 text-center">Adaugă în Coș</p>
-            <div className="flex items-center justify-center gap-1.5 flex-wrap">
+            <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide pb-0.5">
               {selectedVariant.sizes.map((size) => (
                 <button
                   key={size.size}
@@ -250,12 +250,12 @@ export default function ProductCard({ product, priority = false }) {
                       setTimeout(() => setAddedSize(null), 1500);
                     }
                   }}
-                  className={`min-w-[36px] h-9 px-1.5 text-xs font-medium border transition-all duration-200 ${
+                  className={`flex-shrink-0 min-w-[34px] h-8 px-1 text-[11px] font-medium border transition-all duration-200 ${
                     size.stock === 0
                       ? 'border-neutral-200 text-neutral-300 line-through cursor-not-allowed'
                       : addedSize === size.size
-                      ? 'border-green-500 bg-green-500 text-white scale-105'
-                      : 'border-neutral-300 text-neutral-700 active:scale-95 active:bg-black active:text-white active:border-black'
+                      ? 'border-green-500 bg-green-500 text-white'
+                      : 'border-neutral-300 text-neutral-700 active:bg-black active:text-white active:border-black'
                   }`}
                 >
                   {addedSize === size.size ? '✓' : size.size}
