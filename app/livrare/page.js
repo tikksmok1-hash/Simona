@@ -257,7 +257,7 @@ export default function LivrارePage() {
                   <span className="text-sm font-light text-black tracking-wide">Primești banii înapoi</span>
                 </div>
                 <p className="text-xs text-gray-400 leading-relaxed">
-                  Rambursarea se face pe același card/cont în 3–5 zile lucrătoare după verificarea produsului.
+                  Rambursarea se face în decurs de 3–5 zile lucrătoare după verificarea produsului.
                 </p>
               </div>
             </div>
