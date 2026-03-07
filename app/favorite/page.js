@@ -22,7 +22,7 @@ export default function FavoritePage() {
 
   if (favorites.length === 0) {
     return (
-      <div className="min-h-screen bg-white pt-[112px]">
+      <div className="min-h-screen bg-white pt-[112px] md:pt-[170px]">
         <div className="relative bg-black overflow-hidden py-16">
           <div className="absolute left-8 top-0 bottom-0 w-px bg-white/10" />
           <div className="absolute right-8 top-0 bottom-0 w-px bg-white/10" />
@@ -56,7 +56,7 @@ export default function FavoritePage() {
   }
 
   return (
-    <div className="min-h-screen bg-white pt-[112px]">
+    <div className="min-h-screen bg-white pt-[112px] md:pt-[170px]">
       {/* Editorial Hero */}
       <div className="relative bg-black overflow-hidden py-16">
         <div className="absolute left-8 top-0 bottom-0 w-px bg-white/10" />

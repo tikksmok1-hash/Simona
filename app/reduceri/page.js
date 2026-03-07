@@ -28,7 +28,7 @@ export default function ReduceriPage() {
   const availableCategories = [...new Set(saleProducts.map((p) => p.categorySlug))];
 
   return (
-    <div className="min-h-screen bg-white pt-[112px]">
+    <div className="min-h-screen bg-white pt-[112px] md:pt-[170px]">
 
       {/* Hero — rendered on server */}
       <div className="relative bg-black overflow-hidden py-24">

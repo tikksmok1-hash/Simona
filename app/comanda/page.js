@@ -63,7 +63,7 @@ export default function ComandaPage() {
 
   if (cart.length === 0 && step !== 'success') {
     return (
-      <div className="min-h-screen bg-white pt-[112px] flex flex-col items-center justify-center text-center px-4">
+      <div className="min-h-screen bg-white pt-[112px] md:pt-[170px] flex flex-col items-center justify-center text-center px-4">
         <svg className="w-16 h-16 text-neutral-200 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
         </svg>
@@ -78,7 +78,7 @@ export default function ComandaPage() {
 
   if (step === 'success') {
     return (
-      <div className="min-h-screen bg-white pt-[112px] flex flex-col items-center justify-center text-center px-4">
+      <div className="min-h-screen bg-white pt-[112px] md:pt-[170px] flex flex-col items-center justify-center text-center px-4">
         <div className="w-16 h-16 border border-black flex items-center justify-center mb-8">
           <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />

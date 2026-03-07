@@ -21,6 +21,13 @@ body {
   background: #ffffff;
   color: #000000;
   font-family: var(--font-montserrat), 'Montserrat', sans-serif;
+  --navbar-height: 112px;
+}
+
+@media (min-width: 768px) {
+  body {
+    --navbar-height: 168px;
+  }
 }
 
 /* Elegant Fashion Typography */
@@ -133,4 +140,20 @@ html {
 }
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* Ultra thin scrollbar */
+.thin-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #d4d4d4 transparent;
+}
+.thin-scrollbar::-webkit-scrollbar {
+  width: 3px;
+}
+.thin-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.thin-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #d4d4d4;
+  border-radius: 999px;
 }

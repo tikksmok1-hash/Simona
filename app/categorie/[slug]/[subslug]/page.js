@@ -44,7 +44,7 @@ export default async function SubcategoryPage({ params }) {
   ) ?? [];
 
   return (
-    <div className="min-h-screen bg-white pt-[112px]">
+    <div className="min-h-screen bg-white pt-[112px] md:pt-[170px]">
       {/* Breadcrumb */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <nav className="flex items-center space-x-2 text-sm">

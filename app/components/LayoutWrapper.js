@@ -9,6 +9,7 @@ import { CartProvider } from '../context/CartContext';
 export default function LayoutWrapper({ children }) {
   const pathname = usePathname();
   const isAdmin = pathname.startsWith('/admin');
+  const isHomepage = pathname === '/';
 
   if (isAdmin) {
     return <>{children}</>;

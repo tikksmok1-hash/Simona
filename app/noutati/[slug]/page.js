@@ -29,7 +29,7 @@ export default async function BlogPostPage({ params }) {
   const related = blogPosts.filter((_, i) => i !== postIndex).slice(0, 3);
 
   return (
-    <div className="min-h-screen bg-white pt-[112px]">
+    <div className="min-h-screen bg-white pt-[112px] md:pt-[170px]">
 
       {/* Hero */}
       <div className="relative w-full h-[70vh] min-h-[480px] overflow-hidden bg-neutral-900">

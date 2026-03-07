@@ -15,7 +15,7 @@ export default function NoutatiPage() {
   const categories = [...new Set(blogPosts.map((p) => p.category))];
 
   return (
-    <div className="min-h-screen bg-white pt-[112px]">
+    <div className="min-h-screen bg-white pt-[112px] md:pt-[170px]">
       {/* Hero */}
       <div className="relative bg-black overflow-hidden py-20">
         <div className="absolute left-8 top-0 bottom-0 w-px bg-white/10"></div>

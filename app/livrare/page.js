@@ -104,7 +104,7 @@ const faqs = [
 
 export default function LivrارePage() {
   return (
-    <div className="min-h-screen bg-white pt-[112px]">
+    <div className="min-h-screen bg-white pt-[112px] md:pt-[170px]">
 
       {/* Hero */}
       <div className="relative bg-black overflow-hidden py-24">

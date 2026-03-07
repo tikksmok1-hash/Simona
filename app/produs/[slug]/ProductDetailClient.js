@@ -68,16 +68,30 @@ export default function ProductDetailClient({ product, similarProducts = [] }) {
   ];
 
   return (
-    <div className="min-h-screen bg-white pt-20">
+    <div className="min-h-screen bg-white" style={{ paddingTop: '170px' }}>
       {/* Breadcrumb */}
       <div className="border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <nav className="flex items-center gap-2 text-xs text-gray-400 tracking-widest uppercase">
-            <Link href="/" className="hover:text-black transition-colors">Acasă</Link>
-            <span>/</span>
-            <Link href="/noutati" className="hover:text-black transition-colors">Noutăți</Link>
-            <span>/</span>
-            <span className="text-black truncate max-w-[200px]">{product.name}</span>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 md:py-4">
+          <nav className="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-xs text-gray-400 tracking-wider md:tracking-widest uppercase flex-wrap">
+            <Link href="/" className="hover:text-black transition-colors whitespace-nowrap">Acasă</Link>
+            {product.category && (
+              <>
+                <span className="text-gray-300">/</span>
+                <Link href={`/categorie/${product.category.slug}`} className="hover:text-black transition-colors whitespace-nowrap">
+                  {product.category.name}
+                </Link>
+              </>
+            )}
+            {product.subcategory && (
+              <>
+                <span className="text-gray-300">/</span>
+                <Link href={`/categorie/${product.category?.slug}/${product.subcategory.slug}`} className="hover:text-black transition-colors whitespace-nowrap">
+                  {product.subcategory.name}
+                </Link>
+              </>
+            )}
+            <span className="text-gray-300">/</span>
+            <span className="text-black truncate max-w-[120px] md:max-w-[250px]">{product.name}</span>
           </nav>
         </div>
       </div>
@@ -376,17 +390,26 @@ export default function ProductDetailClient({ product, similarProducts = [] }) {
                   >
                     <span className="text-xs tracking-widest uppercase font-medium text-black">{acc.label}</span>
                     <svg
-                      className={`w-4 h-4 text-gray-400 transition-transform ${openAccordion === acc.id ? 'rotate-45' : ''}`}
+                      className={`w-4 h-4 text-gray-400 transition-transform duration-500 ease-in-out ${openAccordion === acc.id ? 'rotate-45' : ''}`}
                       fill="none" stroke="currentColor" viewBox="0 0 24 24"
                     >
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
                     </svg>
                   </button>
-                  {openAccordion === acc.id && (
-                    <div className="pb-5">
-                      <p className="text-sm text-gray-600 leading-relaxed">{acc.content}</p>
+                  <div
+                    className="overflow-hidden transition-all duration-500 ease-in-out"
+                    style={{
+                      display: 'grid',
+                      gridTemplateRows: openAccordion === acc.id ? '1fr' : '0fr',
+                      opacity: openAccordion === acc.id ? 1 : 0,
+                    }}
+                  >
+                    <div className="min-h-0 overflow-hidden">
+                      <div className="pb-5">
+                        <p className="text-sm text-gray-600 leading-relaxed">{acc.content}</p>
+                      </div>
                     </div>
-                  )}
+                  </div>
                 </div>
               ))}
             </div>

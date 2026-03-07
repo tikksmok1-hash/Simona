@@ -13,7 +13,26 @@ export default function ProductCard({ product, priority = false }) {
   const [hoveredVariant, setHoveredVariant] = useState(null);
   const [tooltipPos, setTooltipPos] = useState(null);
   const colorRefs = useRef({});
+  const colorsScrollRef = useRef(null);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
   const { addToCart, toggleFavorite, isFavorite } = useCart();
+
+  // Detect touch device
+  useEffect(() => {
+    setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
+  }, []);
+
+  // Auto-scroll to selected color
+  useEffect(() => {
+    const container = colorsScrollRef.current;
+    const btn = colorRefs.current[selectedVariant.id];
+    if (container && btn) {
+      const btnLeft = btn.offsetLeft;
+      const btnWidth = btn.offsetWidth;
+      const containerWidth = container.offsetWidth;
+      container.scrollTo({ left: btnLeft - containerWidth / 2 + btnWidth / 2, behavior: 'smooth' });
+    }
+  }, [selectedVariant.id]);
   const favorited = isFavorite(product.id, selectedVariant.id);
 
   // Get front and back images for current variant
@@ -178,15 +197,16 @@ export default function ProductCard({ product, priority = false }) {
         </Link>
 
         {/* Color Selector */}
-        <div className="flex items-center gap-2 mb-3">
+        <div ref={colorsScrollRef} className="flex items-center gap-2 mb-3 overflow-x-auto scrollbar-hide py-1 pl-1 pr-0.5">
           {product.variants.map((variant) => {
             const frontImg = variant.images.find(img => img.type === 'FRONT') || variant.images[0];
             return (
-              <div key={variant.id} className="relative">
+              <div key={variant.id} className="relative flex-shrink-0">
                 <button
                   ref={(el) => { colorRefs.current[variant.id] = el; }}
                   onClick={() => setSelectedVariant(variant)}
                   onMouseEnter={() => {
+                    if (isTouchDevice) return;
                     setHoveredVariant(variant.id);
                     const el = colorRefs.current[variant.id];
                     if (el) {
@@ -194,7 +214,11 @@ export default function ProductCard({ product, priority = false }) {
                       setTooltipPos({ x: rect.left + rect.width / 2, y: rect.top });
                     }
                   }}
-                  onMouseLeave={() => { setHoveredVariant(null); setTooltipPos(null); }}
+                  onMouseLeave={() => {
+                    if (isTouchDevice) return;
+                    setHoveredVariant(null);
+                    setTooltipPos(null);
+                  }}
                   className={`w-5 h-5 rounded-full transition-all cursor-pointer ${
                     selectedVariant.id === variant.id
                       ? 'ring-1 ring-black ring-offset-2'
@@ -266,8 +290,8 @@ export default function ProductCard({ product, priority = false }) {
         )}
       </div>
 
-      {/* Color hover tooltip — rendered via portal to escape overflow:hidden */}
-      {hoveredVariant && tooltipPos && typeof document !== 'undefined' && (() => {
+      {/* Color hover tooltip — rendered via portal to escape overflow:hidden (desktop only) */}
+      {!isTouchDevice && hoveredVariant && tooltipPos && typeof document !== 'undefined' && (() => {
         const hv = product.variants.find(v => v.id === hoveredVariant);
         const frontImg = hv?.images?.find(img => img.type === 'FRONT') || hv?.images?.[0];
         if (!hv || !frontImg?.url) return null;

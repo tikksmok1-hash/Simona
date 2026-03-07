@@ -15,18 +15,23 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [showResults, setShowResults] = useState(false);
+  const [isPhoneOpen, setIsPhoneOpen] = useState(false);
   const searchRef = useRef(null);
   const mobileSearchRef = useRef(null);
+  const phoneRef = useRef(null);
   const pathname = usePathname();
   const router = useRouter();
   const { cartCount, favorites, openCart } = useCart();
 
-  // Close search results on outside click
+  // Close search results and phone dropdown on outside click
   useEffect(() => {
     function handleClickOutside(e) {
       if (searchRef.current && !searchRef.current.contains(e.target) &&
           mobileSearchRef.current && !mobileSearchRef.current.contains(e.target)) {
         setShowResults(false);
+      }
+      if (phoneRef.current && !phoneRef.current.contains(e.target)) {
+        setIsPhoneOpen(false);
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
@@ -59,9 +64,9 @@ export default function Navbar() {
     router.push(`/produs/${slug}`);
   }
 
-  // Transparent only on homepage
+  // Transparent only on homepage when not scrolled and menu is closed
   const isHomepage = pathname === '/';
-  const isTransparent = isHomepage && !isScrolled;
+  const isTransparent = isHomepage && !isScrolled && !isMenuOpen;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -94,19 +99,22 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
 
           {/* Phone with dropdown */}
-          <div className="relative group">
-            <button className="flex items-center gap-1.5 hover:opacity-75 transition-opacity cursor-pointer">
+          <div className="relative" ref={phoneRef}>
+            <button
+              onClick={() => setIsPhoneOpen(!isPhoneOpen)}
+              className="flex items-center gap-1.5 hover:opacity-75 transition-opacity cursor-pointer"
+            >
               <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
               </svg>
               <span className="tracking-widest">062 000 160</span>
-              <svg className="w-2.5 h-2.5 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+              <svg className={`w-2.5 h-2.5 opacity-60 transition-transform duration-200 ${isPhoneOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
               </svg>
             </button>
 
             {/* Dropdown */}
-            <div className="absolute left-0 top-full mt-1 w-44 bg-white shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[100]">
+            <div className={`absolute left-0 top-full mt-1 w-44 bg-white shadow-xl border border-gray-100 transition-all duration-200 z-[100] ${isPhoneOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
               <a
                 href="https://wa.me/37362000160"
                 target="_blank"
@@ -271,17 +279,19 @@ export default function Navbar() {
               {/* Mobile Menu Button */}
               <button 
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className={`md:hidden transition-colors ${
-                  isTransparent ? 'text-white hover:text-white/80' : 'text-gray-700 hover:text-black'
+                className={`md:hidden flex flex-col justify-center items-center w-6 h-6 gap-[5px] ${
+                  isTransparent ? 'text-white' : 'text-gray-700'
                 }`}
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-                  {isMenuOpen ? (
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                  ) : (
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                  )}
-                </svg>
+                <span className={`block w-5 h-px bg-current transition-all duration-300 origin-center ${
+                  isMenuOpen ? 'translate-y-[6px] rotate-45' : ''
+                }`} />
+                <span className={`block w-5 h-px bg-current transition-all duration-200 ${
+                  isMenuOpen ? 'opacity-0 scale-x-0' : ''
+                }`} />
+                <span className={`block w-5 h-px bg-current transition-all duration-300 origin-center ${
+                  isMenuOpen ? '-translate-y-[6px] -rotate-45' : ''
+                }`} />
               </button>
             </div>
           </div>
@@ -389,8 +399,9 @@ export default function Navbar() {
       </div>
 
       {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="md:hidden bg-white border-t border-gray-100 max-h-[70vh] overflow-y-auto">
+      <div className={`md:hidden bg-white border-t border-gray-100 overflow-hidden scrollbar-hide transition-all duration-300 ease-in-out ${
+        isMenuOpen ? 'max-h-[70vh] opacity-100 overflow-y-auto' : 'max-h-0 opacity-0'
+      }`}>
           <div className="px-6 py-4">
             <Link href="/" className="block text-gray-700 hover:text-black text-sm font-light tracking-wider uppercase py-3 border-b border-gray-50">
               Acasă
@@ -460,12 +471,35 @@ export default function Navbar() {
               </div>
             ))}
             
-            <Link href="/contact" className="block text-gray-700 hover:text-black text-sm font-light tracking-wider uppercase py-3">
+            <Link href="/contact" className="block text-gray-700 hover:text-black text-sm font-light tracking-wider uppercase py-3 border-b border-gray-50">
               Contact
             </Link>
+
+            {/* Contact Info */}
+            <div className="pt-4 pb-2 flex flex-col gap-3">
+              <a
+                href="mailto:contact@simona.md"
+                className="flex items-center gap-3 text-gray-500 hover:text-black text-sm font-light transition-colors"
+              >
+                <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                </svg>
+                contact@simona.md
+              </a>
+              <a
+                href="https://www.google.com/maps/search/str.+Ion+Creangă+58,+Chișinău,+Moldova"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 text-gray-500 hover:text-black text-sm font-light transition-colors"
+              >
+                <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                </svg>
+                str. Ion Creangă 58, Chișinău
+              </a>
+            </div>
           </div>
         </div>
-      )}
     </nav>
   );
 }

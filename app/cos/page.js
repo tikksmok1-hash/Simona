@@ -17,7 +17,7 @@ export default function CartPage() {
 
   if (cart.length === 0) {
     return (
-      <div className="min-h-screen bg-white pt-[112px] flex flex-col items-center justify-center text-center px-4">
+      <div className="min-h-screen bg-white pt-[112px] md:pt-[170px] flex flex-col items-center justify-center text-center px-4">
         <svg className="w-16 h-16 text-neutral-200 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
         </svg>
@@ -34,7 +34,7 @@ export default function CartPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white pt-[112px]">
+    <div className="min-h-screen bg-white pt-[112px] md:pt-[170px]">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
         <div className="mb-10 border-b border-neutral-100 pb-6">
