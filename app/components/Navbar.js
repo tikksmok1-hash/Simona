@@ -478,13 +478,13 @@ export default function Navbar() {
             {/* Contact Info */}
             <div className="pt-4 pb-2 flex flex-col gap-3">
               <a
-                href="mailto:contact@simona.md"
+                href="mailto:simona.md_info@mail.ru"
                 className="flex items-center gap-3 text-gray-500 hover:text-black text-sm font-light transition-colors"
               >
                 <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
                 </svg>
-                contact@simona.md
+                simona.md_info@mail.ru
               </a>
               <a
                 href="https://www.google.com/maps/search/str.+Ion+Creangă+58,+Chișinău,+Moldova"

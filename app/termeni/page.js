@@ -178,13 +178,13 @@ export default function TermeniPage() {
           <section className="bg-neutral-50 border border-neutral-100 p-8 text-center">
             <p className="text-neutral-500 text-sm mb-3">Ai întrebări despre termenii și condițiile noastre?</p>
             <a 
-              href="mailto:gos.style@mail.ru" 
+              href="mailto:simona.md_info@mail.ru" 
               className="inline-flex items-center gap-2 text-black font-medium hover:underline underline-offset-2"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
               </svg>
-              gos.style@mail.ru
+              simona.md_info@mail.ru
             </a>
           </section>
 

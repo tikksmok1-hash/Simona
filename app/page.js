@@ -37,7 +37,7 @@ export default function Home() {
         {/* Background Image with Ken Burns animation */}
         <div className="absolute inset-0">
           <Image
-            src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1920&h=1080&fit=crop&q=90"
+            src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1920&h=1080&fit=crop&q=90"
             alt="SIMONA Fashion — Colecția Primăvară 2026"
             fill
             priority
@@ -448,12 +448,12 @@ export default function Home() {
                 <div>
                   <p className="text-[10px] tracking-widest uppercase text-gray-400 mb-1">Telefon / WhatsApp</p>
                   <p className="text-sm text-black font-light">062 000 160</p>
-                  <p className="text-xs text-gray-400 mt-0.5">Luni – Sâmbătă, 10:00 – 19:00</p>
+                  <p className="text-xs text-gray-400 mt-0.5">Luni – Vineri: 9:00 – 19:00</p>
                 </div>
               </a>
 
               <a
-                href="mailto:gos.style@mail.ru"
+                href="mailto:simona.md_info@mail.ru"
                 className="flex items-start gap-5 p-6 border border-gray-100 hover:border-black transition-colors group"
               >
                 <div className="w-10 h-10 flex items-center justify-center bg-neutral-100 group-hover:bg-black group-hover:text-white transition-colors shrink-0">
@@ -463,7 +463,7 @@ export default function Home() {
                 </div>
                 <div>
                   <p className="text-[10px] tracking-widest uppercase text-gray-400 mb-1">Email</p>
-                  <p className="text-sm text-black font-light">gos.style@mail.ru</p>
+                  <p className="text-sm text-black font-light">simona.md_info@mail.ru</p>
                   <p className="text-xs text-gray-400 mt-0.5">Răspundem în max. 2 ore</p>
                 </div>
               </a>

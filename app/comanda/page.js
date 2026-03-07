@@ -23,11 +23,7 @@ export default function ComandaPage() {
 
   const isPickup = deliveryMethod === 'pickup';
   const DELIVERY_STANDARD = 70;
-  const DELIVERY_EXPRESS = 200;
-  const deliveryCost =
-    deliveryMethod === 'pickup' ? 0 :
-    deliveryMethod === 'express' ? DELIVERY_EXPRESS :
-    DELIVERY_STANDARD;
+  const deliveryCost = deliveryMethod === 'pickup' ? 0 : DELIVERY_STANDARD;
   const total = cartTotal + deliveryCost;
 
   const handle = (e) => {
@@ -145,26 +141,6 @@ export default function ComandaPage() {
                     <span className="text-xs font-medium">{DELIVERY_STANDARD} MDL</span>
                   </button>
 
-                  {/* Express */}
-                  <button
-                    type="button"
-                    onClick={() => setDeliveryMethod('express')}
-                    className={`w-full flex items-center justify-between px-4 py-3 border text-left transition-all duration-200 ${
-                      deliveryMethod === 'express' ? 'border-black bg-black text-white' : 'border-neutral-200 bg-white text-neutral-700 hover:border-neutral-400'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                      </svg>
-                      <div>
-                        <p className="text-xs tracking-widest uppercase font-medium">Express</p>
-                        <p className={`text-[10px] mt-0.5 ${deliveryMethod === 'express' ? 'text-white/60' : 'text-neutral-400'}`}>Zi lucrătoare următoare</p>
-                      </div>
-                    </div>
-                    <span className="text-xs font-medium">{DELIVERY_EXPRESS} MDL</span>
-                  </button>
-
                   {/* Pick-up */}
                   <button
                     type="button"
@@ -193,7 +169,7 @@ export default function ComandaPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    Luni–Sâmbătă 10:00–19:00
+                    Luni–Vineri 9:00–19:00, Sâmbătă–Duminică 9:00–17:00
                   </p>
                 )}
               </div>
@@ -302,9 +278,7 @@ export default function ComandaPage() {
                   </div>
                   <div className="flex justify-between text-neutral-600">
                     <span>
-                      {deliveryMethod === 'express' ? 'Livrare Express' :
-                       deliveryMethod === 'pickup' ? 'Pick-up' :
-                       'Livrare Standard'}
+                      {deliveryMethod === 'pickup' ? 'Pick-up' : 'Livrare Standard'}
                     </span>
                     <span className={isPickup ? 'text-green-600 font-medium' : ''}>
                       {isPickup ? 'Gratuit' : `${deliveryCost} MDL`}

@@ -63,7 +63,7 @@ export default function ProductDetailClient({ product, similarProducts = [] }) {
     {
       id: 'livrare',
       label: 'Livrare & Returnare',
-      content: 'Livrare standard: 70 MDL (3–5 zile lucrătoare). Livrare express: 200 MDL (1–2 zile). Ridicare gratuită din magazin. Returnare în 14 zile.',
+      content: 'Livrare standard: 70 MDL (3–5 zile lucrătoare). Ridicare gratuită din magazin. Returnare în 14 zile.',
     },
   ];
 

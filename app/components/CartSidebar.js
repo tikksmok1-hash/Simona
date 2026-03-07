@@ -23,11 +23,7 @@ export default function CartSidebar() {
 
   const isPickup = deliveryMethod === 'pickup';
   const DELIVERY_STANDARD = 70;
-  const DELIVERY_EXPRESS = 200;
-  const deliveryCost =
-    deliveryMethod === 'pickup' ? 0 :
-    deliveryMethod === 'express' ? DELIVERY_EXPRESS :
-    DELIVERY_STANDARD;
+  const deliveryCost = deliveryMethod === 'pickup' ? 0 : DELIVERY_STANDARD;
   const total = cartTotal + deliveryCost;
 
   return (
@@ -88,25 +84,6 @@ export default function CartSidebar() {
                 </div>
               </div>
               <span className="text-[10px] font-medium">{DELIVERY_STANDARD} MDL</span>
-            </button>
-
-            {/* Express */}
-            <button
-              onClick={() => setDeliveryMethod('express')}
-              className={`w-full flex items-center justify-between px-3 py-2.5 border text-left transition-all duration-200 cursor-pointer ${
-                deliveryMethod === 'express' ? 'border-black bg-black text-white' : 'border-neutral-200 bg-white text-neutral-600 hover:border-neutral-400'
-              }`}
-            >
-              <div className="flex items-center gap-2.5">
-                <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                <div>
-                  <p className="text-[10px] tracking-widest uppercase font-medium">Express</p>
-                  <p className={`text-[9px] ${deliveryMethod === 'express' ? 'text-white/60' : 'text-neutral-400'}`}>Zi următoare</p>
-                </div>
-              </div>
-              <span className="text-[10px] font-medium">{DELIVERY_EXPRESS} MDL</span>
             </button>
 
             {/* Pick-up */}
@@ -239,9 +216,7 @@ export default function CartSidebar() {
             </div>
             <div className="flex justify-between text-xs text-neutral-500 tracking-wide">
               <span>
-                {deliveryMethod === 'express' ? 'Express' :
-                 deliveryMethod === 'pickup' ? 'Pick-up' :
-                 'Standard'}
+                {deliveryMethod === 'pickup' ? 'Pick-up' : 'Standard'}
               </span>
               <span className={isPickup ? 'text-green-600 font-medium' : ''}>
                 {isPickup ? 'Gratuit' : `${deliveryCost} MDL`}

@@ -8,11 +8,7 @@ export default function CartPage() {
   const { cart, cartTotal, cartCount, removeFromCart, updateQuantity, deliveryMethod, setDeliveryMethod } = useCart();
 
   const DELIVERY_STANDARD = 70;
-  const DELIVERY_EXPRESS = 200;
-  const deliveryCost =
-    deliveryMethod === 'pickup' ? 0 :
-    deliveryMethod === 'express' ? DELIVERY_EXPRESS :
-    DELIVERY_STANDARD;
+  const deliveryCost = deliveryMethod === 'pickup' ? 0 : DELIVERY_STANDARD;
   const total = cartTotal + deliveryCost;
 
   if (cart.length === 0) {
@@ -148,25 +144,6 @@ export default function CartPage() {
                     <span className="text-xs font-medium">{DELIVERY_STANDARD} MDL</span>
                   </button>
 
-                  {/* Express */}
-                  <button
-                    onClick={() => setDeliveryMethod('express')}
-                    className={`w-full flex items-center justify-between px-4 py-3 border text-left transition-all duration-200 ${
-                      deliveryMethod === 'express' ? 'border-black bg-black text-white' : 'border-neutral-200 bg-white text-neutral-700 hover:border-neutral-400'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                      </svg>
-                      <div>
-                        <p className="text-xs tracking-widest uppercase font-medium">Express</p>
-                        <p className={`text-[10px] mt-0.5 ${deliveryMethod === 'express' ? 'text-white/60' : 'text-neutral-400'}`}>Zi lucrătoare următoare</p>
-                      </div>
-                    </div>
-                    <span className="text-xs font-medium">{DELIVERY_EXPRESS} MDL</span>
-                  </button>
-
                   {/* Pick-up */}
                   <button
                     onClick={() => setDeliveryMethod('pickup')}
@@ -197,9 +174,7 @@ export default function CartPage() {
                 </div>
                 <div className="flex justify-between text-neutral-600">
                   <span>
-                    {deliveryMethod === 'express' ? 'Livrare Express' :
-                     deliveryMethod === 'pickup' ? 'Pick-up' :
-                     'Livrare Standard'}
+                    {deliveryMethod === 'pickup' ? 'Pick-up' : 'Livrare Standard'}
                   </span>
                   <span className={deliveryMethod === 'pickup' ? 'text-green-600 font-medium' : ''}>
                     {deliveryMethod === 'pickup' ? 'Gratuit' : `${deliveryCost} MDL`}

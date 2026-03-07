@@ -28,18 +28,6 @@ const deliveryOptions = [
   {
     icon: (
       <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-      </svg>
-    ),
-    title: 'Livrare Express',
-    subtitle: '1–2 zile lucrătoare',
-    price: '200 MDL',
-    description: 'Prioritate maximă. Comanda ta pleacă în aceeași zi dacă este plasată înainte de ora 14:00.',
-    highlight: true,
-  },
-  {
-    icon: (
-      <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
         <polyline points="9 22 9 12 15 12 15 22" />
       </svg>
@@ -47,7 +35,7 @@ const deliveryOptions = [
     title: 'Ridicare din Magazin',
     subtitle: 'Disponibil imediat',
     price: 'Gratuit',
-    description: 'Ridici comanda din showroom-ul nostru de pe str. Ion Creanță 58, Chișinău. Programul de lucru: Luni–Sâmbătă 10:00–19:00.',
+    description: 'Ridici comanda din showroom-ul nostru de pe str. Ion Creanță 58, Chișinău. Program: Luni–Vineri 9:00–19:00, Sâmbătă–Duminică 9:00–17:00.',
     highlight: false,
   },
 ];
@@ -78,11 +66,11 @@ const steps = [
 const faqs = [
   {
     q: 'Cât costă livrarea?',
-    a: 'Livrarea standard costă 70 MDL (3–5 zile lucrătoare), iar livrarea express 200 MDL (1–2 zile). Ridicarea din magazin este gratuită.',
+    a: 'Livrarea standard costă 70 MDL (3–5 zile lucrătoare). Ridicarea din magazin este gratuită.',
   },
   {
     q: 'Pot schimba adresa de livrare după plasarea comenzii?',
-    a: 'Poți modifica adresa în primele 2 ore de la plasarea comenzii contactând echipa noastră la gos.style@mail.ru sau apelând 062 000 160.',
+    a: 'Poți modifica adresa în primele 2 ore de la plasarea comenzii contactând echipa noastră la simona.md_info@mail.ru sau apelând 062 000 160.',,
   },
   {
     q: 'Ce se întâmplă dacă nu sunt acasă?',
@@ -150,7 +138,7 @@ export default function LivrارePage() {
             <p className="text-[10px] tracking-[0.5em] uppercase text-gray-400 mb-3">Opțiuni</p>
             <h2 className="font-serif text-4xl font-light text-black">Metode de Livrare</h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
             {deliveryOptions.map((opt) => (
               <div
                 key={opt.title}
@@ -240,7 +228,7 @@ export default function LivrارePage() {
                 </div>
                 <p className="text-xs text-gray-400 leading-relaxed">
                   Contactează-ne la{' '}
-                  <a href="mailto:gos.style@mail.ru" className="text-black underline underline-offset-2 hover:no-underline">gos.style@mail.ru</a>
+                  <a href="mailto:simona.md_info@mail.ru" className="text-black underline underline-offset-2 hover:no-underline">simona.md_info@mail.ru</a>
                   {' '}sau la{' '}
                   <a href="tel:+37362000160" className="text-black underline underline-offset-2 hover:no-underline">062 000 160</a>
                   {' '}cu numărul comenzii.
@@ -294,14 +282,14 @@ export default function LivrارePage() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <a
-              href="mailto:gos.style@mail.ru"
+              href="mailto:simona.md_info@mail.ru"
               className="inline-flex items-center gap-2 bg-white text-black px-8 py-3 text-xs tracking-widest uppercase hover:bg-neutral-100 transition-colors cursor-pointer"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
                 <polyline points="22,6 12,13 2,6" />
               </svg>
-              gos.style@mail.ru
+              simona.md_info@mail.ru
             </a>
             <a
               href="tel:+37362000160"
