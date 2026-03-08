@@ -82,7 +82,8 @@ export default function ComandaPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setApiError(data.error || 'Eroare la plasarea comenzii.');
+        const msg = data.detail ? `${data.error} (${data.detail})` : (data.error || 'Eroare la plasarea comenzii.');
+        setApiError(msg);
         setLoading(false);
         return;
       }

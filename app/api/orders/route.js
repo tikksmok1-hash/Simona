@@ -135,13 +135,13 @@ export async function POST(request) {
             quantity: item.quantity,
             price: item.price,
             total: item.price * item.quantity,
-            productName: item.name,
-            productSlug: item.slug,
+            productName: item.name || 'Produs',
+            productSlug: item.slug || '-',
             colorName: item.color || '-',
             sizeName: item.size || '-',
             imageUrl: item.image || null,
-            productId: item.productId,
-            ...(item.sizeId ? { sizeId: item.sizeId } : {}),
+            ...(item.productId && /^[a-f\d]{24}$/i.test(item.productId) ? { productId: item.productId } : {}),
+            ...(item.sizeId && /^[a-f\d]{24}$/i.test(item.sizeId) ? { sizeId: item.sizeId } : {}),
           })),
         },
       },
@@ -155,6 +155,9 @@ export async function POST(request) {
     return NextResponse.json({ orderNumber: order.orderNumber, id: order.id }, { status: 201 });
   } catch (error) {
     console.error('Order POST error:', error);
-    return NextResponse.json({ error: 'Eroare la plasarea comenzii.' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Eroare la plasarea comenzii.', detail: error?.message || String(error) },
+      { status: 500 }
+    );
   }
 }
