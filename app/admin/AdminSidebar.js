@@ -34,6 +34,18 @@ const BlogIcon = () => (
   </svg>
 );
 
+const MenuIcon = () => (
+  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
+  </svg>
+);
+
+const CloseIcon = () => (
+  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
+  </svg>
+);
+
 const nav = [
   { href: '/admin', label: 'Dashboard', Icon: DashboardIcon },
   { href: '/admin/comenzi', label: 'Comenzi', Icon: OrdersIcon },
@@ -42,62 +54,108 @@ const nav = [
   { href: '/admin/noutati', label: 'Noutăți', Icon: BlogIcon },
 ];
 
-export default function AdminSidebar() {
+export default function AdminSidebar({ isOpen, onClose }) {
   const pathname = usePathname();
   const { user, logout } = useAdmin();
 
+  const handleNavClick = () => {
+    if (onClose) onClose();
+  };
+
   return (
-    <aside className="sticky top-0 left-0 w-60 h-screen bg-black text-white flex flex-col flex-shrink-0">
-      {/* Logo */}
-      <div className="px-6 py-6 border-b border-white/10">
-        <Link href="/admin" className="text-lg font-serif tracking-wider">
-          SIMONA
-        </Link>
-        <p className="text-[10px] tracking-[0.3em] text-white/40 uppercase mt-1">Admin Panel</p>
-      </div>
+    <>
+      {/* Overlay for mobile */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={onClose}
+        />
+      )}
 
-      {/* Navigation */}
-      <nav className="flex-1 py-4 overflow-y-auto">
-        {nav.map((item) => {
-          const active = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href));
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex items-center gap-3 px-6 py-3 text-sm transition-colors ${
-                active
-                  ? 'bg-white/10 text-white border-r-2 border-white'
-                  : 'text-white/60 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <item.Icon />
-              <span>{item.label}</span>
+      {/* Sidebar */}
+      <aside className={`
+        fixed lg:sticky top-0 left-0 z-50
+        w-64 lg:w-60 h-screen bg-black text-white 
+        flex flex-col flex-shrink-0
+        transform transition-transform duration-300 ease-in-out
+        ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+      `}>
+        {/* Logo + Close button */}
+        <div className="px-6 py-6 border-b border-white/10 flex items-center justify-between">
+          <div>
+            <Link href="/admin" className="text-lg font-serif tracking-wider" onClick={handleNavClick}>
+              SIMONA
             </Link>
-          );
-        })}
-      </nav>
+            <p className="text-[10px] tracking-[0.3em] text-white/40 uppercase mt-1">Admin Panel</p>
+          </div>
+          <button 
+            onClick={onClose}
+            className="lg:hidden p-1 hover:bg-white/10 rounded transition-colors"
+          >
+            <CloseIcon />
+          </button>
+        </div>
 
-      {/* Footer */}
-      <div className="px-6 py-4 border-t border-white/10">
-        <a
-          href="/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-2 text-xs text-white/60 hover:text-white transition-colors mb-3"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-          </svg>
-          Vezi site-ul →
-        </a>
-        <p className="text-xs text-white/40 mb-2">{user?.email}</p>
-        <button
-          onClick={logout}
-          className="text-xs text-white/60 hover:text-white transition-colors cursor-pointer"
-        >
-          Deconectare →
-        </button>
-      </div>
-    </aside>
+        {/* Navigation */}
+        <nav className="flex-1 py-4 overflow-y-auto">
+          {nav.map((item) => {
+            const active = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href));
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={handleNavClick}
+                className={`flex items-center gap-3 px-6 py-3 text-sm transition-colors ${
+                  active
+                    ? 'bg-white/10 text-white border-r-2 border-white'
+                    : 'text-white/60 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <item.Icon />
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Footer */}
+        <div className="px-6 py-4 border-t border-white/10">
+          <a
+            href="/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-xs text-white/60 hover:text-white transition-colors mb-3"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+            Vezi site-ul →
+          </a>
+          <p className="text-xs text-white/40 mb-2 truncate">{user?.email}</p>
+          <button
+            onClick={logout}
+            className="text-xs text-white/60 hover:text-white transition-colors cursor-pointer"
+          >
+            Deconectare →
+          </button>
+        </div>
+      </aside>
+    </>
+  );
+}
+
+// Mobile header component
+export function MobileHeader({ onMenuClick }) {
+  return (
+    <header className="lg:hidden sticky top-0 z-30 bg-black text-white px-4 py-3 flex items-center justify-between">
+      <button 
+        onClick={onMenuClick}
+        className="p-1 hover:bg-white/10 rounded transition-colors"
+      >
+        <MenuIcon />
+      </button>
+      <span className="text-lg font-serif tracking-wider">SIMONA</span>
+      <div className="w-8" />
+    </header>
   );
 }

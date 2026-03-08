@@ -89,10 +89,10 @@ function EditBlogForm() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
         <div>
-          <h1 className="text-2xl font-serif font-light text-black">Editează Articol</h1>
-          <p className="text-sm text-gray-500 mt-1">{form.title}</p>
+          <h1 className="text-xl sm:text-2xl font-serif font-light text-black">Editează Articol</h1>
+          <p className="text-sm text-gray-500 mt-1 truncate">{form.title}</p>
         </div>
         <button onClick={() => router.back()} className="text-sm text-gray-500 hover:text-black cursor-pointer">← Înapoi</button>
       </div>

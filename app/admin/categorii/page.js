@@ -120,14 +120,14 @@ function CategoriesContent() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
         <div>
-          <h1 className="text-2xl font-serif font-light text-black">Categorii & Subcategorii</h1>
+          <h1 className="text-xl sm:text-2xl font-serif font-light text-black">Categorii & Subcategorii</h1>
           <p className="text-sm text-gray-500 mt-1">{categories.length} categorii</p>
         </div>
         <button
           onClick={() => setShowNewCat(!showNewCat)}
-          className="bg-black text-white px-6 py-2.5 text-xs tracking-widest uppercase hover:bg-neutral-800 transition-colors cursor-pointer"
+          className="bg-black text-white px-6 py-2.5 text-xs tracking-widest uppercase hover:bg-neutral-800 transition-colors cursor-pointer text-center"
         >
           + Categorie Nouă
         </button>
@@ -198,8 +198,8 @@ function CategoriesContent() {
                   </div>
                 </div>
               ) : (
-                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-                  <div className="flex items-center gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 sm:px-6 py-4 border-b border-gray-100">
+                  <div className="flex items-center gap-3 sm:gap-4">
                     {cat.image ? (
                       <img src={cat.image} alt="" className="w-10 h-10 object-cover rounded" />
                     ) : (
@@ -214,10 +214,10 @@ function CategoriesContent() {
                       <p className="text-xs text-gray-400">/{cat.slug} · {cat.subcategories?.length || 0} subcategorii</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <button onClick={() => setShowNewSub(showNewSub === cat.id ? null : cat.id)} className="text-xs text-gray-500 hover:text-black px-2 py-1 border border-gray-200 rounded hover:border-black cursor-pointer">+ Subcategorie</button>
-                    <button onClick={() => startEditCat(cat)} className="text-xs text-gray-500 hover:text-black px-2 py-1 border border-gray-200 rounded hover:border-black cursor-pointer">Editează</button>
-                    <button onClick={() => deleteCat(cat.id)} className="text-xs text-red-500 hover:text-red-700 px-2 py-1 border border-red-200 rounded hover:border-red-400 cursor-pointer">Șterge</button>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <button onClick={() => setShowNewSub(showNewSub === cat.id ? null : cat.id)} className="text-xs text-gray-500 hover:text-black px-2 py-1.5 border border-gray-200 rounded hover:border-black cursor-pointer">+ Subcategorie</button>
+                    <button onClick={() => startEditCat(cat)} className="text-xs text-gray-500 hover:text-black px-2 py-1.5 border border-gray-200 rounded hover:border-black cursor-pointer">Editează</button>
+                    <button onClick={() => deleteCat(cat.id)} className="text-xs text-red-500 hover:text-red-700 px-2 py-1.5 border border-red-200 rounded hover:border-red-400 cursor-pointer">Șterge</button>
                   </div>
                 </div>
               )}

@@ -3,12 +3,13 @@
 import { useAdmin } from './AdminAuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import AdminSidebar from './AdminSidebar';
+import AdminSidebar, { MobileHeader } from './AdminSidebar';
 
 export default function AdminShell({ children }) {
   const { user, loading } = useAdmin();
   const router = useRouter();
   const [initialLoad, setInitialLoad] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (!loading) {
@@ -34,11 +35,16 @@ export default function AdminShell({ children }) {
   if (!user || user.pending) return null;
 
   return (
-    <div className="flex min-h-screen">
-      <AdminSidebar />
-      <main className="flex-1 p-8 bg-gray-50 min-h-screen overflow-x-hidden">
-        {children}
-      </main>
+    <div className="min-h-screen bg-gray-50">
+      {/* Mobile header */}
+      <MobileHeader onMenuClick={() => setSidebarOpen(true)} />
+      
+      <div className="flex">
+        <AdminSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 min-h-screen overflow-x-hidden">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }

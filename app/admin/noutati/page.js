@@ -37,14 +37,14 @@ function BlogListContent() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
         <div>
-          <h1 className="text-2xl font-serif font-light text-black">Noutăți / Blog</h1>
+          <h1 className="text-xl sm:text-2xl font-serif font-light text-black">Noutăți / Blog</h1>
           <p className="text-sm text-gray-500 mt-1">{posts.length} articole</p>
         </div>
         <Link
           href="/admin/noutati/nou"
-          className="bg-black text-white px-6 py-2.5 text-xs tracking-widest uppercase hover:bg-neutral-800 transition-colors"
+          className="bg-black text-white px-6 py-2.5 text-xs tracking-widest uppercase hover:bg-neutral-800 transition-colors text-center"
         >
           + Articol Nou
         </Link>

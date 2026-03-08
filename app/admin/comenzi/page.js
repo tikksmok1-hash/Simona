@@ -176,10 +176,10 @@ function OrdersContent() {
             <div key={order.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
               {/* Header */}
               <div
-                className="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-gray-50 transition-colors"
+                className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 sm:px-6 py-4 cursor-pointer hover:bg-gray-50 transition-colors"
                 onClick={() => setExpandedId(expandedId === order.id ? null : order.id)}
               >
-                <div className="flex items-center gap-4">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-4">
                   <span className="text-sm font-mono text-gray-500">#{order.orderNumber}</span>
                   <span className={`text-[10px] tracking-wider uppercase px-2.5 py-1 rounded-full ${STATUS_COLORS[order.status] || 'bg-gray-100'}`}>
                     {STATUS_LABELS[order.status] || order.status}
@@ -193,7 +193,7 @@ function OrdersContent() {
                     </span>
                   )}
                 </div>
-                <div className="flex items-center gap-6">
+                <div className="flex items-center gap-4 sm:gap-6">
                   <span className="text-sm font-medium">{order.total?.toFixed(2)} MDL</span>
                   <span className="text-xs text-gray-400">{new Date(order.createdAt).toLocaleDateString('ro-RO')}</span>
                   <svg className={`w-4 h-4 text-gray-400 transition-transform ${expandedId === order.id ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -204,10 +204,10 @@ function OrdersContent() {
 
               {/* Expanded detail */}
               {expandedId === order.id && (
-                <div className="px-6 pb-6 border-t border-gray-100">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+                <div className="px-4 sm:px-6 pb-6 border-t border-gray-100">
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-4">
                     {/* Items */}
-                    <div className="md:col-span-2">
+                    <div className="lg:col-span-2">
                       <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">Produse</h3>
                       <div className="space-y-2">
                         {order.items?.map((item) => (
