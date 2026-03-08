@@ -140,8 +140,12 @@ export async function POST(request) {
             colorName: item.color || '-',
             sizeName: item.size || '-',
             imageUrl: item.image || null,
-            ...(item.productId && /^[a-f\d]{24}$/i.test(item.productId) ? { productId: item.productId } : {}),
-            ...(item.sizeId && /^[a-f\d]{24}$/i.test(item.sizeId) ? { sizeId: item.sizeId } : {}),
+            ...(item.productId && /^[a-f\d]{24}$/i.test(item.productId)
+              ? { product: { connect: { id: item.productId } } }
+              : {}),
+            ...(item.sizeId && /^[a-f\d]{24}$/i.test(item.sizeId)
+              ? { size: { connect: { id: item.sizeId } } }
+              : {}),
           })),
         },
       },
