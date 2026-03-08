@@ -109,7 +109,7 @@ export async function POST(request) {
         postalCode: '-',
         country: 'Moldova',
         phone: customer.telefon,
-        userId: user.id,
+        user: { connect: { id: user.id } },
       },
     });
 
@@ -117,7 +117,7 @@ export async function POST(request) {
     const orderCount = await prisma.order.count();
     const orderNumber = `SM-${String(orderCount + 1).padStart(5, '0')}`;
 
-    // Create order (without nested items — avoids Prisma relation issues)
+    // Create order
     const order = await prisma.order.create({
       data: {
         orderNumber,
@@ -128,16 +128,19 @@ export async function POST(request) {
         paymentStatus: 'PENDING',
         paymentMethod: deliveryMethod === 'pickup' ? 'CASH_ON_PICKUP' : 'CASH_ON_DELIVERY',
         customerNote: observatii || null,
-        userId: user.id,
-        shippingAddressId: address.id,
+        user: { connect: { id: user.id } },
+        shippingAddress: { connect: { id: address.id } },
       },
     });
 
-    // Create order items separately using scalar fields
+    // Create order items (all relations use connect syntax for MongoDB)
     for (const item of items) {
+      const isValidProductId = item.productId && /^[a-f\d]{24}$/i.test(item.productId);
+      const isValidSizeId = item.sizeId && /^[a-f\d]{24}$/i.test(item.sizeId);
+
       await prisma.orderItem.create({
         data: {
-          orderId: order.id,
+          order: { connect: { id: order.id } },
           quantity: item.quantity,
           price: item.price,
           total: item.price * item.quantity,
@@ -146,8 +149,8 @@ export async function POST(request) {
           colorName: item.color || '-',
           sizeName: item.size || '-',
           imageUrl: item.image || null,
-          ...(item.productId && /^[a-f\d]{24}$/i.test(item.productId) ? { productId: item.productId } : {}),
-          ...(item.sizeId && /^[a-f\d]{24}$/i.test(item.sizeId) ? { sizeId: item.sizeId } : {}),
+          ...(isValidProductId ? { product: { connect: { id: item.productId } } } : {}),
+          ...(isValidSizeId ? { size: { connect: { id: item.sizeId } } } : {}),
         },
       });
     }
