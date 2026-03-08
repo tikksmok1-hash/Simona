@@ -147,15 +147,18 @@ export default function AdminSidebar({ isOpen, onClose }) {
 // Mobile header component
 export function MobileHeader({ onMenuClick }) {
   return (
-    <header className="lg:hidden sticky top-0 z-30 bg-black text-white px-4 py-3 flex items-center justify-between">
+    <header className="lg:hidden sticky top-0 z-30 bg-black text-white px-4 py-3 flex items-center justify-between shadow-md">
       <button 
         onClick={onMenuClick}
-        className="p-1 hover:bg-white/10 rounded transition-colors"
+        className="p-2 hover:bg-white/10 rounded transition-colors"
+        aria-label="Deschide meniul"
       >
-        <MenuIcon />
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
       </button>
       <span className="text-lg font-serif tracking-wider">SIMONA</span>
-      <div className="w-8" />
+      <div className="w-10" />
     </header>
   );
 }
