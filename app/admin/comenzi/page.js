@@ -28,6 +28,11 @@ function OrdersContent() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState(null);
+  
+  // Filters
+  const [statusFilter, setStatusFilter] = useState('ALL');
+  const [dateFilter, setDateFilter] = useState('ALL');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const fetchOrders = async () => {
     try {
@@ -52,28 +57,122 @@ function OrdersContent() {
     } catch {}
   };
 
+  // Filter logic
+  const filteredOrders = orders.filter((order) => {
+    // Status filter
+    if (statusFilter !== 'ALL' && order.status !== statusFilter) return false;
+    
+    // Date filter
+    if (dateFilter !== 'ALL') {
+      const orderDate = new Date(order.createdAt);
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+      const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+      
+      if (dateFilter === 'TODAY' && orderDate < today) return false;
+      if (dateFilter === 'WEEK' && orderDate < weekAgo) return false;
+      if (dateFilter === 'MONTH' && orderDate < monthAgo) return false;
+    }
+    
+    // Search filter
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      const matchesOrderNumber = order.orderNumber?.toLowerCase().includes(q);
+      const matchesPhone = order.shippingAddress?.phone?.toLowerCase().includes(q);
+      const matchesName = `${order.shippingAddress?.firstName || ''} ${order.shippingAddress?.lastName || ''}`.toLowerCase().includes(q);
+      if (!matchesOrderNumber && !matchesPhone && !matchesName) return false;
+    }
+    
+    return true;
+  });
+
   return (
     <div>
-      <div className="mb-8">
+      <div className="mb-6">
         <h1 className="text-2xl font-serif font-light text-black">Comenzi</h1>
-        <p className="text-sm text-gray-500 mt-1">{orders.length} comenzi în total</p>
+        <p className="text-sm text-gray-500 mt-1">{filteredOrders.length} din {orders.length} comenzi</p>
+      </div>
+
+      {/* Filters */}
+      <div className="bg-white rounded-lg border border-gray-200 p-4 mb-6">
+        <div className="flex flex-wrap gap-4 items-end">
+          {/* Search */}
+          <div className="flex-1 min-w-[200px]">
+            <label className="block text-xs text-gray-500 mb-1">Căutare</label>
+            <input
+              type="text"
+              placeholder="Număr comandă, telefon, nume..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-200 rounded text-sm focus:outline-none focus:border-black"
+            />
+          </div>
+          
+          {/* Status filter */}
+          <div className="min-w-[150px]">
+            <label className="block text-xs text-gray-500 mb-1">Status</label>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-200 rounded text-sm focus:outline-none focus:border-black cursor-pointer"
+            >
+              <option value="ALL">Toate</option>
+              {Object.entries(STATUS_LABELS).map(([val, label]) => (
+                <option key={val} value={val}>{label}</option>
+              ))}
+            </select>
+          </div>
+          
+          {/* Date filter */}
+          <div className="min-w-[140px]">
+            <label className="block text-xs text-gray-500 mb-1">Perioadă</label>
+            <select
+              value={dateFilter}
+              onChange={(e) => setDateFilter(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-200 rounded text-sm focus:outline-none focus:border-black cursor-pointer"
+            >
+              <option value="ALL">Toate</option>
+              <option value="TODAY">Azi</option>
+              <option value="WEEK">Ultima săptămână</option>
+              <option value="MONTH">Ultima lună</option>
+            </select>
+          </div>
+          
+          {/* Clear filters */}
+          {(statusFilter !== 'ALL' || dateFilter !== 'ALL' || searchQuery) && (
+            <button
+              onClick={() => { setStatusFilter('ALL'); setDateFilter('ALL'); setSearchQuery(''); }}
+              className="px-3 py-2 text-sm text-gray-500 hover:text-black transition-colors"
+            >
+              Resetează
+            </button>
+          )}
+        </div>
       </div>
 
       {loading ? (
         <div className="text-center py-20 text-gray-400">Se încarcă...</div>
-      ) : orders.length === 0 ? (
+      ) : filteredOrders.length === 0 ? (
         <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
           <div className="flex justify-center mb-2">
             <svg className="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
             </svg>
           </div>
-          <p className="text-gray-500">Nu există comenzi încă.</p>
-          <p className="text-gray-400 text-xs mt-2">Comenzile vor apărea aici când clienții plasează comenzi.</p>
+          <p className="text-gray-500">{orders.length === 0 ? 'Nu există comenzi încă.' : 'Nicio comandă nu corespunde filtrelor.'}</p>
+          {orders.length > 0 && (
+            <button
+              onClick={() => { setStatusFilter('ALL'); setDateFilter('ALL'); setSearchQuery(''); }}
+              className="mt-3 text-sm text-black underline"
+            >
+              Resetează filtrele
+            </button>
+          )}
         </div>
       ) : (
         <div className="space-y-3">
-          {orders.map((order) => (
+          {filteredOrders.map((order) => (
             <div key={order.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
               {/* Header */}
               <div
