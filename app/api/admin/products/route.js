@@ -46,7 +46,6 @@ export async function POST(request) {
         shippingInfo: body.shippingInfo || null,
         price: parseFloat(body.price),
         compareAtPrice: body.compareAtPrice ? parseFloat(body.compareAtPrice) : null,
-        sku: body.sku || null,
         isActive: body.isActive !== false,
         isFeatured: body.isFeatured || false,
         isNew: body.isNew || false,
@@ -69,7 +68,6 @@ export async function POST(request) {
               create: (v.sizes || []).map((s) => ({
                 size: s.size,
                 stock: parseInt(s.stock) || 0,
-                sku: s.sku || null,
               })),
             },
           })),

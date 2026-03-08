@@ -47,7 +47,6 @@ export async function PATCH(request, { params }) {
     if (body.shippingInfo !== undefined) data.shippingInfo = body.shippingInfo || null;
     if (body.price !== undefined) data.price = parseFloat(body.price);
     if (body.compareAtPrice !== undefined) data.compareAtPrice = body.compareAtPrice ? parseFloat(body.compareAtPrice) : null;
-    if (body.sku !== undefined) data.sku = body.sku || null;
     if (body.isActive !== undefined) data.isActive = body.isActive;
     if (body.isFeatured !== undefined) data.isFeatured = body.isFeatured;
     if (body.isNew !== undefined) data.isNew = body.isNew;
@@ -76,7 +75,6 @@ export async function PATCH(request, { params }) {
             create: (v.sizes || []).map((s) => ({
               size: s.size,
               stock: parseInt(s.stock) || 0,
-              sku: s.sku || null,
             })),
           },
         })),
