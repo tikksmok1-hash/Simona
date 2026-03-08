@@ -133,7 +133,7 @@ export async function POST(request) {
       },
     });
 
-    // Create order items — only store snapshot data, no product/size relations
+    // Create order items — only store snapshot data
     for (const item of items) {
       await prisma.orderItem.create({
         data: {
@@ -146,6 +146,8 @@ export async function POST(request) {
           colorName: item.color || '-',
           sizeName: item.size || '-',
           imageUrl: item.image || null,
+          productId: item.productId || null,
+          sizeId: item.sizeId || null,
         },
       });
     }

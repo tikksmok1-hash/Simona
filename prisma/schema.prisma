@@ -98,9 +98,6 @@ model Product {
   // Cart
   cartItems       CartItem[]
   
-  // Order items
-  orderItems      OrderItem[]
-  
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
 
@@ -179,9 +176,6 @@ model VariantSize {
   
   // Cart items
   cartItems   CartItem[]
-  
-  // Order items
-  orderItems  OrderItem[]
   
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
@@ -373,11 +367,8 @@ model OrderItem {
   orderId     String      @db.ObjectId
   order       Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
   
-  productId   String?     @db.ObjectId
-  product     Product?    @relation(fields: [productId], references: [id])
-  
-  sizeId      String?     @db.ObjectId
-  size        VariantSize? @relation(fields: [sizeId], references: [id])
+  productId   String?
+  sizeId      String?
   
   createdAt   DateTime    @default(now())
 
