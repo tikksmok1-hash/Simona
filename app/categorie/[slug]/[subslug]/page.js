@@ -1,24 +1,28 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { products } from '@/lib/data/products';
-import { categories } from '@/lib/data/categories';
+import { getCategoryBySlug, getProductsByCategory, getProductsByCategoryAndSubcategory, getAllCategories } from '@/lib/db/queries';
 import CategoryFilters from '../../CategoryFilters';
 
 export const revalidate = 60;
 
 export async function generateStaticParams() {
-  const params = [];
-  for (const cat of categories) {
-    for (const sub of cat.subcategories ?? []) {
-      params.push({ slug: cat.slug, subslug: sub.slug });
+  try {
+    const categories = await getAllCategories();
+    const params = [];
+    for (const cat of categories) {
+      for (const sub of cat.subcategories ?? []) {
+        params.push({ slug: cat.slug, subslug: sub.slug });
+      }
     }
+    return params;
+  } catch {
+    return [];
   }
-  return params;
 }
 
 export async function generateMetadata({ params }) {
   const { slug, subslug } = await params;
-  const category = categories.find((c) => c.slug === slug);
+  const category = await getCategoryBySlug(slug);
   const subcategory = category?.subcategories?.find((s) => s.slug === subslug);
   if (!category || !subcategory) return { title: 'Pagina nu a fost găsită' };
   return {
@@ -30,17 +34,18 @@ export async function generateMetadata({ params }) {
 export default async function SubcategoryPage({ params }) {
   const { slug, subslug } = await params;
 
-  const category = categories.find((c) => c.slug === slug);
+  const category = await getCategoryBySlug(slug);
   const subcategory = category?.subcategories?.find((s) => s.slug === subslug);
   if (!category || !subcategory) notFound();
 
-  const categoryProducts = products.filter(
-    (p) => p.isActive && p.categorySlug === slug && p.subcategorySlug === subslug
-  );
+  const [categoryProducts, allCategoryProducts] = await Promise.all([
+    getProductsByCategoryAndSubcategory(slug, subslug),
+    getProductsByCategory(slug),
+  ]);
 
   // Only show subcategories that have at least one active product
   const activeSubcategories = category.subcategories?.filter((sub) =>
-    products.some((p) => p.isActive && p.categorySlug === slug && p.subcategorySlug === sub.slug)
+    allCategoryProducts.some((p) => p.subcategorySlug === sub.slug)
   ) ?? [];
 
   return (

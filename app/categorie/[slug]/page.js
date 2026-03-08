@@ -1,18 +1,22 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { products } from '@/lib/data/products';
-import { categories } from '@/lib/data/categories';
+import { getCategoryBySlug, getProductsByCategory, getAllCategories } from '@/lib/db/queries';
 import CategoryFilters from '../CategoryFilters';
 
 export const revalidate = 60;
 
 export async function generateStaticParams() {
-  return categories.map((cat) => ({ slug: cat.slug }));
+  try {
+    const categories = await getAllCategories();
+    return categories.map((cat) => ({ slug: cat.slug }));
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-  const category = categories.find((c) => c.slug === slug);
+  const category = await getCategoryBySlug(slug);
   if (!category) return { title: 'Categorie negăsită' };
   return {
     title: `${category.name} — SIMONA Fashion`,
@@ -23,16 +27,14 @@ export async function generateMetadata({ params }) {
 export default async function CategoryPage({ params }) {
   const { slug } = await params;
 
-  const category = categories.find((c) => c.slug === slug);
+  const category = await getCategoryBySlug(slug);
   if (!category) notFound();
 
-  const categoryProducts = products.filter(
-    (p) => p.isActive && p.categorySlug === slug
-  );
+  const categoryProducts = await getProductsByCategory(slug);
 
   // Only show subcategories that have at least one active product
   const activeSubcategories = category.subcategories?.filter((sub) =>
-    products.some((p) => p.isActive && p.categorySlug === slug && p.subcategorySlug === sub.slug)
+    categoryProducts.some((p) => p.subcategorySlug === sub.slug)
   ) ?? [];
 
   return (

@@ -58,12 +58,12 @@ export default function ProductDetailClient({ product, similarProducts = [] }) {
     {
       id: 'detalii',
       label: 'Detalii & Materiale',
-      content: 'Material de înaltă calitate, produs în România. Spălare la 30°C, nu se usucă în uscător. Consultați eticheta pentru instrucțiuni complete de îngrijire.',
+      content: product.materialsInfo || 'Material de înaltă calitate, produs în România. Spălare la 30°C, nu se usucă în uscător. Consultați eticheta pentru instrucțiuni complete de îngrijire.',
     },
     {
       id: 'livrare',
       label: 'Livrare & Returnare',
-      content: 'Livrare standard: 70 MDL (3–5 zile lucrătoare). Ridicare gratuită din magazin. Returnare în 14 zile.',
+      content: product.shippingInfo || 'Livrare standard: 70 MDL (3–5 zile lucrătoare). Ridicare gratuită din magazin. Returnare în 14 zile.',
     },
   ];
 
@@ -288,7 +288,7 @@ export default function ProductDetailClient({ product, similarProducts = [] }) {
                     const inStock = s.stock > 0;
                     return (
                       <button
-                        key={s.size}
+                        key={s.id || s.size}
                         onClick={() => inStock && setSelectedSize(s.size)}
                         disabled={!inStock}
                         className={`w-12 h-12 border text-xs font-medium tracking-wide transition-all duration-200 ${

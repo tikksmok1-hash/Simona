@@ -3,7 +3,6 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import ProductCard from '@/app/components/ProductCard';
-import { categories } from '@/lib/data/categories';
 
 const PAGE_SIZE = 8;
 
@@ -16,7 +15,7 @@ const CATEGORY_LABELS = {
   'accesorii': 'Accesorii',
 };
 
-export default function BestsellersFilters({ products: productsList, totalSavings = 0, availableCategories, mode = 'sale' }) {
+export default function BestsellersFilters({ products: productsList, totalSavings = 0, availableCategories, categories = [], mode = 'sale' }) {
   const isSaleMode = mode === 'sale';
   const defaultSort = isSaleMode ? 'discount-desc' : 'name-asc';
 

@@ -37,6 +37,7 @@ export async function POST(request) {
         author: body.author || 'Simona',
         isFeatured: body.isFeatured || false,
         isActive: body.isActive !== false,
+        videoUrl: body.videoUrl || null,
         sections: {
           create: (body.sections || []).map((s, i) => ({
             heading: s.heading,

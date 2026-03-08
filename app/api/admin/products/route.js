@@ -42,6 +42,8 @@ export async function POST(request) {
         slug: body.slug,
         description: body.description || '',
         shortDescription: body.shortDescription || null,
+        materialsInfo: body.materialsInfo || null,
+        shippingInfo: body.shippingInfo || null,
         price: parseFloat(body.price),
         compareAtPrice: body.compareAtPrice ? parseFloat(body.compareAtPrice) : null,
         sku: body.sku || null,

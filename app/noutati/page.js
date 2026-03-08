@@ -1,15 +1,15 @@
 import Link from 'next/link';
-import { blogPosts } from '@/lib/data/blog';
+import { getAllBlogPosts } from '@/lib/db/queries';
 
-export const revalidate = false;
-export const dynamic = 'force-static';
+export const revalidate = 60;
 
 export const metadata = {
   title: 'Noutăți — SIMONA Fashion',
   description: 'Tendințe, sfaturi de stil și inspirație din lumea modei feminine.',
 };
 
-export default function NoutatiPage() {
+export default async function NoutatiPage() {
+  const blogPosts = await getAllBlogPosts();
   const featured = blogPosts.filter((p) => p.isFeatured);
   const rest = blogPosts.filter((p) => !p.isFeatured);
   const categories = [...new Set(blogPosts.map((p) => p.category))];

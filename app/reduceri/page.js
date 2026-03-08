@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { products } from '@/lib/data/products';
+import { getSaleProducts, getAllCategories } from '@/lib/db/queries';
 import BestsellersFilters from '../bestsellers/BestsellersFilters';
 
 // ISR — regenerate at most every 60s; admin can trigger /api/revalidate instantly
@@ -10,10 +10,11 @@ export const metadata = {
   description: 'Toate produsele cu reducere din colecția SIMONA Fashion. Oferte speciale și prețuri reduse la rochii, bluze, pantaloni și accesorii.',
 };
 
-export default function ReduceriPage() {
-  const saleProducts = products.filter(
-    (p) => p.isActive && p.compareAtPrice && p.compareAtPrice > p.price
-  );
+export default async function ReduceriPage() {
+  const [saleProducts, categories] = await Promise.all([
+    getSaleProducts(),
+    getAllCategories(),
+  ]);
 
   const maxDiscount = saleProducts.reduce((max, p) => {
     const d = Math.round((1 - p.price / p.compareAtPrice) * 100);
@@ -87,6 +88,7 @@ export default function ReduceriPage() {
         products={saleProducts}
         totalSavings={totalSavings}
         availableCategories={availableCategories}
+        categories={categories}
         mode="sale"
       />
 

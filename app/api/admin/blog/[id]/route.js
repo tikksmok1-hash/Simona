@@ -22,6 +22,7 @@ export async function PATCH(request, { params }) {
     if (body.author !== undefined) data.author = body.author;
     if (body.isFeatured !== undefined) data.isFeatured = body.isFeatured;
     if (body.isActive !== undefined) data.isActive = body.isActive;
+    if (body.videoUrl !== undefined) data.videoUrl = body.videoUrl || null;
 
     // If sections provided, delete old and recreate
     if (body.sections) {

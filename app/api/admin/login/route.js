@@ -2,9 +2,24 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import bcrypt from 'bcryptjs';
 import { signToken } from '@/lib/auth';
+import { createRateLimit } from '@/lib/rateLimit';
+
+const loginLimit = createRateLimit({
+  name: 'admin-login',
+  maxRequests: 5,       // 5 attempts
+  windowMs: 15 * 60 * 1000, // per 15 minutes
+});
 
 // POST /api/admin/login
 export async function POST(request) {
+  const { success, retryAfter } = loginLimit(request);
+  if (!success) {
+    return NextResponse.json(
+      { error: `Prea multe încercări. Reîncearcă peste ${retryAfter} secunde.` },
+      { status: 429 }
+    );
+  }
+
   try {
     const { email, password } = await request.json();
 

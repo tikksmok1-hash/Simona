@@ -1,18 +1,22 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { blogPosts } from '@/lib/data/blog';
+import { getBlogPostBySlug, getAllBlogPosts, getAllBlogSlugs } from '@/lib/db/queries';
 
-// Pre-generate all blog post pages at build time
-export const revalidate = false;
+export const revalidate = 60;
 
 export async function generateStaticParams() {
-  return blogPosts.map((post) => ({ slug: post.slug }));
+  try {
+    const slugs = await getAllBlogSlugs();
+    return slugs.map((slug) => ({ slug }));
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-  const post = blogPosts.find((p) => p.slug === slug);
+  const post = await getBlogPostBySlug(slug);
   if (!post) return {};
   return {
     title: `${post.title} — SIMONA Fashion`,
@@ -22,11 +26,13 @@ export async function generateMetadata({ params }) {
 
 export default async function BlogPostPage({ params }) {
   const { slug } = await params;
-  const post = blogPosts.find((p) => p.slug === slug);
+  const [post, allPosts] = await Promise.all([
+    getBlogPostBySlug(slug),
+    getAllBlogPosts(),
+  ]);
   if (!post) notFound();
 
-  const postIndex = blogPosts.findIndex((p) => p.slug === slug);
-  const related = blogPosts.filter((_, i) => i !== postIndex).slice(0, 3);
+  const related = allPosts.filter((p) => p.slug !== slug).slice(0, 3);
 
   return (
     <div className="min-h-screen bg-white pt-[112px] md:pt-[170px]">
@@ -104,6 +110,26 @@ export default async function BlogPostPage({ params }) {
         <p className="font-serif text-xl md:text-2xl text-neutral-700 font-light leading-relaxed mb-14 border-l-2 border-black pl-6">
           {post.excerpt}
         </p>
+
+        {/* YouTube Video */}
+        {post.videoUrl && (() => {
+          const match = post.videoUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&?\s]+)/);
+          const videoId = match?.[1];
+          if (!videoId) return null;
+          return (
+            <div className="mb-14">
+              <div className="relative w-full aspect-video overflow-hidden bg-neutral-100 rounded-lg">
+                <iframe
+                  src={`https://www.youtube.com/embed/${videoId}`}
+                  title="Video"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="absolute inset-0 w-full h-full"
+                />
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Sections */}
         <div className="space-y-14">

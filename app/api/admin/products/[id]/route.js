@@ -43,6 +43,8 @@ export async function PATCH(request, { params }) {
     if (body.slug !== undefined) data.slug = body.slug;
     if (body.description !== undefined) data.description = body.description;
     if (body.shortDescription !== undefined) data.shortDescription = body.shortDescription;
+    if (body.materialsInfo !== undefined) data.materialsInfo = body.materialsInfo || null;
+    if (body.shippingInfo !== undefined) data.shippingInfo = body.shippingInfo || null;
     if (body.price !== undefined) data.price = parseFloat(body.price);
     if (body.compareAtPrice !== undefined) data.compareAtPrice = body.compareAtPrice ? parseFloat(body.compareAtPrice) : null;
     if (body.sku !== undefined) data.sku = body.sku || null;

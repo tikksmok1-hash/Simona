@@ -56,6 +56,8 @@ model Product {
   slug            String          @unique
   description     String
   shortDescription String?
+  materialsInfo   String?         // Detalii & Materiale (editable from admin)
+  shippingInfo    String?         // Livrare & Returnare (editable from admin)
   
   // Pricing
   price           Float
@@ -374,8 +376,8 @@ model OrderItem {
   productId   String      @db.ObjectId
   product     Product     @relation(fields: [productId], references: [id])
   
-  sizeId      String      @db.ObjectId
-  size        VariantSize @relation(fields: [sizeId], references: [id])
+  sizeId      String?     @db.ObjectId
+  size        VariantSize? @relation(fields: [sizeId], references: [id])
   
   createdAt   DateTime    @default(now())
 
@@ -465,6 +467,7 @@ model BlogPost {
   author      String        @default("Simona")
   isFeatured  Boolean       @default(false)
   isActive    Boolean       @default(true)
+  videoUrl    String?       // YouTube video URL (optional)
   
   sections    BlogSection[]
   

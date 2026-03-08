@@ -18,7 +18,8 @@ function EditProductForm() {
 
   const [form, setForm] = useState({
     name: '', slug: '', description: '', shortDescription: '',
-    price: '', compareAtPrice: '', sku: '', categoryId: '', subcategoryId: '',
+    materialsInfo: '', shippingInfo: '',
+    price: '', compareAtPrice: '', categoryId: '', subcategoryId: '',
     isActive: true, isFeatured: false, isNew: false, isBestseller: false,
   });
 
@@ -36,9 +37,10 @@ function EditProductForm() {
           slug: product.slug || '',
           description: product.description || '',
           shortDescription: product.shortDescription || '',
+          materialsInfo: product.materialsInfo || '',
+          shippingInfo: product.shippingInfo || '',
           price: product.price?.toString() || '',
           compareAtPrice: product.compareAtPrice?.toString() || '',
-          sku: product.sku || '',
           categoryId: product.categoryId || '',
           subcategoryId: product.subcategoryId || '',
           isActive: product.isActive ?? true,
@@ -141,10 +143,6 @@ function EditProductForm() {
               <input name="compareAtPrice" type="number" step="0.01" value={form.compareAtPrice} onChange={handleChange} className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black" />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1.5">SKU</label>
-              <input name="sku" value={form.sku} onChange={handleChange} className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black" />
-            </div>
-            <div>
               <label className="block text-xs font-medium text-gray-600 mb-1.5">Categorie *</label>
               <select name="categoryId" value={form.categoryId} onChange={handleChange} className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black cursor-pointer" required>
                 <option value="">Selectează...</option>
@@ -169,13 +167,21 @@ function EditProductForm() {
             <label className="block text-xs font-medium text-gray-600 mb-1.5">Descriere completă</label>
             <textarea name="description" value={form.description} onChange={handleChange} rows={4} className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black resize-none" />
           </div>
+          <div className="mt-4">
+            <label className="block text-xs font-medium text-gray-600 mb-1.5">Detalii & Materiale</label>
+            <textarea name="materialsInfo" value={form.materialsInfo} onChange={handleChange} rows={3} placeholder="Material de înaltă calitate, produs în România..." className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black resize-none" />
+          </div>
+          <div className="mt-4">
+            <label className="block text-xs font-medium text-gray-600 mb-1.5">Livrare & Returnare</label>
+            <textarea name="shippingInfo" value={form.shippingInfo} onChange={handleChange} rows={3} placeholder="Livrare standard: 70 MDL (3–5 zile lucrătoare)..." className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black resize-none" />
+          </div>
         </div>
 
         {/* Flags */}
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <h2 className="text-sm font-medium text-black mb-4">Setări Produs</h2>
           <div className="flex flex-wrap gap-6">
-            {[{ name: 'isActive', label: 'Activ' }, { name: 'isNew', label: 'Nou' }, { name: 'isBestseller', label: 'Bestseller' }, { name: 'isFeatured', label: 'Featured' }].map((flag) => (
+            {[{ name: 'isActive', label: 'Activ' }, { name: 'isNew', label: 'Nou' }, { name: 'isBestseller', label: 'Bestseller' }, { name: 'isFeatured', label: 'Recomandat' }].map((flag) => (
               <label key={flag.name} className="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" name={flag.name} checked={form[flag.name]} onChange={handleChange} className="w-4 h-4 accent-black cursor-pointer" />
                 <span className="text-sm text-gray-700">{flag.label}</span>

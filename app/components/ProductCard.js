@@ -154,7 +154,7 @@ export default function ProductCard({ product, priority = false }) {
                 <div className="flex items-center justify-center gap-1.5 flex-wrap">
                   {selectedVariant.sizes.map((size) => (
                     <button
-                      key={size.size}
+                      key={size.id || size.size}
                       disabled={size.stock === 0}
                       onClick={(e) => {
                         e.preventDefault();
@@ -264,7 +264,7 @@ export default function ProductCard({ product, priority = false }) {
             <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide pb-0.5">
               {selectedVariant.sizes.map((size) => (
                 <button
-                  key={size.size}
+                  key={size.id || size.size}
                   disabled={size.stock === 0}
                   onClick={(e) => {
                     e.preventDefault();

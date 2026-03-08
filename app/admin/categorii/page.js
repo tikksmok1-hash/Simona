@@ -203,7 +203,11 @@ function CategoriesContent() {
                     {cat.image ? (
                       <img src={cat.image} alt="" className="w-10 h-10 object-cover rounded" />
                     ) : (
-                      <div className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center text-lg">📂</div>
+                      <div className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center">
+                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                        </svg>
+                      </div>
                     )}
                     <div>
                       <h3 className="text-sm font-medium text-black">{cat.name}</h3>
@@ -277,7 +281,11 @@ function CategoriesContent() {
                             {sub.image ? (
                               <img src={sub.image} alt="" className="w-8 h-8 object-cover rounded" />
                             ) : (
-                              <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center text-sm">📄</div>
+                              <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center">
+                                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                </svg>
+                              </div>
                             )}
                             <div>
                               <p className="text-sm text-gray-700">{sub.name}</p>

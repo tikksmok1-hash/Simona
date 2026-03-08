@@ -44,17 +44,56 @@ export default function ComandaPage() {
     return errs;
   };
 
+  const [apiError, setApiError] = useState('');
+
   const submit = async (e) => {
     e.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
 
     setLoading(true);
-    // Simulate order processing
-    await new Promise((r) => setTimeout(r, 1200));
-    setLoading(false);
-    setStep('success');
-    clearCart();
+    setApiError('');
+
+    try {
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customer: form,
+          items: cart.map((item) => ({
+            productId: item.productId,
+            slug: item.slug,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            color: item.colorName,
+            size: item.size,
+            image: item.image,
+            sizeId: item.sizeId || null,
+          })),
+          deliveryMethod,
+          subtotal: cartTotal,
+          shippingCost: deliveryCost,
+          total,
+          observatii: form.observatii,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setApiError(data.error || 'Eroare la plasarea comenzii.');
+        setLoading(false);
+        return;
+      }
+
+      setLoading(false);
+      setStep('success');
+      clearCart();
+    } catch (err) {
+      setApiError('Eroare de conexiune. Reîncearcă.');
+      setLoading(false);
+    }
   };
 
   if (cart.length === 0 && step !== 'success') {
@@ -289,6 +328,12 @@ export default function ComandaPage() {
                     <span>{total} MDL</span>
                   </div>
                 </div>
+
+                {apiError && (
+                  <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-xs text-center">
+                    {apiError}
+                  </div>
+                )}
 
                 <button
                   type="submit"

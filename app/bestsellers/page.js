@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { products } from '@/lib/data/products';
+import { getBestsellerProducts, getAllCategories } from '@/lib/db/queries';
 import BestsellersFilters from './BestsellersFilters';
 
 // ISR — regenerate at most every 60s; admin can trigger /api/revalidate instantly
@@ -10,10 +10,11 @@ export const metadata = {
   description: 'Cele mai vândute produse din colecția SIMONA Fashion. Produsele preferate de clientele noastre.',
 };
 
-export default function BestsellersPage() {
-  const bestsellerProducts = products.filter(
-    (p) => p.isActive && p.isBestseller
-  );
+export default async function BestsellersPage() {
+  const [bestsellerProducts, categories] = await Promise.all([
+    getBestsellerProducts(),
+    getAllCategories(),
+  ]);
 
   const availableCategories = [...new Set(bestsellerProducts.map((p) => p.categorySlug))];
 
@@ -75,6 +76,7 @@ export default function BestsellersPage() {
       <BestsellersFilters
         products={bestsellerProducts}
         availableCategories={availableCategories}
+        categories={categories}
         mode="bestseller"
       />
 

@@ -63,7 +63,11 @@ function OrdersContent() {
         <div className="text-center py-20 text-gray-400">Se încarcă...</div>
       ) : orders.length === 0 ? (
         <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-          <p className="text-gray-400 text-lg mb-2">📦</p>
+          <div className="flex justify-center mb-2">
+            <svg className="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            </svg>
+          </div>
           <p className="text-gray-500">Nu există comenzi încă.</p>
           <p className="text-gray-400 text-xs mt-2">Comenzile vor apărea aici când clienții plasează comenzi.</p>
         </div>
@@ -81,6 +85,14 @@ function OrdersContent() {
                   <span className={`text-[10px] tracking-wider uppercase px-2.5 py-1 rounded-full ${STATUS_COLORS[order.status] || 'bg-gray-100'}`}>
                     {STATUS_LABELS[order.status] || order.status}
                   </span>
+                  {order.returning?.isReturning && (
+                    <span className="text-[10px] tracking-wider uppercase px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 flex items-center gap-1">
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                      Client Cunoscut
+                    </span>
+                  )}
                 </div>
                 <div className="flex items-center gap-6">
                   <span className="text-sm font-medium">{order.total?.toFixed(2)} MDL</span>
@@ -140,6 +152,29 @@ function OrdersContent() {
                         </div>
                       )}
 
+                      {/* Returning customer info */}
+                      {order.returning?.isReturning && (
+                        <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                          <h3 className="text-xs font-medium text-amber-800 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                            </svg>
+                            Client Cunoscut
+                          </h3>
+                          <div className="space-y-1 text-xs text-amber-900">
+                            {order.returning.phoneOrders > 0 && (
+                              <p>📱 Telefonul apare în <b>{order.returning.phoneOrders}</b> {order.returning.phoneOrders === 1 ? 'altă comandă' : 'alte comenzi'}</p>
+                            )}
+                            {order.returning.nameOrders > 0 && (
+                              <p>👤 Numele apare în <b>{order.returning.nameOrders}</b> {order.returning.nameOrders === 1 ? 'altă comandă' : 'alte comenzi'}</p>
+                            )}
+                            {order.returning.addressOrders > 0 && (
+                              <p>📍 Adresa apare în <b>{order.returning.addressOrders}</b> {order.returning.addressOrders === 1 ? 'altă comandă' : 'alte comenzi'}</p>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
                       <div className="mt-4 pt-4 border-t border-gray-100 space-y-1 text-sm">
                         <div className="flex justify-between text-gray-500">
                           <span>Subtotal</span>
@@ -154,6 +189,19 @@ function OrdersContent() {
                           <span>{order.total?.toFixed(2)} MDL</span>
                         </div>
                       </div>
+
+                      {order.customerNote && (
+                        <div className="mt-4 pt-3 border-t border-gray-100">
+                          <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Observații client</h3>
+                          <p className="text-sm text-gray-600 italic">{order.customerNote}</p>
+                        </div>
+                      )}
+
+                      {order.user?.email && !order.user.email.startsWith('guest_') && (
+                        <div className="mt-3">
+                          <p className="text-xs text-gray-400">Email: <span className="text-gray-600">{order.user.email}</span></p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

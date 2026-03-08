@@ -1,34 +1,31 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import ProductCard from './components/ProductCard';
-import { products } from '@/lib/data/products';
-import { categories } from '@/lib/data/categories';
-import { blogPosts } from '@/lib/data/blog';
+import {
+  getFeaturedProducts,
+  getSaleProducts,
+  getBestsellerProducts,
+  getLatestBlogPosts,
+} from '@/lib/db/queries';
 
 // ISR — regenerate at most every 60s so new products appear fast
 // Admin panel can also trigger instant revalidation via /api/revalidate
 export const revalidate = 60;
 
-export default function Home() {
-  // Get featured products
-  const featuredProducts = products.filter(p => p.isFeatured).slice(0, 8);
-  
-  // Get latest blog posts
-  const latestPosts = blogPosts.slice(0, 3);
+export default async function Home() {
+  // Fetch data from DB in parallel
+  const [featuredProducts, saleProducts, bestsellerProducts, latestPosts] = await Promise.all([
+    getFeaturedProducts(8),
+    getSaleProducts(4),
+    getBestsellerProducts(4),
+    getLatestBlogPosts(3),
+  ]);
 
-  // Get products on sale
-  const saleProducts = products.filter(p => p.compareAtPrice && p.compareAtPrice > p.price).slice(0, 4);
-
-  // Get bestseller products
-  const bestsellerProducts = products.filter(p => p.isActive && p.isBestseller).slice(0, 4);
-
-  // Calculate maximum discount percentage from all products on sale
-  const maxDiscount = products
-    .filter(p => p.compareAtPrice && p.compareAtPrice > p.price)
-    .reduce((max, p) => {
-      const discount = Math.round((1 - p.price / p.compareAtPrice) * 100);
-      return discount > max ? discount : max;
-    }, 0);
+  // Calculate maximum discount percentage from sale products
+  const maxDiscount = saleProducts.reduce((max, p) => {
+    const discount = Math.round((1 - p.price / p.compareAtPrice) * 100);
+    return discount > max ? discount : max;
+  }, 0);
 
   return (
     <div className="min-h-screen bg-white">
@@ -326,7 +323,7 @@ export default function Home() {
                 {/* Content */}
                 <div className="pt-6 flex flex-col flex-1">
                   <div className="flex items-center gap-4 text-[10px] tracking-widest uppercase text-neutral-400 mb-3">
-                    <span>{post.date.split('-').reverse().join('.')}</span>
+                    <span>{(typeof post.date === 'string' ? post.date : post.date?.toISOString?.()?.split('T')[0] || '').split('-').reverse().join('.')}</span>
                     <span>·</span>
                     <span>{post.readTime} citire</span>
                   </div>

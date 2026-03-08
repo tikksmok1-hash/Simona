@@ -7,7 +7,7 @@ const categoriesData = [
     name: 'Rochii',
     slug: 'rochii',
     description: 'Colecția noastră de rochii elegante și casual pentru orice ocazie',
-    image: '/images/categories/rochii.jpg',
+    image: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&h=600&fit=crop&q=80',
     order: 1,
     subcategories: [
       { name: 'Rochii de Seară', slug: 'rochii-de-seara', order: 1 },
@@ -22,7 +22,7 @@ const categoriesData = [
     name: 'Bluze & Topuri',
     slug: 'bluze-topuri',
     description: 'Bluze și topuri pentru toate gusturile',
-    image: '/images/categories/bluze.jpg',
+    image: 'https://images.unsplash.com/photo-1564257631407-4deb1f99d992?w=800&h=600&fit=crop&q=80',
     order: 2,
     subcategories: [
       { name: 'Bluze Elegante', slug: 'bluze-elegante', order: 1 },
@@ -36,7 +36,7 @@ const categoriesData = [
     name: 'Pantaloni',
     slug: 'pantaloni',
     description: 'Pantaloni de toate stilurile și mărimile',
-    image: '/images/categories/pantaloni.jpg',
+    image: 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=800&h=600&fit=crop&q=80',
     order: 3,
     subcategories: [
       { name: 'Pantaloni Eleganți', slug: 'pantaloni-eleganti', order: 1 },
@@ -50,7 +50,7 @@ const categoriesData = [
     name: 'Fuste',
     slug: 'fuste',
     description: 'Fuste elegante și casual',
-    image: '/images/categories/fuste.jpg',
+    image: 'https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?w=800&h=600&fit=crop&q=80',
     order: 4,
     subcategories: [
       { name: 'Fuste Midi', slug: 'fuste-midi', order: 1 },
@@ -64,7 +64,7 @@ const categoriesData = [
     name: 'Jachete & Paltoane',
     slug: 'jachete-paltoane',
     description: 'Îmbrăcăminte exterioară pentru toate anotimpurile',
-    image: '/images/categories/jachete.jpg',
+    image: 'https://images.unsplash.com/photo-1551537482-f2075a1d41f2?w=800&h=600&fit=crop&q=80',
     order: 5,
     subcategories: [
       { name: 'Jachete din Piele', slug: 'jachete-piele', order: 1 },
@@ -78,7 +78,7 @@ const categoriesData = [
     name: 'Accesorii',
     slug: 'accesorii',
     description: 'Accesorii pentru a completa ținuta',
-    image: '/images/categories/accesorii.jpg',
+    image: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=800&h=600&fit=crop&q=80',
     order: 6,
     subcategories: [
       { name: 'Genți', slug: 'genti', order: 1 },

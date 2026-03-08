@@ -1,10 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { categories } from '@/lib/data/categories';
-import { products } from '@/lib/data/products';
 import { useCart } from '@/app/context/CartContext';
 
 export default function Navbar() {
@@ -16,12 +14,25 @@ export default function Navbar() {
   const [searchResults, setSearchResults] = useState([]);
   const [showResults, setShowResults] = useState(false);
   const [isPhoneOpen, setIsPhoneOpen] = useState(false);
+  const [dbCategories, setDbCategories] = useState([]);
+  const [isAdmin, setIsAdmin] = useState(false);
   const searchRef = useRef(null);
   const mobileSearchRef = useRef(null);
   const phoneRef = useRef(null);
+  const searchTimerRef = useRef(null);
   const pathname = usePathname();
   const router = useRouter();
   const { cartCount, favorites, openCart } = useCart();
+
+  // Fetch categories from DB on mount
+  useEffect(() => {
+    fetch('/api/categories')
+      .then((res) => res.json())
+      .then((data) => { if (Array.isArray(data)) setDbCategories(data); })
+      .catch(() => {});
+    // Check if admin is logged in
+    if (localStorage.getItem('admin-token')) setIsAdmin(true);
+  }, []);
 
   // Close search results and phone dropdown on outside click
   useEffect(() => {
@@ -38,19 +49,27 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Filter products on query change
+  // Search products via API with debounce
   useEffect(() => {
-    const q = searchQuery.trim().toLowerCase();
+    const q = searchQuery.trim();
     if (q.length < 2) {
       setSearchResults([]);
       setShowResults(false);
       return;
     }
-    const results = products
-      .filter(p => p.isActive && p.name.toLowerCase().includes(q))
-      .slice(0, 6);
-    setSearchResults(results);
-    setShowResults(true);
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+    searchTimerRef.current = setTimeout(() => {
+      fetch(`/api/search?q=${encodeURIComponent(q)}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (Array.isArray(data)) {
+            setSearchResults(data);
+            setShowResults(true);
+          }
+        })
+        .catch(() => {});
+    }, 300);
+    return () => { if (searchTimerRef.current) clearTimeout(searchTimerRef.current); };
   }, [searchQuery]);
 
   function handleSearchSubmit(e) {
@@ -77,7 +96,7 @@ export default function Navbar() {
   }, []);
 
   const navCategories = [
-    ...categories,
+    ...dbCategories,
     { id: 'reducere', name: 'Reducere', slug: 'reduceri', subcategories: [], highlight: true },
     { id: 'bestsellers', name: 'BestSellers', slug: 'bestsellers', subcategories: [] },
     { id: 'noutati', name: 'Noutăți', slug: 'noutati', subcategories: [] },
@@ -206,7 +225,6 @@ export default function Navbar() {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </button>
-                {/* Dropdown rezultate */}
                 {showResults && searchResults.length > 0 && (
                   <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 shadow-xl z-[200]">
                     {searchResults.map(p => (
@@ -216,9 +234,9 @@ export default function Navbar() {
                         onClick={() => handleResultClick(p.slug)}
                         className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors text-left"
                       >
-                        {p.variants?.[0]?.images?.[0]?.url && (
+                        {p.image && (
                           // eslint-disable-next-line @next/next/no-img-element
-                          <img src={p.variants[0].images[0].url} alt={p.name} className="w-10 h-12 object-cover flex-shrink-0" />
+                          <img src={p.image} alt={p.name} className="w-10 h-12 object-cover flex-shrink-0" />
                         )}
                         <div className="flex-1 min-w-0">
                           <p className="text-sm text-black font-light truncate">{p.name}</p>
@@ -233,6 +251,18 @@ export default function Navbar() {
 
             {/* Right Icons */}
             <div className="flex items-center space-x-6">
+              {/* Admin */}
+              {isAdmin && (
+                <Link href="/admin" className={`relative transition-colors hidden md:block ${
+                  isTransparent ? 'text-white hover:text-white/80' : 'text-gray-700 hover:text-black'
+                }`} title="Admin Panel">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 010 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 010-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.28z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </Link>
+              )}
+
               {/* Search - Mobile */}
               <button 
                 onClick={() => setIsSearchOpen(!isSearchOpen)}
@@ -323,9 +353,9 @@ export default function Navbar() {
                         onClick={() => handleResultClick(p.slug)}
                         className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors text-left"
                       >
-                        {p.variants?.[0]?.images?.[0]?.url && (
+                        {p.image && (
                           // eslint-disable-next-line @next/next/no-img-element
-                          <img src={p.variants[0].images[0].url} alt={p.name} className="w-10 h-12 object-cover flex-shrink-0" />
+                          <img src={p.image} alt={p.name} className="w-10 h-12 object-cover flex-shrink-0" />
                         )}
                         <div className="flex-1 min-w-0">
                           <p className="text-sm text-black font-light truncate">{p.name}</p>
@@ -477,6 +507,19 @@ export default function Navbar() {
 
             {/* Contact Info */}
             <div className="pt-4 pb-2 flex flex-col gap-3">
+              {isAdmin && (
+                <Link
+                  href="/admin"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="flex items-center gap-3 text-gray-500 hover:text-black text-sm font-light transition-colors"
+                >
+                  <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 010 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 010-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.28z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  Admin Panel
+                </Link>
+              )}
               <a
                 href="mailto:simona.md_info@mail.ru"
                 className="flex items-center gap-3 text-gray-500 hover:text-black text-sm font-light transition-colors"

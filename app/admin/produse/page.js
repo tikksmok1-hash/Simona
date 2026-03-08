@@ -32,15 +32,22 @@ function ProductsContent() {
   };
 
   const toggleField = async (id, field, current) => {
+    // Optimistic update — instant UI toggle
+    setProducts((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, [field]: !current } : p))
+    );
     try {
-      await apiFetch(`/api/admin/products/${id}`, {
+      const res = await apiFetch(`/api/admin/products/${id}`, {
         method: 'PATCH',
         body: JSON.stringify({ [field]: !current }),
       });
+      if (!res.ok) throw new Error();
+    } catch {
+      // Revert on failure
       setProducts((prev) =>
-        prev.map((p) => (p.id === id ? { ...p, [field]: !current } : p))
+        prev.map((p) => (p.id === id ? { ...p, [field]: current } : p))
       );
-    } catch {}
+    }
   };
 
   const filtered = products.filter((p) =>

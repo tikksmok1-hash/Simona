@@ -20,6 +20,7 @@ function NewBlogForm() {
     readTime: '5 min',
     author: 'Simona',
     isFeatured: false,
+    videoUrl: '',
   });
 
   const [sections, setSections] = useState([
@@ -125,6 +126,10 @@ function NewBlogForm() {
             <input type="checkbox" name="isFeatured" checked={form.isFeatured} onChange={handleChange} className="w-4 h-4 accent-black cursor-pointer" />
             <span className="text-sm text-gray-700">Featured (afișat mare pe pagina de Noutăți)</span>
           </label>
+          <div className="mt-4">
+            <label className="block text-xs font-medium text-gray-600 mb-1.5">Link Video YouTube (opțional)</label>
+            <input name="videoUrl" value={form.videoUrl} onChange={handleChange} placeholder="https://www.youtube.com/watch?v=..." className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black" />
+          </div>
         </div>
 
         {/* Sections */}
