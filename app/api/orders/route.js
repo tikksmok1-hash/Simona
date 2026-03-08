@@ -117,7 +117,7 @@ export async function POST(request) {
     const orderCount = await prisma.order.count();
     const orderNumber = `SM-${String(orderCount + 1).padStart(5, '0')}`;
 
-    // Create order with items
+    // Create order (without nested items — avoids Prisma relation issues)
     const order = await prisma.order.create({
       data: {
         orderNumber,
@@ -130,27 +130,27 @@ export async function POST(request) {
         customerNote: observatii || null,
         userId: user.id,
         shippingAddressId: address.id,
-        items: {
-          create: items.map((item) => ({
-            quantity: item.quantity,
-            price: item.price,
-            total: item.price * item.quantity,
-            productName: item.name || 'Produs',
-            productSlug: item.slug || '-',
-            colorName: item.color || '-',
-            sizeName: item.size || '-',
-            imageUrl: item.image || null,
-            ...(item.productId && /^[a-f\d]{24}$/i.test(item.productId)
-              ? { product: { connect: { id: item.productId } } }
-              : {}),
-            ...(item.sizeId && /^[a-f\d]{24}$/i.test(item.sizeId)
-              ? { size: { connect: { id: item.sizeId } } }
-              : {}),
-          })),
-        },
       },
-      include: { items: true },
     });
+
+    // Create order items separately using scalar fields
+    for (const item of items) {
+      await prisma.orderItem.create({
+        data: {
+          orderId: order.id,
+          quantity: item.quantity,
+          price: item.price,
+          total: item.price * item.quantity,
+          productName: item.name || 'Produs',
+          productSlug: item.slug || '-',
+          colorName: item.color || '-',
+          sizeName: item.size || '-',
+          imageUrl: item.image || null,
+          ...(item.productId && /^[a-f\d]{24}$/i.test(item.productId) ? { productId: item.productId } : {}),
+          ...(item.sizeId && /^[a-f\d]{24}$/i.test(item.sizeId) ? { sizeId: item.sizeId } : {}),
+        },
+      });
+    }
 
     // ── Send Telegram notification (fire-and-forget) ───────────
     const telegramMsg = buildOrderMessage(order, customer, items, returning, deliveryMethod);
