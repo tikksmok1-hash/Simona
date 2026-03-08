@@ -133,11 +133,8 @@ export async function POST(request) {
       },
     });
 
-    // Create order items (all relations use connect syntax for MongoDB)
+    // Create order items — only store snapshot data, no product/size relations
     for (const item of items) {
-      const isValidProductId = item.productId && /^[a-f\d]{24}$/i.test(item.productId);
-      const isValidSizeId = item.sizeId && /^[a-f\d]{24}$/i.test(item.sizeId);
-
       await prisma.orderItem.create({
         data: {
           order: { connect: { id: order.id } },
@@ -149,8 +146,6 @@ export async function POST(request) {
           colorName: item.color || '-',
           sizeName: item.size || '-',
           imageUrl: item.image || null,
-          ...(isValidProductId ? { product: { connect: { id: item.productId } } } : {}),
-          ...(isValidSizeId ? { size: { connect: { id: item.sizeId } } } : {}),
         },
       });
     }
