@@ -53,12 +53,21 @@ export async function POST(request) {
     const phone = customer.telefon.trim();
     const addr = (customer.adresa || '').trim().toLowerCase();
 
-    // Check previous orders by this user or matching phone/name/address
+    // Find addresses matching phone to get their order history
+    const matchingAddresses = await prisma.address.findMany({
+      where: { phone },
+      select: { id: true, firstName: true, lastName: true, address1: true },
+    });
+    const matchingAddressIds = matchingAddresses.map((a) => a.id);
+
+    // Get all previous orders from this user OR from matching phone addresses
     const previousOrders = await prisma.order.findMany({
       where: {
         OR: [
           { userId: user.id },
-          { shippingAddress: { phone: phone } },
+          ...(matchingAddressIds.length > 0
+            ? [{ shippingAddressId: { in: matchingAddressIds } }]
+            : []),
         ],
       },
       include: { shippingAddress: true },

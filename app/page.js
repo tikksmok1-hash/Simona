@@ -58,7 +58,7 @@ export default async function Home() {
               <span className="block font-normal italic">Stilul Tău</span>
             </h1>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/colectie" className="group inline-flex items-center justify-center gap-3 bg-white text-black px-12 py-4 font-medium text-sm tracking-widest uppercase transition-all duration-300 hover:-translate-y-1 hover:shadow-xl active:translate-y-0 active:shadow-none">
+              <Link href="/bestsellers" className="group inline-flex items-center justify-center gap-3 bg-white text-black px-12 py-4 font-medium text-sm tracking-widest uppercase transition-all duration-300 hover:-translate-y-1 hover:shadow-xl active:translate-y-0 active:shadow-none">
                 Vezi Colecția
                 <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -187,7 +187,7 @@ export default async function Home() {
               <h2 className="font-serif text-3xl md:text-4xl font-light text-black mb-2">Produse Recomandate</h2>
               <p className="text-neutral-500 tracking-wide">Cele mai populare alegeri ale clienților noștri</p>
             </div>
-            <Link href="/produse" className="group hidden md:flex items-center gap-2 text-black text-sm tracking-widest uppercase transition-colors link-underline">
+            <Link href="/bestsellers" className="group hidden md:flex items-center gap-2 text-black text-sm tracking-widest uppercase transition-colors link-underline">
               Vezi toate
               <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -200,7 +200,7 @@ export default async function Home() {
             ))}
           </div>
           <div className="text-center mt-10 md:hidden">
-            <Link href="/produse" className="group inline-flex items-center gap-2 text-black text-sm tracking-widest uppercase link-underline transition-colors">
+            <Link href="/bestsellers" className="group inline-flex items-center gap-2 text-black text-sm tracking-widest uppercase link-underline transition-colors">
               Vezi toate produsele
               <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
