@@ -441,6 +441,16 @@ model AdminUser {
   updatedAt DateTime @updatedAt
 }
 
+// ==================== SITE SETTINGS ====================
+
+model SiteSettings {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  key             String   @unique  // e.g., "heroImage", "heroTitle"
+  value           String   // JSON or string value
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
 // ==================== BLOG POSTS ====================
 
 model BlogPost {

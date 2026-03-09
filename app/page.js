@@ -6,6 +6,7 @@ import {
   getSaleProducts,
   getBestsellerProducts,
   getLatestBlogPosts,
+  getSiteSettings,
 } from '@/lib/db/queries';
 
 // ISR — regenerate at most every 60s so new products appear fast
@@ -14,12 +15,19 @@ export const revalidate = 60;
 
 export default async function Home() {
   // Fetch data from DB in parallel
-  const [featuredProducts, saleProducts, bestsellerProducts, latestPosts] = await Promise.all([
+  const [featuredProducts, saleProducts, bestsellerProducts, latestPosts, siteSettings] = await Promise.all([
     getFeaturedProducts(8),
     getSaleProducts(4),
     getBestsellerProducts(4),
     getLatestBlogPosts(3),
+    getSiteSettings(),
   ]);
+
+  // Hero settings with defaults
+  const heroImage = siteSettings.heroImage || 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1920&h=1080&fit=crop&q=90';
+  const heroTitle = siteSettings.heroTitle || 'Descoperă';
+  const heroSubtitle = siteSettings.heroSubtitle || 'Stilul Tău';
+  const heroLabel = siteSettings.heroLabel || 'Colecția Primăvară 2026';
 
   // Calculate maximum discount percentage from sale products
   const maxDiscount = saleProducts.reduce((max, p) => {
@@ -34,7 +42,7 @@ export default async function Home() {
         {/* Background Image with Ken Burns animation */}
         <div className="absolute inset-0">
           <Image
-            src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1920&h=1080&fit=crop&q=90"
+            src={heroImage}
             alt="SIMONA Fashion — Colecția Primăvară 2026"
             fill
             priority
@@ -51,11 +59,11 @@ export default async function Home() {
         <div className="relative z-10 h-full flex items-center justify-center">
           <div className="text-center px-4">
             <span className="inline-block border border-white/60 text-white/80 px-6 py-1.5 text-xs font-light tracking-[0.4em] uppercase mb-10">
-              Colecția Primăvară 2026
+              {heroLabel}
             </span>
             <h1 className="font-serif text-6xl md:text-8xl lg:text-9xl font-light text-white leading-none mb-10">
-              Descoperă
-              <span className="block font-normal italic">Stilul Tău</span>
+              {heroTitle}
+              <span className="block font-normal italic">{heroSubtitle}</span>
             </h1>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/bestsellers" className="group inline-flex items-center justify-center gap-3 bg-white text-black px-12 py-4 font-medium text-sm tracking-widest uppercase transition-all duration-300 hover:-translate-y-1 hover:shadow-xl active:translate-y-0 active:shadow-none">

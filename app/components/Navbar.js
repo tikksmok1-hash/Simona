@@ -24,6 +24,17 @@ export default function Navbar() {
   const router = useRouter();
   const { cartCount, favorites, openCart } = useCart();
 
+  // Check scroll position on mount and scroll events
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    // Check immediately on mount
+    handleScroll();
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   // Fetch categories from DB on mount
   useEffect(() => {
     fetch('/api/categories')
@@ -85,15 +96,8 @@ export default function Navbar() {
 
   // Transparent only on homepage when not scrolled and menu is closed
   const isHomepage = pathname === '/';
+  // On SSR/initial render, default to transparent for homepage to prevent flash
   const isTransparent = isHomepage && !isScrolled && !isMenuOpen;
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   const navCategories = [
     ...dbCategories,
