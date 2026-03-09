@@ -39,6 +39,17 @@ export default function AdminShell({ children }) {
       {/* Mobile header */}
       <MobileHeader onMenuClick={() => setSidebarOpen(true)} />
       
+      {/* Floating menu button for mobile - always visible */}
+      <button
+        onClick={() => setSidebarOpen(true)}
+        className="lg:hidden fixed bottom-6 right-6 z-50 w-14 h-14 bg-black text-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-800 active:scale-95 transition-all"
+        aria-label="Deschide meniul"
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+      
       <div className="flex">
         <AdminSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
         <main className="flex-1 p-4 sm:p-6 lg:p-8 min-h-screen overflow-x-hidden">
