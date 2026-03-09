@@ -7,6 +7,7 @@ import {
   getBestsellerProducts,
   getLatestBlogPosts,
   getSiteSettings,
+  getAllCategories,
 } from '@/lib/db/queries';
 
 // ISR — regenerate at most every 60s so new products appear fast
@@ -15,12 +16,13 @@ export const revalidate = 60;
 
 export default async function Home() {
   // Fetch data from DB in parallel
-  const [featuredProducts, saleProducts, bestsellerProducts, latestPosts, siteSettings] = await Promise.all([
+  const [featuredProducts, saleProducts, bestsellerProducts, latestPosts, siteSettings, categories] = await Promise.all([
     getFeaturedProducts(8),
     getSaleProducts(4),
     getBestsellerProducts(4),
     getLatestBlogPosts(3),
     getSiteSettings(),
+    getAllCategories(),
   ]);
 
   // Hero settings with defaults
@@ -99,31 +101,12 @@ export default async function Home() {
             <div className="w-12 h-px bg-black mx-auto"></div>
           </div>
 
-          {/* First row — 3 large cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-            {[
-              {
-                name: 'Rochii',
-                slug: 'rochii',
-                sub: '6 subcategorii',
-                img: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&h=1000&fit=crop&q=80',
-              },
-              {
-                name: 'Bluze & Topuri',
-                slug: 'bluze-topuri',
-                sub: '5 subcategorii',
-                img: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=800&h=1000&fit=crop&q=80',
-              },
-              {
-                name: 'Pantaloni',
-                slug: 'pantaloni',
-                sub: '5 subcategorii',
-                img: 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=800&h=1000&fit=crop&q=80',
-              },
-            ].map((cat) => (
+          {/* Categories grid - dynamic from DB */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {categories.slice(0, 6).map((cat) => (
               <Link key={cat.slug} href={`/categorie/${cat.slug}`} className="group relative overflow-hidden block aspect-[3/4]">
                 <img
-                  src={cat.img}
+                  src={cat.image || 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=1000&fit=crop&q=80'}
                   alt={cat.name}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
@@ -132,49 +115,9 @@ export default async function Home() {
                 {/* Content */}
                 <div className="absolute bottom-0 left-0 right-0 p-6 flex items-end justify-between">
                   <div>
-                    <p className="text-white/60 text-[10px] tracking-[0.4em] uppercase mb-1">{cat.sub}</p>
-                    <h3 className="font-serif text-2xl text-white font-light">{cat.name}</h3>
-                  </div>
-                  <span className="border border-white/60 text-white text-[10px] tracking-widest uppercase px-4 py-2 group-hover:bg-white group-hover:text-black transition-all duration-300">
-                    Vezi
-                  </span>
-                </div>
-              </Link>
-            ))}
-          </div>
-
-          {/* Second row — 3 cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[
-              {
-                name: 'Fuste',
-                slug: 'fuste',
-                sub: '5 subcategorii',
-                img: 'https://images.unsplash.com/photo-1577900232427-18219b9166a0?w=800&h=1000&fit=crop&q=80',
-              },
-              {
-                name: 'Jachete & Paltoane',
-                slug: 'jachete-paltoane',
-                sub: '5 subcategorii',
-                img: 'https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=800&h=1000&fit=crop&q=80',
-              },
-              {
-                name: 'Accesorii',
-                slug: 'accesorii',
-                sub: '5 subcategorii',
-                img: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=800&h=1000&fit=crop&q=80',
-              },
-            ].map((cat) => (
-              <Link key={cat.slug} href={`/categorie/${cat.slug}`} className="group relative overflow-hidden block aspect-[3/4]">
-                <img
-                  src={cat.img}
-                  alt={cat.name}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"></div>
-                <div className="absolute bottom-0 left-0 right-0 p-6 flex items-end justify-between">
-                  <div>
-                    <p className="text-white/60 text-[10px] tracking-[0.4em] uppercase mb-1">{cat.sub}</p>
+                    <p className="text-white/60 text-[10px] tracking-[0.4em] uppercase mb-1">
+                      {cat.subcategories?.length || 0} subcategorii
+                    </p>
                     <h3 className="font-serif text-2xl text-white font-light">{cat.name}</h3>
                   </div>
                   <span className="border border-white/60 text-white text-[10px] tracking-widest uppercase px-4 py-2 group-hover:bg-white group-hover:text-black transition-all duration-300">
