@@ -400,7 +400,7 @@ export default function Navbar() {
                       category.slug === 'livrare' ? '/livrare' :
                       `/categorie/${category.slug}`
                     }
-                    className={`text-[11px] lg:text-xs xl:text-sm tracking-wider uppercase transition-colors py-3 block whitespace-nowrap ${
+                    className={`text-[11px] lg:text-xs xl:text-sm tracking-wider uppercase ${mounted ? 'transition-colors' : ''} py-3 block whitespace-nowrap ${
                       category.highlight 
                         ? isTransparent ? 'text-white font-medium' : 'text-black font-medium'
                         : isTransparent ? 'text-white/80 hover:text-white font-light' : 'text-gray-600 hover:text-black font-light'
