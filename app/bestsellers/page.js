@@ -19,7 +19,7 @@ export default async function BestsellersPage() {
   const availableCategories = [...new Set(bestsellerProducts.map((p) => p.categorySlug))];
 
   return (
-    <div className="min-h-screen bg-white pt-[112px] md:pt-[170px]">
+    <div className="min-h-screen bg-white pt-[112px] md:pt-[160px]">
 
       {/* Hero — rendered on server, instantly visible */}
       <div className="relative bg-black overflow-hidden py-24">

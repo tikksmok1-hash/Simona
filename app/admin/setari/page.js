@@ -11,6 +11,13 @@ export default function SetariPage() {
     heroTitle: 'Descoperă',
     heroSubtitle: 'Stilul Tău',
     heroLabel: 'Colecția Primăvară 2026',
+    phone1: '062 000 160',
+    phone2: '',
+    email: 'simona.md_info@mail.ru',
+    address: 'str. Ion Creangă 58, Chișinău',
+    schedule1: 'Luni – Vineri: 9:00 – 19:00',
+    schedule2: 'Sâmbătă – Duminică: 9:00 – 17:00',
+    footerDescription: 'Magazinul tău de modă feminină din Chișinău. Cele mai noi tendințe la prețuri accesibile.',
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -47,8 +54,6 @@ export default function SetariPage() {
 
       if (res.ok) {
         setSuccess(true);
-        // Revalidate home page
-        await fetch('/api/revalidate?path=/');
         setTimeout(() => setSuccess(false), 3000);
       }
     } catch (error) {
@@ -216,6 +221,109 @@ export default function SetariPage() {
               className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black"
             />
           </div>
+        </div>
+      </div>
+
+      {/* Contact Settings */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+        <h2 className="text-lg font-medium text-black mb-6">Date de Contact</h2>
+
+        {/* Phone Numbers */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Telefon Principal
+            </label>
+            <input
+              type="text"
+              value={settings.phone1}
+              onChange={(e) => setSettings(prev => ({ ...prev, phone1: e.target.value }))}
+              placeholder="062 000 160"
+              className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Telefon Secundar (opțional)
+            </label>
+            <input
+              type="text"
+              value={settings.phone2}
+              onChange={(e) => setSettings(prev => ({ ...prev, phone2: e.target.value }))}
+              placeholder="069 123 456"
+              className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black"
+            />
+          </div>
+        </div>
+
+        {/* Email */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Email
+          </label>
+          <input
+            type="email"
+            value={settings.email}
+            onChange={(e) => setSettings(prev => ({ ...prev, email: e.target.value }))}
+            placeholder="simona.md_info@mail.ru"
+            className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black"
+          />
+        </div>
+
+        {/* Address */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Adresă
+          </label>
+          <input
+            type="text"
+            value={settings.address}
+            onChange={(e) => setSettings(prev => ({ ...prev, address: e.target.value }))}
+            placeholder="str. Ion Creangă 58, Chișinău"
+            className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black"
+          />
+        </div>
+
+        {/* Schedule */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Program Luni – Vineri
+            </label>
+            <input
+              type="text"
+              value={settings.schedule1}
+              onChange={(e) => setSettings(prev => ({ ...prev, schedule1: e.target.value }))}
+              placeholder="Luni – Vineri: 9:00 – 19:00"
+              className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Program Sâmbătă – Duminică
+            </label>
+            <input
+              type="text"
+              value={settings.schedule2}
+              onChange={(e) => setSettings(prev => ({ ...prev, schedule2: e.target.value }))}
+              placeholder="Sâmbătă – Duminică: 9:00 – 17:00"
+              className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black"
+            />
+          </div>
+        </div>
+
+        {/* Footer Description */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Descriere Footer
+          </label>
+          <textarea
+            value={settings.footerDescription}
+            onChange={(e) => setSettings(prev => ({ ...prev, footerDescription: e.target.value }))}
+            placeholder="Magazinul tău de modă feminină din Chișinău..."
+            rows={2}
+            className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black resize-none"
+          />
         </div>
       </div>
 

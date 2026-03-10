@@ -5,7 +5,7 @@ import { useAdmin } from '../../AdminAuthContext';
 import ImageUploader from '../../components/ImageUploader';
 import { useRouter, useParams } from 'next/navigation';
 
-const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '34', '36', '38', '40', '42', '44'];
+const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL', '5XL', '34', '36', '38', '40', '42', '44', '46', '48', '50', '52', '54', '56', '58'];
 
 function EditProductForm() {
   const { apiFetch } = useAdmin();

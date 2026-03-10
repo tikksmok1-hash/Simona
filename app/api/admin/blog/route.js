@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import prisma from '@/lib/db';
 import { requireAuth } from '@/lib/auth';
 
@@ -43,12 +44,16 @@ export async function POST(request) {
             heading: s.heading,
             body: s.body,
             image: s.image || null,
+            videoUrl: s.videoUrl || null,
             order: i,
           })),
         },
       },
       include: { sections: true },
     });
+
+    revalidatePath('/noutati', 'page');
+
     return NextResponse.json(post, { status: 201 });
   } catch (error) {
     console.error('Blog POST error:', error);

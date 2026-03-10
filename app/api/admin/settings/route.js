@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { requireAuth } from '@/lib/auth';
 import prisma from '@/lib/db';
 
@@ -41,6 +42,9 @@ export async function POST(request) {
     );
 
     await Promise.all(updates);
+
+    // Revalidate all pages so new settings appear immediately
+    revalidatePath('/', 'layout');
 
     return NextResponse.json({ success: true });
   } catch (error) {

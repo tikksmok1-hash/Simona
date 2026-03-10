@@ -35,7 +35,7 @@ export default async function BlogPostPage({ params }) {
   const related = allPosts.filter((p) => p.slug !== slug).slice(0, 3);
 
   return (
-    <div className="min-h-screen bg-white pt-[112px] md:pt-[170px]">
+    <div className="min-h-screen bg-white pt-[112px] md:pt-[160px]">
 
       {/* Hero */}
       <div className="relative w-full h-[70vh] min-h-[480px] overflow-hidden bg-neutral-900">
@@ -113,19 +113,20 @@ export default async function BlogPostPage({ params }) {
 
         {/* YouTube Video */}
         {post.videoUrl && (() => {
-          const match = post.videoUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&?\s]+)/);
+          const match = post.videoUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|shorts\/|live\/|watch\?v=|watch\?.+&v=))([^&?\s\/]+)/);
           const videoId = match?.[1];
           if (!videoId) return null;
           return (
             <div className="mb-14">
               <div className="relative w-full aspect-video overflow-hidden bg-neutral-100 rounded-lg">
                 <iframe
-                  src={`https://www.youtube.com/embed/${videoId}`}
+                  src={`https://www.youtube.com/embed/${videoId}?rel=0`}
                   title="Video"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   allowFullScreen
                   className="absolute inset-0 w-full h-full"
-                />
+                ></iframe>
               </div>
             </div>
           );
@@ -141,7 +142,24 @@ export default async function BlogPostPage({ params }) {
               <p className="text-neutral-600 leading-relaxed text-base md:text-lg mb-6">
                 {section.body}
               </p>
-              {section.image && (
+              {section.videoUrl && (() => {
+                const m = section.videoUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|shorts\/|live\/|watch\?v=|watch\?.+&v=))([^&?\s\/]+)/);
+                const vid = m?.[1];
+                if (!vid) return null;
+                return (
+                  <div className="relative w-full aspect-video overflow-hidden bg-neutral-100 rounded-lg mt-8">
+                    <iframe
+                      src={`https://www.youtube.com/embed/${vid}?rel=0`}
+                      title={section.heading || 'Video'}
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                      className="absolute inset-0 w-full h-full"
+                    ></iframe>
+                  </div>
+                );
+              })()}
+              {section.image && !section.videoUrl && (
                 <div className="relative w-full aspect-[16/7] overflow-hidden bg-neutral-100 mt-8">
                   <img
                     src={section.image}

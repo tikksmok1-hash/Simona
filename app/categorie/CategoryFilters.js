@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import ProductCard from '@/app/components/ProductCard';
 
-const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL', '5XL'];
 
 export default function CategoryFilters({ categoryProducts, category, activeSubslug }) {
   const [sortBy, setSortBy] = useState('newest');

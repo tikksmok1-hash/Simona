@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import prisma from '@/lib/db';
 import { requireAuth } from '@/lib/auth';
 
@@ -32,6 +33,7 @@ export async function PATCH(request, { params }) {
           heading: s.heading,
           body: s.body,
           image: s.image || null,
+          videoUrl: s.videoUrl || null,
           order: i,
         })),
       };
@@ -42,6 +44,11 @@ export async function PATCH(request, { params }) {
       data,
       include: { sections: true },
     });
+
+    // Revalidate blog pages so changes appear immediately
+    revalidatePath('/noutati', 'page');
+    revalidatePath(`/noutati/${post.slug}`, 'page');
+
     return NextResponse.json(post);
   } catch (error) {
     console.error('Blog PATCH error:', error);
@@ -56,7 +63,12 @@ export async function DELETE(request, { params }) {
 
   try {
     const { id } = await params;
+    const post = await prisma.blogPost.findUnique({ where: { id }, select: { slug: true } });
     await prisma.blogPost.delete({ where: { id } });
+
+    revalidatePath('/noutati', 'page');
+    if (post?.slug) revalidatePath(`/noutati/${post.slug}`, 'page');
+
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json({ error: 'Eroare la ștergere' }, { status: 500 });

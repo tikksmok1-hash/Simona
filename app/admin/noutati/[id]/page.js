@@ -44,6 +44,7 @@ function EditBlogForm() {
               heading: s.heading || '',
               body: s.body || '',
               image: s.image || '',
+              videoUrl: s.videoUrl || '',
             }))
           );
         }
@@ -58,7 +59,7 @@ function EditBlogForm() {
   };
 
   const updateSection = (idx, field, value) => setSections((prev) => prev.map((s, i) => (i === idx ? { ...s, [field]: value } : s)));
-  const addSection = () => setSections((prev) => [...prev, { heading: '', body: '', image: '' }]);
+  const addSection = () => setSections((prev) => [...prev, { heading: '', body: '', image: '', videoUrl: '' }]);
   const removeSection = (idx) => { if (sections.length > 1) setSections((prev) => prev.filter((_, i) => i !== idx)); };
 
   const handleSubmit = async (e) => {
@@ -169,6 +170,10 @@ function EditBlogForm() {
                   <textarea value={section.body} onChange={(e) => updateSection(idx, 'body', e.target.value)} rows={5} className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black resize-none" />
                 </div>
                 <ImageUploader value={section.image} onChange={(url) => updateSection(idx, 'image', url)} label="Imagine Secțiune (opțional)" />
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1.5">Link Video YouTube (opțional)</label>
+                  <input value={section.videoUrl || ''} onChange={(e) => updateSection(idx, 'videoUrl', e.target.value)} placeholder="https://www.youtube.com/watch?v=..." className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black" />
+                </div>
               </div>
             </div>
           ))}

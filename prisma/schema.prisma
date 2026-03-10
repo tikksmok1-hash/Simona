@@ -480,10 +480,22 @@ model BlogSection {
   heading     String
   body        String
   image       String?   // Optional section image
+  videoUrl    String?   // Optional YouTube video URL
   order       Int       @default(0)
   
   postId      String    @db.ObjectId
   post        BlogPost  @relation(fields: [postId], references: [id], onDelete: Cascade)
   
   @@index([postId])
+}
+
+// ==================== STATIC PAGES ====================
+
+model StaticPage {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  slug      String   @unique  // "confidentialitate", "termeni", "livrare"
+  title     String
+  content   String   // HTML content
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

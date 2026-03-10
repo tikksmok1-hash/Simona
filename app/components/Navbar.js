@@ -5,7 +5,23 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCart } from '@/app/context/CartContext';
 
-export default function Navbar() {
+// Helper: convert display phone like "062 000 160" to international format "37362000160"
+function phoneToInternational(phone) {
+  const digits = phone.replace(/[^\d]/g, '');
+  if (digits.startsWith('373')) return digits;
+  // Remove leading 0 if present
+  const local = digits.startsWith('0') ? digits.slice(1) : digits;
+  return '373' + local;
+}
+
+export default function Navbar({ siteSettings = {} }) {
+  const phone1 = siteSettings.phone1 || '062 000 160';
+  const phone2 = siteSettings.phone2 || '';
+  const siteEmail = siteSettings.email || 'simona.md_info@mail.ru';
+  const siteAddress = siteSettings.address || 'str. Ion Creangă 58, Chișinău';
+  const phone1Intl = phoneToInternational(phone1);
+  const phone2Intl = phone2 ? phoneToInternational(phone2) : '';
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [openMobileCategory, setOpenMobileCategory] = useState(null);
@@ -133,16 +149,16 @@ export default function Navbar() {
               <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
               </svg>
-              <span className="tracking-widest">062 000 160</span>
+              <span className="tracking-widest">{phone1}</span>
               <svg className={`w-2.5 h-2.5 opacity-60 transition-transform duration-200 ${isPhoneOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
               </svg>
             </button>
 
             {/* Dropdown */}
-            <div className={`absolute left-0 top-full mt-1 w-44 bg-white shadow-xl border border-gray-100 transition-all duration-200 z-[100] ${isPhoneOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
+            <div className={`absolute left-0 top-full mt-1 w-52 bg-white shadow-xl border border-gray-100 transition-all duration-200 z-[100] ${isPhoneOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
               <a
-                href="https://wa.me/37362000160"
+                href={`https://wa.me/${phone1Intl}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors text-gray-700 hover:text-black"
@@ -153,7 +169,7 @@ export default function Navbar() {
                 <span className="text-xs tracking-wide">WhatsApp</span>
               </a>
               <a
-                href="viber://chat?number=%2B37362000160"
+                href={`viber://chat?number=%2B${phone1Intl}`}
                 className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors text-gray-700 hover:text-black border-t border-gray-50"
               >
                 <svg className="w-4 h-4 flex-shrink-0" fill="#7360F2" viewBox="0 0 24 24">
@@ -162,14 +178,25 @@ export default function Navbar() {
                 <span className="text-xs tracking-wide">Viber</span>
               </a>
               <a
-                href="tel:062000160"
+                href={`tel:+${phone1Intl}`}
                 className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors text-gray-700 hover:text-black border-t border-gray-50"
               >
                 <svg className="w-4 h-4 flex-shrink-0 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
                 </svg>
-                <span className="text-xs tracking-wide">Telefon</span>
+                <span className="text-xs tracking-wide">{phone1}</span>
               </a>
+              {phone2 && (
+                <a
+                  href={`tel:+${phone2Intl}`}
+                  className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors text-gray-700 hover:text-black border-t border-gray-50"
+                >
+                  <svg className="w-4 h-4 flex-shrink-0 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                  </svg>
+                  <span className="text-xs tracking-wide">{phone2}</span>
+                </a>
+              )}
             </div>
           </div>
 
@@ -180,7 +207,7 @@ export default function Navbar() {
 
           {/* Address - link to Google Maps */}
           <a
-            href="https://www.google.com/maps/search/str.+Ion+Creangă+58,+Chișinău,+Moldova"
+            href={`https://www.google.com/maps/search/${encodeURIComponent(siteAddress + ', Moldova')}`}
             target="_blank"
             rel="noopener noreferrer"
             className="hidden md:flex items-center gap-1.5 text-[10px] tracking-wide opacity-80 hover:opacity-100 transition-opacity"
@@ -188,7 +215,7 @@ export default function Navbar() {
             <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
             </svg>
-            str. Ion Creangă 58, Chișinău
+            {siteAddress}
           </a>
         </div>
       </div>
@@ -385,13 +412,10 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-center gap-1 lg:gap-3 xl:gap-6 h-11">
             {navCategories.map((category) => {
-              // Filter subcategories that have at least 1 active product
-              const subsWithProducts = (category.subcategories || []).filter(
-                (sub) => sub._count?.products > 0
-              );
+              const subs = category.subcategories || [];
 
               return (
-                <div key={category.id} className="relative group flex-shrink-0">
+                <div key={category.id} className="relative group flex-shrink-0 h-full flex items-center">
                   <Link 
                     href={
                       category.slug === 'reduceri' ? '/reduceri' :
@@ -409,12 +433,12 @@ export default function Navbar() {
                     {category.name}
                   </Link>
                   
-                  {/* Subcategories Dropdown — only if there are subs with products */}
-                  {subsWithProducts.length > 0 && (
-                    <div className="absolute left-1/2 -translate-x-1/2 top-full pt-0 w-56 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                      <div className="bg-white border border-gray-100 shadow-xl mt-0">
+                  {/* Subcategories Dropdown */}
+                  {subs.length > 0 && (
+                    <div className="absolute left-1/2 -translate-x-1/2 top-full w-56 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                      <div className="bg-white border border-gray-100 shadow-xl rounded-md">
                         <div className="py-2">
-                          {subsWithProducts.map((sub) => (
+                          {subs.map((sub) => (
                             <Link 
                               key={sub.id}
                               href={`/categorie/${category.slug}/${sub.slug}`}
@@ -452,14 +476,11 @@ export default function Navbar() {
             </Link>
             
             {navCategories.map((category) => {
-              // Filter subcategories that have at least 1 active product
-              const subsWithProducts = (category.subcategories || []).filter(
-                (sub) => sub._count?.products > 0
-              );
+              const subs = category.subcategories || [];
 
               return (
                 <div key={category.id} className="border-b border-gray-50">
-                  {subsWithProducts.length > 0 ? (
+                  {subs.length > 0 ? (
                     <>
                       <button
                         onClick={() => setOpenMobileCategory(openMobileCategory === category.id ? null : category.id)}
@@ -482,7 +503,7 @@ export default function Navbar() {
                       </button>
                       {openMobileCategory === category.id && (
                         <div className="pb-3 pl-4">
-                          {subsWithProducts.map((sub) => (
+                          {subs.map((sub) => (
                             <Link 
                               key={sub.id}
                               href={`/categorie/${category.slug}/${sub.slug}`}
@@ -542,16 +563,16 @@ export default function Navbar() {
                 </Link>
               )}
               <a
-                href="mailto:simona.md_info@mail.ru"
+                href={`mailto:${siteEmail}`}
                 className="flex items-center gap-3 text-gray-500 hover:text-black text-sm font-light transition-colors"
               >
                 <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
                 </svg>
-                simona.md_info@mail.ru
+                {siteEmail}
               </a>
               <a
-                href="https://www.google.com/maps/search/str.+Ion+Creangă+58,+Chișinău,+Moldova"
+                href={`https://www.google.com/maps/search/${encodeURIComponent(siteAddress + ', Moldova')}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 text-gray-500 hover:text-black text-sm font-light transition-colors"
@@ -559,7 +580,7 @@ export default function Navbar() {
                 <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
                 </svg>
-                str. Ion Creangă 58, Chișinău
+                {siteAddress}
               </a>
             </div>
           </div>
