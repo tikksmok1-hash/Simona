@@ -628,7 +628,7 @@ async function main() {
   // Create products
   console.log('Creating products...');
   for (const productData of productsData) {
-    const { variants, categorySlug, subcategorySlug, ...productInfo } = productData;
+    const { variants, categorySlug, subcategorySlug, sku, ...productInfo } = productData;
 
     // Find category and subcategory
     const category = await prisma.category.findUnique({
@@ -667,7 +667,6 @@ async function main() {
               create: variant.sizes.map((size) => ({
                 size: size.size,
                 stock: size.stock,
-                sku: `${productInfo.sku}-${variant.colorName.substring(0, 3).toUpperCase()}-${size.size}`,
               })),
             },
           })),

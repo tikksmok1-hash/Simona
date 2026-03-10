@@ -379,55 +379,62 @@ export default function Navbar() {
       <div className={`hidden md:block transition-all duration-500 ${
         isTransparent ? 'border-b border-white/10' : 'border-b border-gray-100'
       }`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-center space-x-8 h-12">
-            {navCategories.map((category) => (
-              <div key={category.id} className="relative group">
-                <Link 
-                  href={
-                    category.slug === 'reduceri' ? '/reduceri' :
-                    category.slug === 'bestsellers' ? '/bestsellers' :
-                    category.slug === 'noutati' ? '/noutati' :
-                    category.slug === 'livrare' ? '/livrare' :
-                    `/categorie/${category.slug}`
-                  }
-                  className={`text-sm tracking-wider uppercase transition-colors py-3 block ${
-                    category.highlight 
-                      ? isTransparent ? 'text-white font-medium' : 'text-black font-medium'
-                      : isTransparent ? 'text-white/80 hover:text-white font-light' : 'text-gray-600 hover:text-black font-light'
-                  }`}
-                >
-                  {category.name}
-                </Link>
-                
-                {/* Subcategories Dropdown */}
-                {category.subcategories && category.subcategories.length > 0 && (
-                  <div className="absolute left-1/2 -translate-x-1/2 top-full pt-0 w-56 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                    <div className="bg-white border border-gray-100 shadow-xl mt-0">
-                      <div className="py-2">
-                        {category.subcategories.map((sub) => (
-                          <Link 
-                            key={sub.id}
-                            href={`/categorie/${category.slug}/${sub.slug}`}
-                            className="block px-5 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-black text-sm font-light tracking-wide transition-colors"
-                          >
-                            {sub.name}
-                          </Link>
-                        ))}
-                        <div className="border-t border-gray-100 mt-2 pt-2">
-                          <Link 
-                            href={`/categorie/${category.slug}`}
-                            className="block px-5 py-2.5 text-black text-sm font-medium tracking-wide hover:bg-gray-50 transition-colors"
-                          >
-                            Vezi toate →
-                          </Link>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 overflow-x-auto scrollbar-hide">
+          <div className="flex items-center justify-center gap-1 lg:gap-3 xl:gap-6 h-11 min-w-max mx-auto">
+            {navCategories.map((category) => {
+              // Filter subcategories that have at least 1 active product
+              const subsWithProducts = (category.subcategories || []).filter(
+                (sub) => sub._count?.products > 0
+              );
+
+              return (
+                <div key={category.id} className="relative group flex-shrink-0">
+                  <Link 
+                    href={
+                      category.slug === 'reduceri' ? '/reduceri' :
+                      category.slug === 'bestsellers' ? '/bestsellers' :
+                      category.slug === 'noutati' ? '/noutati' :
+                      category.slug === 'livrare' ? '/livrare' :
+                      `/categorie/${category.slug}`
+                    }
+                    className={`text-[11px] lg:text-xs xl:text-sm tracking-wider uppercase transition-colors py-3 block whitespace-nowrap ${
+                      category.highlight 
+                        ? isTransparent ? 'text-white font-medium' : 'text-black font-medium'
+                        : isTransparent ? 'text-white/80 hover:text-white font-light' : 'text-gray-600 hover:text-black font-light'
+                    }`}
+                  >
+                    {category.name}
+                  </Link>
+                  
+                  {/* Subcategories Dropdown — only if there are subs with products */}
+                  {subsWithProducts.length > 0 && (
+                    <div className="absolute left-1/2 -translate-x-1/2 top-full pt-0 w-56 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                      <div className="bg-white border border-gray-100 shadow-xl mt-0">
+                        <div className="py-2">
+                          {subsWithProducts.map((sub) => (
+                            <Link 
+                              key={sub.id}
+                              href={`/categorie/${category.slug}/${sub.slug}`}
+                              className="block px-5 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-black text-sm font-light tracking-wide transition-colors"
+                            >
+                              {sub.name}
+                            </Link>
+                          ))}
+                          <div className="border-t border-gray-100 mt-2 pt-2">
+                            <Link 
+                              href={`/categorie/${category.slug}`}
+                              className="block px-5 py-2.5 text-black text-sm font-medium tracking-wide hover:bg-gray-50 transition-colors"
+                            >
+                              Vezi toate →
+                            </Link>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            ))}
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -441,69 +448,76 @@ export default function Navbar() {
               Acasă
             </Link>
             
-            {navCategories.map((category) => (
-              <div key={category.id} className="border-b border-gray-50">
-                {category.subcategories && category.subcategories.length > 0 ? (
-                  <>
-                    <button
-                      onClick={() => setOpenMobileCategory(openMobileCategory === category.id ? null : category.id)}
-                      className={`w-full flex items-center justify-between text-sm tracking-wider py-3 ${
+            {navCategories.map((category) => {
+              // Filter subcategories that have at least 1 active product
+              const subsWithProducts = (category.subcategories || []).filter(
+                (sub) => sub._count?.products > 0
+              );
+
+              return (
+                <div key={category.id} className="border-b border-gray-50">
+                  {subsWithProducts.length > 0 ? (
+                    <>
+                      <button
+                        onClick={() => setOpenMobileCategory(openMobileCategory === category.id ? null : category.id)}
+                        className={`w-full flex items-center justify-between text-sm tracking-wider py-3 ${
+                          category.highlight 
+                            ? 'text-black font-medium uppercase' 
+                            : 'text-gray-700 hover:text-black font-light'
+                        }`}
+                      >
+                        {category.name}
+                        <svg 
+                          className={`w-4 h-4 transition-transform ${openMobileCategory === category.id ? 'rotate-180' : ''}`} 
+                          fill="none" 
+                          stroke="currentColor" 
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+                      {openMobileCategory === category.id && (
+                        <div className="pb-3 pl-4">
+                          {subsWithProducts.map((sub) => (
+                            <Link 
+                              key={sub.id}
+                              href={`/categorie/${category.slug}/${sub.slug}`}
+                              className="block text-gray-500 hover:text-black text-sm font-light py-2"
+                            >
+                              {sub.name}
+                            </Link>
+                          ))}
+                          <Link 
+                            href={`/categorie/${category.slug}`}
+                            className="block text-black text-sm font-medium py-2 mt-1"
+                          >
+                            Vezi toate →
+                          </Link>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <Link 
+                      href={
+                        category.slug === 'reduceri' ? '/reduceri' :
+                        category.slug === 'bestsellers' ? '/bestsellers' :
+                        category.slug === 'noutati' ? '/noutati' :
+                        category.slug === 'livrare' ? '/livrare' :
+                        `/categorie/${category.slug}`
+                      }
+                      className={`block text-sm tracking-wider py-3 ${
                         category.highlight 
                           ? 'text-black font-medium uppercase' 
-                          : 'text-gray-700 hover:text-black font-light'
+                          : 'text-gray-700 hover:text-black font-light uppercase'
                       }`}
                     >
                       {category.name}
-                      <svg 
-                        className={`w-4 h-4 transition-transform ${openMobileCategory === category.id ? 'rotate-180' : ''}`} 
-                        fill="none" 
-                        stroke="currentColor" 
-                        viewBox="0 0 24 24"
-                        strokeWidth={1.5}
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </button>
-                    {openMobileCategory === category.id && (
-                      <div className="pb-3 pl-4">
-                        {category.subcategories.map((sub) => (
-                          <Link 
-                            key={sub.id}
-                            href={`/categorie/${category.slug}/${sub.slug}`}
-                            className="block text-gray-500 hover:text-black text-sm font-light py-2"
-                          >
-                            {sub.name}
-                          </Link>
-                        ))}
-                        <Link 
-                          href={`/categorie/${category.slug}`}
-                          className="block text-black text-sm font-medium py-2 mt-1"
-                        >
-                          Vezi toate →
-                        </Link>
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <Link 
-                    href={
-                      category.slug === 'reduceri' ? '/reduceri' :
-                      category.slug === 'bestsellers' ? '/bestsellers' :
-                      category.slug === 'noutati' ? '/noutati' :
-                      category.slug === 'livrare' ? '/livrare' :
-                      `/categorie/${category.slug}`
-                    }
-                    className={`block text-sm tracking-wider py-3 ${
-                      category.highlight 
-                        ? 'text-black font-medium uppercase' 
-                        : 'text-gray-700 hover:text-black font-light uppercase'
-                    }`}
-                  >
-                    {category.name}
-                  </Link>
-                )}
-              </div>
-            ))}
+                    </Link>
+                  )}
+                </div>
+              );
+            })}
             
             <Link href="/contact" className="block text-gray-700 hover:text-black text-sm font-light tracking-wider uppercase py-3 border-b border-gray-50">
               Contact

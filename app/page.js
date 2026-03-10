@@ -60,21 +60,21 @@ export default async function Home() {
         {/* Content */}
         <div className="relative z-10 h-full flex items-center justify-center">
           <div className="text-center px-4">
-            <span className="inline-block border border-white/60 text-white/80 px-6 py-1.5 text-xs font-light tracking-[0.4em] uppercase mb-10">
+            <span className="inline-block border border-white/60 text-white/80 px-4 sm:px-6 py-1.5 text-[10px] sm:text-xs font-light tracking-[0.3em] sm:tracking-[0.4em] uppercase mb-6 sm:mb-10">
               {heroLabel}
             </span>
-            <h1 className="font-serif text-6xl md:text-8xl lg:text-9xl font-light text-white leading-none mb-10">
+            <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-light text-white leading-none mb-6 sm:mb-10">
               {heroTitle}
               <span className="block font-normal italic">{heroSubtitle}</span>
             </h1>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/bestsellers" className="group inline-flex items-center justify-center gap-3 bg-white text-black px-12 py-4 font-medium text-sm tracking-widest uppercase transition-all duration-300 hover:-translate-y-1 hover:shadow-xl active:translate-y-0 active:shadow-none">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+              <Link href="/bestsellers" className="group inline-flex items-center justify-center gap-3 bg-white text-black px-8 sm:px-12 py-3.5 sm:py-4 font-medium text-xs sm:text-sm tracking-widest uppercase transition-all duration-300 hover:-translate-y-1 hover:shadow-xl active:translate-y-0 active:shadow-none">
                 Vezi Colecția
                 <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
               </Link>
-              <Link href="/reduceri" className="inline-flex items-center justify-center gap-3 bg-transparent hover:bg-white hover:text-black text-white px-12 py-4 font-medium text-sm tracking-widest uppercase transition-all duration-300 border-2 border-white backdrop-blur-sm hover:-translate-y-1 hover:shadow-xl active:translate-y-0 active:shadow-none">
+              <Link href="/reduceri" className="inline-flex items-center justify-center gap-3 bg-transparent hover:bg-white hover:text-black text-white px-8 sm:px-12 py-3.5 sm:py-4 font-medium text-xs sm:text-sm tracking-widest uppercase transition-all duration-300 border-2 border-white backdrop-blur-sm hover:-translate-y-1 hover:shadow-xl active:translate-y-0 active:shadow-none">
                 Reduceri {maxDiscount}%
               </Link>
             </div>
@@ -93,16 +93,16 @@ export default async function Home() {
       </section>
 
       {/* Categories Section */}
-      <section className="py-24 bg-white">
+      <section className="py-16 sm:py-20 lg:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <div className="text-center mb-10 sm:mb-16">
             <p className="text-[10px] tracking-[0.5em] uppercase text-gray-400 mb-3">Colecție</p>
-            <h2 className="font-serif text-4xl md:text-5xl font-light text-black mb-4">Categorii</h2>
+            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-light text-black mb-4">Categorii</h2>
             <div className="w-12 h-px bg-black mx-auto"></div>
           </div>
 
           {/* Categories grid - dynamic from DB */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
             {categories.slice(0, 6).map((cat) => (
               <Link key={cat.slug} href={`/categorie/${cat.slug}`} className="group relative overflow-hidden block aspect-[3/4]">
                 <img
@@ -113,14 +113,14 @@ export default async function Home() {
                 {/* Overlay gradient */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"></div>
                 {/* Content */}
-                <div className="absolute bottom-0 left-0 right-0 p-6 flex items-end justify-between">
-                  <div>
-                    <p className="text-white/60 text-[10px] tracking-[0.4em] uppercase mb-1">
-                      {cat.subcategories?.length || 0} subcategorii
+                <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-6 flex items-end justify-between">
+                  <div className="min-w-0">
+                    <p className="text-white/60 text-[9px] sm:text-[10px] tracking-[0.3em] sm:tracking-[0.4em] uppercase mb-0.5 sm:mb-1">
+                      {cat._count?.products || 0} produse
                     </p>
-                    <h3 className="font-serif text-2xl text-white font-light">{cat.name}</h3>
+                    <h3 className="font-serif text-base sm:text-xl lg:text-2xl text-white font-light truncate">{cat.name}</h3>
                   </div>
-                  <span className="border border-white/60 text-white text-[10px] tracking-widest uppercase px-4 py-2 group-hover:bg-white group-hover:text-black transition-all duration-300">
+                  <span className="hidden sm:inline-block border border-white/60 text-white text-[10px] tracking-widest uppercase px-4 py-2 group-hover:bg-white group-hover:text-black transition-all duration-300 flex-shrink-0 ml-2">
                     Vezi
                   </span>
                 </div>
@@ -131,21 +131,21 @@ export default async function Home() {
       </section>
 
       {/* Featured Products */}
-      <section className="py-20 bg-neutral-50">
+      <section className="py-16 sm:py-20 bg-neutral-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-12">
+          <div className="flex items-center justify-between mb-8 sm:mb-12">
             <div>
-              <h2 className="font-serif text-3xl md:text-4xl font-light text-black mb-2">Produse Recomandate</h2>
-              <p className="text-neutral-500 tracking-wide">Cele mai populare alegeri ale clienților noștri</p>
+              <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-light text-black mb-1 sm:mb-2">Produse Recomandate</h2>
+              <p className="text-sm text-neutral-500 tracking-wide">Cele mai populare alegeri ale clienților noștri</p>
             </div>
-            <Link href="/bestsellers" className="group hidden md:flex items-center gap-2 text-black text-sm tracking-widest uppercase transition-colors link-underline">
+            <Link href="/bestsellers" className="group hidden md:flex items-center gap-2 text-black text-sm tracking-widest uppercase transition-colors link-underline flex-shrink-0 ml-4">
               Vezi toate
               <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
             </Link>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
             {featuredProducts.map((product, i) => (
               <ProductCard key={product.id} product={product} priority={i < 4} />
             ))}
@@ -162,18 +162,18 @@ export default async function Home() {
       </section>
 
       {/* Banner Section */}
-      <section className="py-20 bg-black">
+      <section className="py-14 sm:py-20 bg-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
+          <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
             <div className="text-white text-center md:text-left">
-              <span className="inline-block border border-white/30 px-5 py-1.5 text-xs font-medium tracking-widest uppercase mb-6">
+              <span className="inline-block border border-white/30 px-4 sm:px-5 py-1.5 text-[10px] sm:text-xs font-medium tracking-widest uppercase mb-4 sm:mb-6">
                 Ofertă Specială
               </span>
-              <h2 className="font-serif text-3xl md:text-5xl font-light mb-6">Reduceri de Primăvară</h2>
-              <p className="text-lg text-neutral-400 mb-8 leading-relaxed">
+              <h2 className="font-serif text-2xl sm:text-3xl md:text-5xl font-light mb-4 sm:mb-6">Reduceri de Primăvară</h2>
+              <p className="text-base sm:text-lg text-neutral-400 mb-6 sm:mb-8 leading-relaxed">
                 Până la {maxDiscount}% reducere la întreaga colecție de primăvară. Ofertă valabilă până la epuizarea stocului.
               </p>
-              <Link href="/reduceri" className="group inline-flex items-center gap-3 bg-white text-black hover:bg-neutral-100 px-10 py-4 font-medium text-sm tracking-widest uppercase transition-all duration-300 hover:-translate-y-1 hover:shadow-lg active:translate-y-0 active:shadow-none">
+              <Link href="/reduceri" className="group inline-flex items-center gap-3 bg-white text-black hover:bg-neutral-100 px-8 sm:px-10 py-3.5 sm:py-4 font-medium text-xs sm:text-sm tracking-widest uppercase transition-all duration-300 hover:-translate-y-1 hover:shadow-lg active:translate-y-0 active:shadow-none">
                 Cumpără Acum
                 <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
               </Link>
@@ -194,16 +194,16 @@ export default async function Home() {
       </section>
 
       {/* Bestsellers Section */}
-      <section className="py-20 bg-white">
+      <section className="py-16 sm:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-14">
-            <span className="inline-block border border-black text-black px-5 py-1.5 text-xs font-medium tracking-widest uppercase mb-6">
+          <div className="text-center mb-10 sm:mb-14">
+            <span className="inline-block border border-black text-black px-4 sm:px-5 py-1.5 text-[10px] sm:text-xs font-medium tracking-widest uppercase mb-4 sm:mb-6">
               Cele Mai Vândute
             </span>
-            <h2 className="font-serif text-3xl md:text-4xl font-light text-black mb-4">Bestsellers</h2>
-            <p className="text-neutral-500 tracking-wide">Produsele preferate de clientele noastre</p>
+            <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-light text-black mb-3 sm:mb-4">Bestsellers</h2>
+            <p className="text-sm text-neutral-500 tracking-wide">Produsele preferate de clientele noastre</p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
             {bestsellerProducts.map((product, i) => (
               <ProductCard key={product.id} product={product} priority={i < 2} />
             ))}
@@ -220,16 +220,16 @@ export default async function Home() {
       </section>
 
       {/* Reduceri Section */}
-      <section className="py-20 bg-neutral-50">
+      <section className="py-16 sm:py-20 bg-neutral-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-14">
-            <span className="inline-block border border-black text-black px-5 py-1.5 text-xs font-medium tracking-widest uppercase mb-6">
+          <div className="text-center mb-10 sm:mb-14">
+            <span className="inline-block border border-black text-black px-4 sm:px-5 py-1.5 text-[10px] sm:text-xs font-medium tracking-widest uppercase mb-4 sm:mb-6">
               Prețuri Reduse
             </span>
-            <h2 className="font-serif text-3xl md:text-4xl font-light text-black mb-4">Reduceri</h2>
-            <p className="text-neutral-500 tracking-wide">Cele mai bune oferte din colecția noastră</p>
+            <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-light text-black mb-3 sm:mb-4">Reduceri</h2>
+            <p className="text-sm text-neutral-500 tracking-wide">Cele mai bune oferte din colecția noastră</p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
             {saleProducts.map((product, i) => (
               <ProductCard key={product.id} product={product} priority={i < 2} />
             ))}
@@ -246,14 +246,14 @@ export default async function Home() {
       </section>
 
       {/* Noutăți / Blog Section */}
-      <section className="py-20 bg-white">
+      <section className="py-16 sm:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <span className="inline-block border border-black text-black px-5 py-1.5 text-xs font-medium tracking-widest uppercase mb-6">
+          <div className="text-center mb-10 sm:mb-16">
+            <span className="inline-block border border-black text-black px-4 sm:px-5 py-1.5 text-[10px] sm:text-xs font-medium tracking-widest uppercase mb-4 sm:mb-6">
               Blog & Inspirație
             </span>
-            <h2 className="font-serif text-3xl md:text-4xl font-light text-black mb-4">Ultimele Noutăți</h2>
-            <p className="text-neutral-500 tracking-wide">Tendințe, sfaturi de stil și inspirație pentru garderoba ta</p>
+            <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-light text-black mb-3 sm:mb-4">Ultimele Noutăți</h2>
+            <p className="text-sm text-neutral-500 tracking-wide">Tendințe, sfaturi de stil și inspirație pentru garderoba ta</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {latestPosts.map((post) => (
@@ -306,13 +306,13 @@ export default async function Home() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-20 bg-neutral-50">
+      <section className="py-16 sm:py-20 bg-neutral-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="font-serif text-3xl md:text-4xl font-light text-black mb-4">Ce Spun Clienții Noștri</h2>
-            <p className="text-neutral-500 tracking-wide">Peste 10.000 de cliente mulțumite</p>
+          <div className="text-center mb-10 sm:mb-16">
+            <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-light text-black mb-3 sm:mb-4">Ce Spun Clienții Noștri</h2>
+            <p className="text-sm text-neutral-500 tracking-wide">Peste 10.000 de cliente mulțumite</p>
           </div>
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-8">
             {[
               { name: 'Maria P.', text: 'Calitate excepțională și livrare rapidă! Rochiile sunt exact ca în poze, ba chiar mai frumoase. Recomand cu încredere!', rating: 5 },
               { name: 'Alexandra D.', text: 'Am comandat deja de 5 ori și de fiecare dată am fost impresionată. Serviciul clienți este extraordinar!', rating: 5 },
@@ -337,14 +337,14 @@ export default async function Home() {
       </section>
 
       {/* Cum ne găsești */}
-      <section className="py-20 bg-white">
+      <section className="py-16 sm:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-14">
-            <span className="inline-block border border-black text-black px-5 py-1.5 text-xs font-medium tracking-widest uppercase mb-6">
+          <div className="text-center mb-10 sm:mb-14">
+            <span className="inline-block border border-black text-black px-4 sm:px-5 py-1.5 text-[10px] sm:text-xs font-medium tracking-widest uppercase mb-4 sm:mb-6">
               Contact
             </span>
-            <h2 className="font-serif text-3xl md:text-4xl font-light text-black mb-4">Cum Ne Găsești?</h2>
-            <p className="text-neutral-500 tracking-wide">Suntem aici pentru tine — online și fizic</p>
+            <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-light text-black mb-3 sm:mb-4">Cum Ne Găsești?</h2>
+            <p className="text-sm text-neutral-500 tracking-wide">Suntem aici pentru tine — online și fizic</p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
