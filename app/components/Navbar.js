@@ -14,6 +14,9 @@ function phoneToInternational(phone) {
   return '373' + local;
 }
 
+// Module-level cache — persists across navigations within the same session
+let categoriesCache = { data: null, ts: 0 };
+
 export default function Navbar({ siteSettings = {} }) {
   const phone1 = siteSettings.phone1 || '062 000 160';
   const phone2 = siteSettings.phone2 || '';
@@ -54,14 +57,37 @@ export default function Navbar({ siteSettings = {} }) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Fetch categories from DB on mount
+  // Fetch categories — use module-level cache to avoid refetching on every navigation
   useEffect(() => {
-    fetch('/api/categories')
-      .then((res) => res.json())
-      .then((data) => { if (Array.isArray(data)) setDbCategories(data); })
-      .catch(() => {});
     // Check if admin is logged in
     if (localStorage.getItem('admin-token')) setIsAdmin(true);
+
+    if (categoriesCache.data) {
+      setDbCategories(categoriesCache.data);
+      // Refetch in background if stale (> 5 min)
+      if (Date.now() - categoriesCache.ts > 5 * 60 * 1000) {
+        fetch('/api/categories')
+          .then((res) => res.json())
+          .then((data) => {
+            if (Array.isArray(data)) {
+              categoriesCache = { data, ts: Date.now() };
+              setDbCategories(data);
+            }
+          })
+          .catch(() => {});
+      }
+      return;
+    }
+
+    fetch('/api/categories')
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          categoriesCache = { data, ts: Date.now() };
+          setDbCategories(data);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   // Close search results and phone dropdown on outside click

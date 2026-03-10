@@ -1,8 +1,20 @@
 import { NextResponse } from 'next/server';
 import { searchProducts } from '@/lib/db/queries';
+import { createRateLimit } from '@/lib/rateLimit';
+
+const searchLimit = createRateLimit({
+  name: 'search',
+  maxRequests: 30,          // 30 searches
+  windowMs: 60 * 1000,      // per minute per IP
+});
 
 // GET /api/search?q=query — public product search
 export async function GET(request) {
+  const { success } = searchLimit(request);
+  if (!success) {
+    return NextResponse.json([], { status: 429 });
+  }
+
   const { searchParams } = new URL(request.url);
   const q = searchParams.get('q')?.trim() || '';
 
