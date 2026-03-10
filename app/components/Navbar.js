@@ -10,6 +10,7 @@ export default function Navbar() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [openMobileCategory, setOpenMobileCategory] = useState(null);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [showResults, setShowResults] = useState(false);
@@ -31,6 +32,8 @@ export default function Navbar() {
     };
     // Check immediately on mount
     handleScroll();
+    // Mark as mounted so transitions can kick in after first paint
+    requestAnimationFrame(() => setMounted(true));
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -108,13 +111,13 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+    <nav className={`fixed top-0 left-0 right-0 z-50 ${mounted ? 'transition-all duration-500' : ''} ${
       isTransparent 
         ? 'bg-transparent' 
         : 'bg-white/95 backdrop-blur-md shadow-sm'
     }`}>
       {/* Top Bar */}
-      <div className={`py-2 text-xs tracking-wide font-light transition-all duration-500 ${
+      <div className={`py-2 text-xs tracking-wide font-light ${mounted ? 'transition-all duration-500' : ''} ${
         isTransparent 
           ? 'bg-white/10 backdrop-blur-sm text-white'
           : 'bg-black text-white'
@@ -191,7 +194,7 @@ export default function Navbar() {
       </div>
 
       {/* Main Header - Logo, Search, Icons */}
-      <div className={`transition-all duration-500 ${
+      <div className={`${mounted ? 'transition-all duration-500' : ''} ${
         isTransparent ? 'border-b border-white/20' : 'border-b border-gray-100'
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -376,11 +379,11 @@ export default function Navbar() {
       </div>
 
       {/* Categories Navigation Bar - Desktop */}
-      <div className={`hidden md:block transition-all duration-500 ${
+      <div className={`hidden md:block ${mounted ? 'transition-all duration-500' : ''} ${
         isTransparent ? 'border-b border-white/10' : 'border-b border-gray-100'
       }`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 overflow-x-auto scrollbar-hide">
-          <div className="flex items-center justify-center gap-1 lg:gap-3 xl:gap-6 h-11 min-w-max mx-auto">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-center gap-1 lg:gap-3 xl:gap-6 h-11">
             {navCategories.map((category) => {
               // Filter subcategories that have at least 1 active product
               const subsWithProducts = (category.subcategories || []).filter(
