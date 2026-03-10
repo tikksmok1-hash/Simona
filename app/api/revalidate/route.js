@@ -1,5 +1,12 @@
 import { revalidatePath } from 'next/cache';
 import { NextResponse } from 'next/server';
+import { createRateLimit } from '@/lib/rateLimit';
+
+const revalLimit = createRateLimit({
+  name: 'revalidate',
+  maxRequests: 20,           // 20 revalidations
+  windowMs: 5 * 60 * 1000,   // per 5 minutes
+});
 
 /**
  * On-demand revalidation endpoint.
@@ -16,6 +23,14 @@ import { NextResponse } from 'next/server';
  *   Body:    { "all": true }
  */
 export async function POST(request) {
+  const { success, retryAfter } = revalLimit(request);
+  if (!success) {
+    return NextResponse.json(
+      { error: `Prea multe cereri. Reîncearcă peste ${retryAfter} secunde.` },
+      { status: 429 }
+    );
+  }
+
   // Verify secret so only the admin panel can trigger this
   const authHeader = request.headers.get('authorization');
   const secret = process.env.REVALIDATION_SECRET;

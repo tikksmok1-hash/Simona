@@ -1,6 +1,13 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { requireAuth } from '@/lib/auth';
+import { createRateLimit } from '@/lib/rateLimit';
+
+const writeLimit = createRateLimit({
+  name: 'admin-products-write',
+  maxRequests: 30,           // 30 creates
+  windowMs: 10 * 60 * 1000,  // per 10 minutes
+});
 
 // GET /api/admin/products — list all
 export async function GET(request) {
@@ -32,6 +39,14 @@ export async function GET(request) {
 export async function POST(request) {
   const user = requireAuth(request);
   if (!user) return NextResponse.json({ error: 'Neautorizat' }, { status: 401 });
+
+  const { success, retryAfter } = writeLimit(request);
+  if (!success) {
+    return NextResponse.json(
+      { error: `Prea multe cereri. Reîncearcă peste ${retryAfter} secunde.` },
+      { status: 429 }
+    );
+  }
 
   try {
     const body = await request.json();

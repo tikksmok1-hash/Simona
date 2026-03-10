@@ -1,11 +1,26 @@
 import { NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
 import { put, del } from '@vercel/blob';
+import { createRateLimit } from '@/lib/rateLimit';
+
+const uploadLimit = createRateLimit({
+  name: 'upload',
+  maxRequests: 30,           // 30 uploads
+  windowMs: 10 * 60 * 1000,  // per 10 minutes
+});
 
 // POST /api/admin/upload — upload image to Vercel Blob
 export async function POST(request) {
   const user = requireAuth(request);
   if (!user) return NextResponse.json({ error: 'Neautorizat' }, { status: 401 });
+
+  const { success, retryAfter } = uploadLimit(request);
+  if (!success) {
+    return NextResponse.json(
+      { error: `Prea multe upload-uri. Reîncearcă peste ${retryAfter} secunde.` },
+      { status: 429 }
+    );
+  }
 
   try {
     const formData = await request.formData();
