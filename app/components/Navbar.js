@@ -44,6 +44,9 @@ export default function Navbar({ siteSettings = {} }) {
   const router = useRouter();
   const { cartCount, favorites, openCart } = useCart();
 
+  // Client-verified homepage detection (handles Vercel SSR edge cases)
+  const [clientIsHome, setClientIsHome] = useState(pathname === '/' || !pathname);
+
   // Check scroll position on mount and scroll events
   useEffect(() => {
     const handleScroll = () => {
@@ -56,6 +59,11 @@ export default function Navbar({ siteSettings = {} }) {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Verify homepage on client using actual browser location
+  useEffect(() => {
+    setClientIsHome(window.location.pathname === '/');
+  }, [pathname]);
 
   // Fetch categories — use module-level cache to avoid refetching on every navigation
   useEffect(() => {
@@ -140,8 +148,7 @@ export default function Navbar({ siteSettings = {} }) {
   }
 
   // Transparent only on homepage when not scrolled and menu is closed
-  const isHomepage = pathname === '/';
-  // On SSR/initial render, default to transparent for homepage to prevent flash
+  const isHomepage = clientIsHome;
   const isTransparent = isHomepage && !isScrolled && !isMenuOpen;
 
   const navCategories = [
