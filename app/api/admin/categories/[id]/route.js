@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { requireAuth } from '@/lib/auth';
+import { logAudit } from '@/lib/audit';
 
 // PATCH /api/admin/categories/[id]
 export async function PATCH(request, { params }) {
@@ -21,6 +22,7 @@ export async function PATCH(request, { params }) {
         ...(body.isActive !== undefined && { isActive: body.isActive }),
       },
     });
+    await logAudit(request, { action: 'CATEGORY_UPDATE', details: `Categorie actualizată: ${category.name}`, userId: user.id, userEmail: user.email });
     return NextResponse.json(category);
   } catch (error) {
     return NextResponse.json({ error: 'Eroare la actualizare' }, { status: 500 });
@@ -34,7 +36,9 @@ export async function DELETE(request, { params }) {
 
   try {
     const { id } = await params;
+    const existing = await prisma.category.findUnique({ where: { id }, select: { name: true } });
     await prisma.category.delete({ where: { id } });
+    await logAudit(request, { action: 'CATEGORY_DELETE', details: `Categorie ștearsă: ${existing?.name || id}`, userId: user.id, userEmail: user.email });
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json({ error: 'Eroare la ștergere' }, { status: 500 });

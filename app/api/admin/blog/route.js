@@ -3,6 +3,7 @@ import { revalidatePath } from 'next/cache';
 import prisma from '@/lib/db';
 import { requireAuth } from '@/lib/auth';
 import { createRateLimit } from '@/lib/rateLimit';
+import { logAudit } from '@/lib/audit';
 
 const writeLimit = createRateLimit({
   name: 'admin-blog-write',
@@ -68,6 +69,7 @@ export async function POST(request) {
     });
 
     revalidatePath('/noutati', 'page');
+    await logAudit(request, { action: 'BLOG_CREATE', details: `Articol creat: ${post.title}`, userId: user.id, userEmail: user.email });
 
     return NextResponse.json(post, { status: 201 });
   } catch (error) {

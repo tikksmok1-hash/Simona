@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { createRateLimit } from '@/lib/rateLimit';
 import { sendTelegram, buildOrderMessage } from '@/lib/telegram';
+import { stripHtml } from '@/lib/sanitize';
 
 const orderLimit = createRateLimit({
   name: 'place-order',
@@ -21,7 +22,18 @@ export async function POST(request) {
 
   try {
     const body = await request.json();
-    const { customer, items, deliveryMethod, subtotal, shippingCost, total, observatii } = body;
+    const { customer: rawCustomer, items, deliveryMethod, subtotal, shippingCost, total, observatii } = body;
+
+    // Sanitize all customer text inputs
+    const customer = {
+      nume: stripHtml(rawCustomer?.nume),
+      prenume: stripHtml(rawCustomer?.prenume),
+      telefon: stripHtml(rawCustomer?.telefon),
+      email: stripHtml(rawCustomer?.email),
+      oras: stripHtml(rawCustomer?.oras),
+      adresa: stripHtml(rawCustomer?.adresa),
+    };
+    const safeObservatii = stripHtml(observatii);
 
     // Validate required fields
     if (!customer?.nume || !customer?.prenume || !customer?.telefon) {
@@ -127,7 +139,7 @@ export async function POST(request) {
         status: 'PENDING',
         paymentStatus: 'PENDING',
         paymentMethod: deliveryMethod === 'pickup' ? 'CASH_ON_PICKUP' : 'CASH_ON_DELIVERY',
-        customerNote: observatii || null,
+        customerNote: safeObservatii || null,
         user: { connect: { id: user.id } },
         shippingAddress: { connect: { id: address.id } },
       },

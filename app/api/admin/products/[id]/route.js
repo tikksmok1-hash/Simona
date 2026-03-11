@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { requireAuth } from '@/lib/auth';
+import { logAudit } from '@/lib/audit';
 
 // GET /api/admin/products/[id]
 export async function GET(request, { params }) {
@@ -90,6 +91,7 @@ export async function PATCH(request, { params }) {
       },
     });
 
+    await logAudit(request, { action: 'PRODUCT_UPDATE', details: `Produs actualizat: ${product.name}`, userId: user.id, userEmail: user.email });
     return NextResponse.json(product);
   } catch (error) {
     console.error('Product PATCH error:', error);
@@ -104,7 +106,9 @@ export async function DELETE(request, { params }) {
 
   try {
     const { id } = await params;
+    const existing = await prisma.product.findUnique({ where: { id }, select: { name: true } });
     await prisma.product.delete({ where: { id } });
+    await logAudit(request, { action: 'PRODUCT_DELETE', details: `Produs șters: ${existing?.name || id}`, userId: user.id, userEmail: user.email });
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json({ error: 'Eroare la ștergere' }, { status: 500 });

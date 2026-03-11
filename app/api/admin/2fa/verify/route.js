@@ -3,6 +3,7 @@ import { verifyToken, signToken } from '@/lib/auth';
 import { verify } from 'otplib';
 import prisma from '@/lib/db';
 import { createRateLimit } from '@/lib/rateLimit';
+import { logAudit } from '@/lib/audit';
 
 const verifyLimit = createRateLimit({
   name: '2fa-verify',
@@ -39,9 +40,11 @@ export async function POST(request) {
 
   const result = await verify({ token: code, secret: admin.twoFactorSecret });
   if (!result.valid) {
+    await logAudit(request, { action: 'LOGIN_2FA_FAILED', details: 'Cod 2FA invalid', userId: admin.id, userEmail: admin.email });
     return NextResponse.json({ error: 'Cod invalid. Încearcă din nou.' }, { status: 400 });
   }
 
+  await logAudit(request, { action: 'LOGIN', details: 'Autentificare cu 2FA reușită', userId: admin.id, userEmail: admin.email });
   const token = signToken({ id: admin.id, email: admin.email, name: admin.name });
 
   const response = NextResponse.json({

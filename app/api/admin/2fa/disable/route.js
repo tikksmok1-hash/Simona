@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
 import bcrypt from 'bcryptjs';
 import prisma from '@/lib/db';
+import { logAudit } from '@/lib/audit';
 
 // POST /api/admin/2fa/disable — disable 2FA (requires current password)
 export async function POST(request) {
@@ -24,5 +25,6 @@ export async function POST(request) {
     data: { twoFactorSecret: null, twoFactorEnabled: false },
   });
 
+  await logAudit(request, { action: '2FA_DISABLE', details: '2FA dezactivat', userId: user.id, userEmail: user.email });
   return NextResponse.json({ success: true });
 }

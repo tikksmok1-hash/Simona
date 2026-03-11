@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import prisma from '@/lib/db';
 import { requireAuth } from '@/lib/auth';
+import { logAudit } from '@/lib/audit';
 
 // PATCH /api/admin/blog/[id]
 export async function PATCH(request, { params }) {
@@ -48,6 +49,7 @@ export async function PATCH(request, { params }) {
     // Revalidate blog pages so changes appear immediately
     revalidatePath('/noutati', 'page');
     revalidatePath(`/noutati/${post.slug}`, 'page');
+    await logAudit(request, { action: 'BLOG_UPDATE', details: `Articol actualizat: ${post.title}`, userId: user.id, userEmail: user.email });
 
     return NextResponse.json(post);
   } catch (error) {
@@ -65,6 +67,7 @@ export async function DELETE(request, { params }) {
     const { id } = await params;
     const post = await prisma.blogPost.findUnique({ where: { id }, select: { slug: true } });
     await prisma.blogPost.delete({ where: { id } });
+    await logAudit(request, { action: 'BLOG_DELETE', details: `Articol șters: ${post?.slug || id}`, userId: user.id, userEmail: user.email });
 
     revalidatePath('/noutati', 'page');
     if (post?.slug) revalidatePath(`/noutati/${post.slug}`, 'page');

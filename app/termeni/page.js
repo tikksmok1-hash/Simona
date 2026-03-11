@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getStaticPage } from '@/lib/db/queries';
 import { defaultPages } from '@/lib/data/defaultPages';
+import { sanitizeHtml } from '@/lib/sanitize';
 
 export const revalidate = 60;
 
@@ -40,7 +41,7 @@ export default async function TermeniPage() {
         </div>
 
         {/* Content */}
-        <div className="page-content" dangerouslySetInnerHTML={{ __html: content }} />
+        <div className="page-content" dangerouslySetInnerHTML={{ __html: sanitizeHtml(content) }} />
       </div>
     </div>
   );

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { requireAuth } from '@/lib/auth';
 import prisma from '@/lib/db';
+import { sanitizeHtml } from '@/lib/sanitize';
 
 const slugToPath = {
   confidentialitate: '/confidentialitate',
@@ -44,10 +45,12 @@ export async function PUT(request, { params }) {
       return NextResponse.json({ error: 'Titlul și conținutul sunt obligatorii' }, { status: 400 });
     }
 
+    const safeContent = sanitizeHtml(content);
+
     const page = await prisma.staticPage.upsert({
       where: { slug },
-      update: { title, content },
-      create: { slug, title, content },
+      update: { title, content: safeContent },
+      create: { slug, title, content: safeContent },
     });
 
     // Revalidate the specific frontend page

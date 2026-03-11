@@ -3,6 +3,7 @@ import { revalidatePath } from 'next/cache';
 import { requireAuth } from '@/lib/auth';
 import prisma from '@/lib/db';
 import { createRateLimit } from '@/lib/rateLimit';
+import { logAudit } from '@/lib/audit';
 
 const writeLimit = createRateLimit({
   name: 'admin-settings-write',
@@ -57,6 +58,7 @@ export async function POST(request) {
     );
 
     await Promise.all(updates);
+    await logAudit(request, { action: 'SETTINGS_UPDATE', details: `Setări actualizate: ${Object.keys(data).join(', ')}`, userId: user.id, userEmail: user.email });
 
     // Revalidate all pages so new settings appear immediately
     revalidatePath('/', 'layout');

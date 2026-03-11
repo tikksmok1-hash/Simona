@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { requireAuth } from '@/lib/auth';
+import { logAudit } from '@/lib/audit';
 
 // PATCH /api/admin/orders/[id] — update order status
 export async function PATCH(request, { params }) {
@@ -18,6 +19,8 @@ export async function PATCH(request, { params }) {
     if (body.trackingNumber !== undefined) data.trackingNumber = body.trackingNumber;
 
     const order = await prisma.order.update({ where: { id }, data });
+    const changes = Object.entries(data).map(([k,v]) => `${k}: ${v}`).join(', ');
+    await logAudit(request, { action: 'ORDER_UPDATE', details: `Comandă #${id.slice(-6)} actualizată: ${changes}`, userId: user.id, userEmail: user.email });
     return NextResponse.json(order);
   } catch (error) {
     console.error('Order PATCH error:', error);

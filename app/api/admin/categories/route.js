@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { requireAuth } from '@/lib/auth';
 import { createRateLimit } from '@/lib/rateLimit';
+import { logAudit } from '@/lib/audit';
 
 const writeLimit = createRateLimit({
   name: 'admin-categories-write',
@@ -50,6 +51,7 @@ export async function POST(request) {
         isActive: body.isActive !== false,
       },
     });
+    await logAudit(request, { action: 'CATEGORY_CREATE', details: `Categorie creată: ${category.name}`, userId: user.id, userEmail: user.email });
     return NextResponse.json(category, { status: 201 });
   } catch (error) {
     console.error('Category POST error:', error);

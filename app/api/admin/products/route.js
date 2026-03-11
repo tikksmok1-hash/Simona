@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { requireAuth } from '@/lib/auth';
 import { createRateLimit } from '@/lib/rateLimit';
+import { logAudit } from '@/lib/audit';
 
 const writeLimit = createRateLimit({
   name: 'admin-products-write',
@@ -94,6 +95,7 @@ export async function POST(request) {
       },
     });
 
+    await logAudit(request, { action: 'PRODUCT_CREATE', details: `Produs creat: ${product.name}`, userId: user.id, userEmail: user.email });
     return NextResponse.json(product, { status: 201 });
   } catch (error) {
     console.error('Product POST error:', error);

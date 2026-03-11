@@ -443,6 +443,23 @@ model AdminUser {
   updatedAt         DateTime @updatedAt
 }
 
+// ==================== AUDIT LOGS ====================
+
+model AuditLog {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  action    String   // LOGIN, LOGIN_FAILED, LOGOUT, 2FA_ENABLE, 2FA_DISABLE, PRODUCT_CREATE, etc.
+  details   String?  // Extra info (product name, order id, etc.)
+  userId    String?  // Admin user id (null for failed logins)
+  userEmail String?  // Admin email (for display + failed logins)
+  ip        String?  // Client IP address
+  userAgent String?  // Browser user agent
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([userId])
+  @@index([action])
+}
+
 // ==================== SITE SETTINGS ====================
 
 model SiteSettings {

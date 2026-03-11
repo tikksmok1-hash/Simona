@@ -3,6 +3,7 @@ import prisma from '@/lib/db';
 import bcrypt from 'bcryptjs';
 import { signToken, signTempToken } from '@/lib/auth';
 import { createRateLimit } from '@/lib/rateLimit';
+import { logAudit } from '@/lib/audit';
 
 const loginLimit = createRateLimit({
   name: 'admin-login',
@@ -29,20 +30,24 @@ export async function POST(request) {
 
     const admin = await prisma.adminUser.findUnique({ where: { email } });
     if (!admin) {
+      await logAudit(request, { action: 'LOGIN_FAILED', details: `Email necunoscut: ${email}`, userEmail: email });
       return NextResponse.json({ error: 'Credențiale invalide' }, { status: 401 });
     }
 
     const valid = await bcrypt.compare(password, admin.password);
     if (!valid) {
+      await logAudit(request, { action: 'LOGIN_FAILED', details: 'Parolă incorectă', userId: admin.id, userEmail: admin.email });
       return NextResponse.json({ error: 'Credențiale invalide' }, { status: 401 });
     }
 
     // 2FA check
     if (admin.twoFactorEnabled && admin.twoFactorSecret) {
+      await logAudit(request, { action: 'LOGIN_2FA_PENDING', details: 'Credențiale corecte, se așteaptă cod 2FA', userId: admin.id, userEmail: admin.email });
       const tempToken = signTempToken({ id: admin.id, email: admin.email, name: admin.name });
       return NextResponse.json({ requiresTwoFactor: true, tempToken });
     }
 
+    await logAudit(request, { action: 'LOGIN', details: 'Autentificare reușită', userId: admin.id, userEmail: admin.email });
     const token = signToken({ id: admin.id, email: admin.email, name: admin.name });
 
     const response = NextResponse.json({

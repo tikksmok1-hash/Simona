@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
 import { verify } from 'otplib';
 import prisma from '@/lib/db';
+import { logAudit } from '@/lib/audit';
 
 // POST /api/admin/2fa/enable — verify code and save secret
 export async function POST(request) {
@@ -24,5 +25,6 @@ export async function POST(request) {
     data: { twoFactorSecret: secret, twoFactorEnabled: true },
   });
 
+  await logAudit(request, { action: '2FA_ENABLE', details: '2FA activat', userId: user.id, userEmail: user.email });
   return NextResponse.json({ success: true });
 }
