@@ -178,7 +178,7 @@ export default function FavoritePage() {
           <p className="text-xs text-neutral-400 tracking-[0.5em] uppercase mb-3">Continuă să explorezi</p>
           <h3 className="font-serif text-3xl text-black font-light mb-8">Descoperă Mai Mult</h3>
           <Link
-            href="/"
+            href="/bestsellers"
             className="group inline-flex items-center gap-3 border border-black text-black px-10 py-3.5 text-xs tracking-widest uppercase hover:bg-black hover:text-white transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0"
           >
             Toate Produsele

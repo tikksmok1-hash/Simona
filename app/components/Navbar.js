@@ -101,8 +101,9 @@ export default function Navbar({ siteSettings = {} }) {
   // Close search results and phone dropdown on outside click
   useEffect(() => {
     function handleClickOutside(e) {
-      if (searchRef.current && !searchRef.current.contains(e.target) &&
-          mobileSearchRef.current && !mobileSearchRef.current.contains(e.target)) {
+      const inDesktop = searchRef.current && searchRef.current.contains(e.target);
+      const inMobile = mobileSearchRef.current && mobileSearchRef.current.contains(e.target);
+      if (!inDesktop && !inMobile) {
         setShowResults(false);
       }
       if (phoneRef.current && !phoneRef.current.contains(e.target)) {
@@ -138,6 +139,9 @@ export default function Navbar({ siteSettings = {} }) {
 
   function handleSearchSubmit(e) {
     e.preventDefault();
+    if (searchQuery.trim().length >= 2) {
+      setShowResults(true);
+    }
   }
 
   function handleResultClick(slug) {
@@ -276,7 +280,7 @@ export default function Navbar({ siteSettings = {} }) {
                   type="text"
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
-                  onFocus={() => searchResults.length > 0 && setShowResults(true)}
+                  onFocus={() => searchQuery.trim().length >= 2 && setShowResults(true)}
                   onKeyDown={e => e.key === 'Escape' && setShowResults(false)}
                   placeholder="Caută produse..."
                   className={`w-full px-4 py-2.5 border focus:outline-none text-sm font-light tracking-wide transition-all duration-500 ${
