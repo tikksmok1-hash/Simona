@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { verifyToken, signToken } from '@/lib/auth';
-import { authenticator } from 'otplib';
+import { verify } from 'otplib';
 import prisma from '@/lib/db';
 import { createRateLimit } from '@/lib/rateLimit';
 
@@ -37,8 +37,8 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Eroare server' }, { status: 500 });
   }
 
-  const isValid = authenticator.verify({ token: code, secret: admin.twoFactorSecret });
-  if (!isValid) {
+  const result = await verify({ token: code, secret: admin.twoFactorSecret });
+  if (!result.valid) {
     return NextResponse.json({ error: 'Cod invalid. Încearcă din nou.' }, { status: 400 });
   }
 

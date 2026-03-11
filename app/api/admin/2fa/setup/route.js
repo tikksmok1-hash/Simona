@@ -1,15 +1,15 @@
 import { NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
-import { authenticator } from 'otplib';
+import { generateSecret, generateURI } from 'otplib';
 
 // GET /api/admin/2fa/setup — generate a TOTP secret for setup
 export async function GET(request) {
   const user = requireAuth(request);
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const secret = authenticator.generateSecret();
+  const secret = generateSecret();
   const appName = 'SIMONA Admin';
-  const otpauthUrl = authenticator.keyuri(user.email, appName, secret);
+  const otpauthUrl = generateURI({ secret, label: user.email, issuer: appName, type: 'totp' });
 
   // QR code via free public API (no extra npm package needed)
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(otpauthUrl)}`;

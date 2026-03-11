@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
-import { authenticator } from 'otplib';
+import { verify } from 'otplib';
 import prisma from '@/lib/db';
 
 // POST /api/admin/2fa/enable — verify code and save secret
@@ -14,8 +14,8 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Cod și secret obligatorii' }, { status: 400 });
   }
 
-  const isValid = authenticator.verify({ token: code, secret });
-  if (!isValid) {
+  const result = await verify({ token: code, secret });
+  if (!result.valid) {
     return NextResponse.json({ error: 'Cod invalid. Încearcă din nou.' }, { status: 400 });
   }
 
