@@ -95,6 +95,7 @@ export function CartProvider({ children }) {
         {
           key,
           productId: product.id,
+          variantId: variant.id,
           slug: product.slug,
           name: product.name,
           price: product.price,

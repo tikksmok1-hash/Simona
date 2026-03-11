@@ -6,8 +6,11 @@ import Link from 'next/link';
 import { useCart } from '@/app/context/CartContext';
 import ProductCard from '@/app/components/ProductCard';
 
-export default function ProductDetailClient({ product, similarProducts = [] }) {
-  const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
+export default function ProductDetailClient({ product, similarProducts = [], initialVariantId }) {
+  const initialIndex = initialVariantId
+    ? Math.max(0, (product.variants?.findIndex(v => v.id === initialVariantId) ?? -1) === -1 ? 0 : product.variants.findIndex(v => v.id === initialVariantId))
+    : 0;
+  const [selectedVariantIndex, setSelectedVariantIndex] = useState(initialIndex);
   const [selectedSize, setSelectedSize] = useState(null);
   const [mainImageIndex, setMainImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -477,6 +480,9 @@ export default function ProductDetailClient({ product, similarProducts = [] }) {
                       { size: 'L', bust: '92–96', waist: '72–76', hip: '98–102', eu: '40' },
                       { size: 'XL', bust: '96–100', waist: '76–80', hip: '102–106', eu: '42' },
                       { size: 'XXL', bust: '100–104', waist: '80–84', hip: '106–110', eu: '44' },
+                      { size: '3XL', bust: '104–108', waist: '84–88', hip: '110–114', eu: '46' },
+                      { size: '4XL', bust: '108–112', waist: '88–92', hip: '114–118', eu: '48' },
+                      { size: '5XL', bust: '112–116', waist: '92–96', hip: '118–122', eu: '50' },
                     ].map((row, i) => {
                       const available = sizes.some(s => s.size === row.size);
                       const isSelected = selectedSize === row.size;

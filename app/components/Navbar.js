@@ -292,9 +292,9 @@ export default function Navbar({ siteSettings = {} }) {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </button>
-                {showResults && searchResults.length > 0 && (
+                {showResults && (
                   <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 shadow-xl z-[200]">
-                    {searchResults.map(p => (
+                    {searchResults.length > 0 ? searchResults.map(p => (
                       <button
                         key={p.id}
                         type="button"
@@ -310,7 +310,15 @@ export default function Navbar({ siteSettings = {} }) {
                           <p className="text-xs text-gray-400">{p.price} MDL</p>
                         </div>
                       </button>
-                    ))}
+                    )) : (
+                      <div className="px-4 py-5 text-center">
+                        <svg className="w-8 h-8 text-gray-200 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        <p className="text-sm text-gray-400 font-light">Niciun produs găsit pentru</p>
+                        <p className="text-sm text-black font-medium mt-0.5">&ldquo;{searchQuery}&rdquo;</p>
+                      </div>
+                    )}
                   </div>
                 )}
               </form>
@@ -411,9 +419,9 @@ export default function Navbar({ siteSettings = {} }) {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </button>
-                {showResults && searchResults.length > 0 && (
+                {showResults && (
                   <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 shadow-xl z-[200]">
-                    {searchResults.map(p => (
+                    {searchResults.length > 0 ? searchResults.map(p => (
                       <button
                         key={p.id}
                         type="button"
@@ -429,7 +437,15 @@ export default function Navbar({ siteSettings = {} }) {
                           <p className="text-xs text-gray-400">{p.price} MDL</p>
                         </div>
                       </button>
-                    ))}
+                    )) : (
+                      <div className="px-4 py-5 text-center">
+                        <svg className="w-8 h-8 text-gray-200 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        <p className="text-sm text-gray-400 font-light">Niciun produs găsit pentru</p>
+                        <p className="text-sm text-black font-medium mt-0.5">&ldquo;{searchQuery}&rdquo;</p>
+                      </div>
+                    )}
                   </div>
                 )}
               </form>
@@ -576,10 +592,6 @@ export default function Navbar({ siteSettings = {} }) {
               );
             })}
             
-            <Link href="/contact" className="block text-gray-700 hover:text-black text-sm font-light tracking-wider uppercase py-3 border-b border-gray-50">
-              Contact
-            </Link>
-
             {/* Contact Info */}
             <div className="pt-4 pb-2 flex flex-col gap-3">
               {isAdmin && (

@@ -433,12 +433,14 @@ enum CouponType {
 // ==================== ADMIN USERS ====================
 
 model AdminUser {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  email     String   @unique
-  password  String   // bcrypt hash
-  name      String   @default("Admin")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  email             String   @unique
+  password          String   // bcrypt hash
+  name              String   @default("Admin")
+  twoFactorSecret   String?
+  twoFactorEnabled  Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
 
 // ==================== SITE SETTINGS ====================

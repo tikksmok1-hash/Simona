@@ -42,7 +42,7 @@ export default function FavoritePage() {
             Salvează produsele preferate apăsând inimița de pe orice produs.
           </p>
           <Link
-            href="/"
+            href="/bestsellers"
             className="group inline-flex items-center gap-3 bg-black text-white px-10 py-3.5 text-xs tracking-widest uppercase transition-all duration-300 hover:bg-neutral-800 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0"
           >
             Explorează Colecția
@@ -89,10 +89,13 @@ export default function FavoritePage() {
       {/* Products grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-5 gap-y-10">
-          {favorites.map((item) => (
+          {favorites.map((item) => {
+            const variantId = item.variantId || item.key.split('-').slice(1).join('-');
+            const productUrl = `/produs/${item.slug}?variant=${variantId}`;
+            return (
             <div key={item.key} className="group">
               {/* Image wrapper */}
-              <div className="relative aspect-[3/4] bg-neutral-100 overflow-hidden mb-4">
+              <Link href={productUrl} className="relative aspect-[3/4] bg-neutral-100 overflow-hidden mb-4 block">
                 {item.image ? (
                   <Image
                     src={item.image}
@@ -122,7 +125,7 @@ export default function FavoritePage() {
                 {/* Action bar — slides up on hover */}
                 <div className="absolute bottom-0 left-0 right-0 flex translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-10">
                   <button
-                    onClick={() => handleQuickAdd(item)}
+                    onClick={(e) => { e.preventDefault(); handleQuickAdd(item); }}
                     className={`flex-1 py-3 text-[10px] tracking-widest uppercase font-medium transition-all duration-200 ${
                       addedKey === item.key
                         ? 'bg-green-600 text-white'
@@ -132,7 +135,7 @@ export default function FavoritePage() {
                     {addedKey === item.key ? '✓ Adăugat' : 'Adaugă în Coș'}
                   </button>
                   <button
-                    onClick={() => removeFromFavorites(item.key)}
+                    onClick={(e) => { e.preventDefault(); removeFromFavorites(item.key); }}
                     className="w-12 bg-white border-l border-neutral-100 flex items-center justify-center group/rm hover:bg-red-50 transition-colors duration-200 active:scale-90"
                     title="Șterge din favorite"
                   >
@@ -141,12 +144,12 @@ export default function FavoritePage() {
                     </svg>
                   </button>
                 </div>
-              </div>
+              </Link>
 
               {/* Info */}
               <div>
                 <Link
-                  href={`/produs/${item.slug}`}
+                  href={productUrl}
                   className="font-serif text-sm text-black hover:underline line-clamp-2 leading-snug block mb-1.5"
                 >
                   {item.name}
@@ -166,7 +169,8 @@ export default function FavoritePage() {
                 </div>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Bottom CTA */}

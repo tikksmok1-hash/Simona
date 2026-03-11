@@ -60,10 +60,22 @@ export function AdminAuthProvider({ children }) {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Eroare la autentificare');
+    
+    // 2FA required — don't set token yet
+    if (data.requiresTwoFactor) {
+      return data;
+    }
+
     localStorage.setItem('admin-token', data.token);
     setToken(data.token);
     setUser(data.user);
     return data;
+  };
+
+  const setAuthData = (token, user) => {
+    localStorage.setItem('admin-token', token);
+    setToken(token);
+    setUser(user);
   };
 
   const logout = () => {
@@ -91,7 +103,7 @@ export function AdminAuthProvider({ children }) {
   };
 
   return (
-    <AdminAuthContext.Provider value={{ user, token, loading, login, logout, apiFetch }}>
+    <AdminAuthContext.Provider value={{ user, token, loading, login, logout, apiFetch, setAuthData }}>
       {children}
     </AdminAuthContext.Provider>
   );

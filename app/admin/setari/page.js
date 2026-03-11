@@ -4,6 +4,159 @@ import { useState, useEffect } from 'react';
 import { useAdmin } from '../AdminAuthContext';
 import Image from 'next/image';
 
+// ── 2FA Section Component ─────────────────────────────────────────────────────
+function TwoFactorSection({ apiFetch }) {
+  const [status, setStatus] = useState(null); // null = loading, true = enabled, false = disabled
+  const [setupData, setSetupData] = useState(null); // { secret, qrUrl }
+  const [setupStep, setSetupStep] = useState(0); // 0=idle, 1=qr shown, 2=verified
+  const [verifyCode, setVerifyCode] = useState('');
+  const [disablePassword, setDisablePassword] = useState('');
+  const [showDisable, setShowDisable] = useState(false);
+  const [msg, setMsg] = useState(null);
+  const [loading2fa, setLoading2fa] = useState(false);
+
+  useEffect(() => {
+    apiFetch('/api/admin/me')
+      .then(r => r.json())
+      .then(d => setStatus(d.user?.twoFactorEnabled ?? false))
+      .catch(() => setStatus(false));
+  }, [apiFetch]);
+
+  const startSetup = async () => {
+    setLoading2fa(true); setMsg(null);
+    const res = await apiFetch('/api/admin/2fa/setup');
+    const data = await res.json();
+    setSetupData(data);
+    setSetupStep(1);
+    setLoading2fa(false);
+  };
+
+  const enableTwoFactor = async () => {
+    if (verifyCode.length !== 6) { setMsg({ type: 'error', text: 'Introdu 6 cifre' }); return; }
+    setLoading2fa(true); setMsg(null);
+    const res = await apiFetch('/api/admin/2fa/enable', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: verifyCode, secret: setupData.secret }),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      setStatus(true); setSetupStep(0); setSetupData(null); setVerifyCode('');
+      setMsg({ type: 'success', text: '2FA activat cu succes!' });
+    } else {
+      setMsg({ type: 'error', text: data.error });
+    }
+    setLoading2fa(false);
+  };
+
+  const disableTwoFactor = async () => {
+    if (!disablePassword) { setMsg({ type: 'error', text: 'Introduceți parola' }); return; }
+    setLoading2fa(true); setMsg(null);
+    const res = await apiFetch('/api/admin/2fa/disable', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: disablePassword }),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      setStatus(false); setShowDisable(false); setDisablePassword('');
+      setMsg({ type: 'success', text: '2FA dezactivat.' });
+    } else {
+      setMsg({ type: 'error', text: data.error });
+    }
+    setLoading2fa(false);
+  };
+
+  if (status === null) return <div className="h-10 flex items-center"><div className="w-5 h-5 border-2 border-gray-300 border-t-transparent rounded-full animate-spin" /></div>;
+
+  return (
+    <div>
+      {msg && (
+        <div className={`mb-4 px-4 py-3 rounded-lg text-sm ${msg.type === 'success' ? 'bg-green-50 border border-green-200 text-green-800' : 'bg-red-50 border border-red-200 text-red-700'}`}>
+          {msg.text}
+        </div>
+      )}
+
+      {/* Status badge */}
+      <div className="flex items-center gap-3 mb-6">
+        <div className={`w-2.5 h-2.5 rounded-full ${status ? 'bg-green-500' : 'bg-gray-300'}`} />
+        <span className="text-sm text-gray-700">{status ? '2FA Activ — contul tău este protejat' : '2FA Inactiv — activează pentru securitate sporită'}</span>
+      </div>
+
+      {!status && setupStep === 0 && (
+        <button onClick={startSetup} disabled={loading2fa}
+          className="px-5 py-2.5 bg-black text-white text-sm rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50">
+          {loading2fa ? 'Se pregătește...' : 'Activează 2FA'}
+        </button>
+      )}
+
+      {!status && setupStep === 1 && setupData && (
+        <div className="space-y-5">
+          <p className="text-sm text-gray-600">Scanează cu <strong>Google Authenticator</strong>, <strong>Authy</strong> sau orice aplicație TOTP:</p>
+          <div className="flex flex-col sm:flex-row gap-6 items-start">
+            {/* QR Code */}
+            <div className="border border-gray-200 rounded-lg p-3 bg-white inline-block">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={setupData.qrUrl} alt="QR Code 2FA" width={160} height={160} />
+            </div>
+            <div className="flex-1 space-y-3">
+              <p className="text-xs text-gray-500">Sau introdu manual secretul în aplicație:</p>
+              <code className="block bg-gray-50 border border-gray-200 rounded px-3 py-2 text-xs font-mono tracking-widest break-all select-all">
+                {setupData.secret}
+              </code>
+              <p className="text-xs text-gray-400">Apoi introdu codul de 6 cifre generat de aplicație pentru confirmare:</p>
+              <div className="flex gap-2">
+                <input
+                  type="text" inputMode="numeric" maxLength={6}
+                  value={verifyCode}
+                  onChange={e => setVerifyCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  placeholder="000000"
+                  className="w-36 px-3 py-2 border border-gray-200 rounded-lg text-sm text-center tracking-widest focus:outline-none focus:border-black"
+                />
+                <button onClick={enableTwoFactor} disabled={loading2fa || verifyCode.length < 6}
+                  className="px-5 py-2 bg-black text-white text-sm rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50">
+                  {loading2fa ? '...' : 'Confirmă'}
+                </button>
+                <button onClick={() => { setSetupStep(0); setSetupData(null); setVerifyCode(''); }}
+                  className="px-4 py-2 text-sm text-gray-500 hover:text-black transition-colors">
+                  Anulează
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {status && !showDisable && (
+        <button onClick={() => setShowDisable(true)}
+          className="px-5 py-2.5 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg hover:bg-red-100 transition-colors">
+          Dezactivează 2FA
+        </button>
+      )}
+
+      {status && showDisable && (
+        <div className="flex flex-col sm:flex-row gap-3 items-start">
+          <input
+            type="password"
+            value={disablePassword}
+            onChange={e => setDisablePassword(e.target.value)}
+            placeholder="Confirmă cu parola actuală"
+            className="w-64 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black"
+          />
+          <button onClick={disableTwoFactor} disabled={loading2fa}
+            className="px-5 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50">
+            {loading2fa ? '...' : 'Dezactivează'}
+          </button>
+          <button onClick={() => { setShowDisable(false); setDisablePassword(''); }}
+            className="px-4 py-2 text-sm text-gray-500 hover:text-black transition-colors">
+            Anulează
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function SetariPage() {
   const { apiFetch } = useAdmin();
   const [settings, setSettings] = useState({
@@ -325,6 +478,22 @@ export default function SetariPage() {
             className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black resize-none"
           />
         </div>
+      </div>
+
+      {/* 2FA Security */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+        <div className="flex items-start gap-3 mb-5">
+          <div className="w-9 h-9 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+            <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+            </svg>
+          </div>
+          <div>
+            <h2 className="text-lg font-medium text-black">Autentificare în Doi Pași (2FA)</h2>
+            <p className="text-sm text-gray-500 mt-0.5">Protejează contul cu Google Authenticator sau Authy</p>
+          </div>
+        </div>
+        <TwoFactorSection apiFetch={apiFetch} />
       </div>
 
       {/* Save Button */}

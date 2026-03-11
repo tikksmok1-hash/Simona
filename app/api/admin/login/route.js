@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import bcrypt from 'bcryptjs';
-import { signToken } from '@/lib/auth';
+import { signToken, signTempToken } from '@/lib/auth';
 import { createRateLimit } from '@/lib/rateLimit';
 
 const loginLimit = createRateLimit({
   name: 'admin-login',
-  maxRequests: 5,       // 5 attempts
-  windowMs: 15 * 60 * 1000, // per 15 minutes
+  maxRequests: 5,
+  windowMs: 15 * 60 * 1000,
 });
 
 // POST /api/admin/login
@@ -37,6 +37,12 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Credențiale invalide' }, { status: 401 });
     }
 
+    // 2FA check
+    if (admin.twoFactorEnabled && admin.twoFactorSecret) {
+      const tempToken = signTempToken({ id: admin.id, email: admin.email, name: admin.name });
+      return NextResponse.json({ requiresTwoFactor: true, tempToken });
+    }
+
     const token = signToken({ id: admin.id, email: admin.email, name: admin.name });
 
     const response = NextResponse.json({
@@ -44,12 +50,11 @@ export async function POST(request) {
       user: { id: admin.id, email: admin.email, name: admin.name },
     });
 
-    // Set cookie too
     response.cookies.set('admin-token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      maxAge: 60 * 60 * 24 * 7,
       path: '/',
     });
 

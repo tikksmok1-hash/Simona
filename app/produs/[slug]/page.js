@@ -44,13 +44,14 @@ export async function generateMetadata({ params }) {
   };
 }
 
-export default async function ProductPage({ params }) {
+export default async function ProductPage({ params, searchParams }) {
   const { slug } = await params;
+  const { variant } = await searchParams;
   const product = await getProduct(slug);
 
   if (!product) notFound();
 
   const similarProducts = await getRelatedProducts(product);
 
-  return <ProductDetailClient product={product} similarProducts={similarProducts} />;
+  return <ProductDetailClient product={product} similarProducts={similarProducts} initialVariantId={variant} />;
 }
