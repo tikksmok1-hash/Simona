@@ -50,6 +50,8 @@ export default function RootLayout({ children }) {
   return (
     <html lang="ro">
       <head>
+        {/* Inline script to mark homepage BEFORE React hydrates — prevents navbar flash */}
+        <script dangerouslySetInnerHTML={{ __html: `try{if(location.pathname==='/'){document.documentElement.dataset.home='1'}}catch(e){}` }} />
         {/* Meta Pixel Code */}
         <Script id="meta-pixel" strategy="afterInteractive">
           {`
