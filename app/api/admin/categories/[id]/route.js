@@ -15,8 +15,12 @@ export async function PATCH(request, { params }) {
       where: { id },
       data: {
         ...(body.name && { name: body.name }),
+        ...(body.nameRu !== undefined && { nameRu: body.nameRu || null }),
+        ...(body.nameEn !== undefined && { nameEn: body.nameEn || null }),
         ...(body.slug && { slug: body.slug }),
         ...(body.description !== undefined && { description: body.description }),
+        ...(body.descriptionRu !== undefined && { descriptionRu: body.descriptionRu || null }),
+        ...(body.descriptionEn !== undefined && { descriptionEn: body.descriptionEn || null }),
         ...(body.image !== undefined && { image: body.image }),
         ...(body.order !== undefined && { order: body.order }),
         ...(body.isActive !== undefined && { isActive: body.isActive }),

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAdmin } from '../AdminAuthContext';
+import TranslatableField from '../components/TranslatableField';
 import Image from 'next/image';
 
 // ── 2FA Section Component ─────────────────────────────────────────────────────
@@ -162,15 +163,29 @@ export default function SetariPage() {
   const [settings, setSettings] = useState({
     heroImage: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1920&h=1080&fit=crop&q=90',
     heroTitle: 'Descoperă',
+    heroTitleRu: '',
+    heroTitleEn: '',
     heroSubtitle: 'Stilul Tău',
+    heroSubtitleRu: '',
+    heroSubtitleEn: '',
     heroLabel: 'Colecția Primăvară 2026',
+    heroLabelRu: '',
+    heroLabelEn: '',
     phone1: '062 000 160',
     phone2: '',
     email: 'simona.md_info@mail.ru',
     address: 'str. Ion Creangă 58, Chișinău',
+    addressRu: '',
+    addressEn: '',
     schedule1: 'Luni – Vineri: 9:00 – 19:00',
+    schedule1Ru: '',
+    schedule1En: '',
     schedule2: 'Sâmbătă – Duminică: 9:00 – 17:00',
+    schedule2Ru: '',
+    schedule2En: '',
     footerDescription: 'Magazinul tău de modă feminină din Chișinău. Cele mai noi tendințe la prețuri accesibile.',
+    footerDescriptionRu: '',
+    footerDescriptionEn: '',
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -240,6 +255,8 @@ export default function SetariPage() {
       setUploading(false);
     }
   };
+
+  const updateField = (key, val) => setSettings(prev => ({ ...prev, [key]: val }));
 
   if (loading) {
     return (
@@ -336,44 +353,40 @@ export default function SetariPage() {
 
         {/* Hero Label */}
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Label (Text Mic de Sus)
-          </label>
-          <input
-            type="text"
+          <TranslatableField
+            label="Label (Text Mic de Sus)"
             value={settings.heroLabel}
-            onChange={(e) => setSettings(prev => ({ ...prev, heroLabel: e.target.value }))}
+            valueRu={settings.heroLabelRu}
+            valueEn={settings.heroLabelEn}
+            onChange={updateField}
+            fieldKey="heroLabel"
+            apiFetch={apiFetch}
             placeholder="Colecția Primăvară 2026"
-            className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black"
           />
         </div>
 
         {/* Hero Title */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Titlu Principal
-            </label>
-            <input
-              type="text"
-              value={settings.heroTitle}
-              onChange={(e) => setSettings(prev => ({ ...prev, heroTitle: e.target.value }))}
-              placeholder="Descoperă"
-              className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Subtitlu (Italic)
-            </label>
-            <input
-              type="text"
-              value={settings.heroSubtitle}
-              onChange={(e) => setSettings(prev => ({ ...prev, heroSubtitle: e.target.value }))}
-              placeholder="Stilul Tău"
-              className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black"
-            />
-          </div>
+          <TranslatableField
+            label="Titlu Principal"
+            value={settings.heroTitle}
+            valueRu={settings.heroTitleRu}
+            valueEn={settings.heroTitleEn}
+            onChange={updateField}
+            fieldKey="heroTitle"
+            apiFetch={apiFetch}
+            placeholder="Descoperă"
+          />
+          <TranslatableField
+            label="Subtitlu (Italic)"
+            value={settings.heroSubtitle}
+            valueRu={settings.heroSubtitleRu}
+            valueEn={settings.heroSubtitleEn}
+            onChange={updateField}
+            fieldKey="heroSubtitle"
+            apiFetch={apiFetch}
+            placeholder="Stilul Tău"
+          />
         </div>
       </div>
 
@@ -425,57 +438,55 @@ export default function SetariPage() {
 
         {/* Address */}
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Adresă
-          </label>
-          <input
-            type="text"
+          <TranslatableField
+            label="Adresă"
             value={settings.address}
-            onChange={(e) => setSettings(prev => ({ ...prev, address: e.target.value }))}
+            valueRu={settings.addressRu}
+            valueEn={settings.addressEn}
+            onChange={updateField}
+            fieldKey="address"
+            apiFetch={apiFetch}
             placeholder="str. Ion Creangă 58, Chișinău"
-            className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black"
           />
         </div>
 
         {/* Schedule */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Program Luni – Vineri
-            </label>
-            <input
-              type="text"
-              value={settings.schedule1}
-              onChange={(e) => setSettings(prev => ({ ...prev, schedule1: e.target.value }))}
-              placeholder="Luni – Vineri: 9:00 – 19:00"
-              className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Program Sâmbătă – Duminică
-            </label>
-            <input
-              type="text"
-              value={settings.schedule2}
-              onChange={(e) => setSettings(prev => ({ ...prev, schedule2: e.target.value }))}
-              placeholder="Sâmbătă – Duminică: 9:00 – 17:00"
-              className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black"
-            />
-          </div>
+          <TranslatableField
+            label="Program Luni – Vineri"
+            value={settings.schedule1}
+            valueRu={settings.schedule1Ru}
+            valueEn={settings.schedule1En}
+            onChange={updateField}
+            fieldKey="schedule1"
+            apiFetch={apiFetch}
+            placeholder="Luni – Vineri: 9:00 – 19:00"
+          />
+          <TranslatableField
+            label="Program Sâmbătă – Duminică"
+            value={settings.schedule2}
+            valueRu={settings.schedule2Ru}
+            valueEn={settings.schedule2En}
+            onChange={updateField}
+            fieldKey="schedule2"
+            apiFetch={apiFetch}
+            placeholder="Sâmbătă – Duminică: 9:00 – 17:00"
+          />
         </div>
 
         {/* Footer Description */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Descriere Footer
-          </label>
-          <textarea
+          <TranslatableField
+            label="Descriere Footer"
             value={settings.footerDescription}
-            onChange={(e) => setSettings(prev => ({ ...prev, footerDescription: e.target.value }))}
-            placeholder="Magazinul tău de modă feminină din Chișinău..."
+            valueRu={settings.footerDescriptionRu}
+            valueEn={settings.footerDescriptionEn}
+            onChange={updateField}
+            fieldKey="footerDescription"
+            apiFetch={apiFetch}
+            multiline
             rows={2}
-            className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black resize-none"
+            placeholder="Magazinul tău de modă feminină din Chișinău..."
           />
         </div>
       </div>

@@ -4,15 +4,18 @@ import { useState } from 'react';
 import { useCart } from '@/app/context/CartContext';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useTranslation } from '@/app/context/LanguageContext';
+import { localize } from '@/lib/localize';
 
 export default function FavoritePage() {
   const { favorites, removeFromFavorites, addToCart, openCart } = useCart();
   const [addedKey, setAddedKey] = useState(null);
+  const { lang, t } = useTranslation();
 
   const handleQuickAdd = (item) => {
     addToCart(
-      { id: item.productId, slug: item.slug, name: item.name, price: item.price, compareAtPrice: item.compareAtPrice },
-      { id: item.key.split('-')[1] ?? 'v1', colorName: item.colorName, colorCode: item.colorCode, images: [{ url: item.image }] },
+      { id: item.productId, slug: item.slug, name: item.name, nameRu: item.nameRu, nameEn: item.nameEn, price: item.price, compareAtPrice: item.compareAtPrice },
+      { id: item.key.split('-')[1] ?? 'v1', colorName: item.colorName, colorNameRu: item.colorNameRu, colorNameEn: item.colorNameEn, colorCode: item.colorCode, images: [{ url: item.image }] },
       'M',
       1
     );
@@ -27,8 +30,8 @@ export default function FavoritePage() {
           <div className="absolute left-8 top-0 bottom-0 w-px bg-white/10" />
           <div className="absolute right-8 top-0 bottom-0 w-px bg-white/10" />
           <div className="text-center relative z-10">
-            <p className="text-white/30 text-[10px] tracking-[0.6em] uppercase mb-4">Colecția Ta</p>
-            <h1 className="font-serif text-6xl md:text-8xl text-white font-light leading-none">Favorite</h1>
+            <p className="text-white/30 text-[10px] tracking-[0.6em] uppercase mb-4">{t('fav.collection')}</p>
+            <h1 className="font-serif text-6xl md:text-8xl text-white font-light leading-none">{t('fav.title')}</h1>
           </div>
         </div>
         <div className="flex flex-col items-center justify-center py-32 text-center px-4">
@@ -37,15 +40,15 @@ export default function FavoritePage() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
             </svg>
           </div>
-          <h2 className="font-serif text-2xl font-light text-black mb-3">Lista ta de favorite este goală</h2>
+          <h2 className="font-serif text-2xl font-light text-black mb-3">{t('fav.emptyTitle')}</h2>
           <p className="text-neutral-400 text-sm max-w-xs mb-10 leading-relaxed">
-            Salvează produsele preferate apăsând inimița de pe orice produs.
+            {t('fav.emptyDesc')}
           </p>
           <Link
             href="/bestsellers"
             className="group inline-flex items-center gap-3 bg-black text-white px-10 py-3.5 text-xs tracking-widest uppercase transition-all duration-300 hover:bg-neutral-800 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0"
           >
-            Explorează Colecția
+            {t('fav.explore')}
             <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
@@ -63,12 +66,12 @@ export default function FavoritePage() {
         <div className="absolute right-8 top-0 bottom-0 w-px bg-white/10" />
         <div className="absolute left-1/2 top-0 bottom-0 w-px bg-white/5 hidden md:block" />
         <div className="max-w-7xl mx-auto px-8 text-center relative z-10">
-          <p className="text-white/30 text-[10px] tracking-[0.6em] uppercase mb-4 font-light">Colecția Ta</p>
-          <h1 className="font-serif text-6xl md:text-8xl text-white font-light leading-none">Favorite</h1>
+          <p className="text-white/30 text-[10px] tracking-[0.6em] uppercase mb-4 font-light">{t('fav.collection')}</p>
+          <h1 className="font-serif text-6xl md:text-8xl text-white font-light leading-none">{t('fav.title')}</h1>
           <div className="flex items-center justify-center gap-6 mt-6">
             <div className="h-px w-16 bg-white/20" />
             <p className="text-white/40 text-xs tracking-[0.4em] uppercase font-light">
-              {favorites.length} {favorites.length === 1 ? 'produs salvat' : 'produse salvate'}
+              {favorites.length} {favorites.length === 1 ? t('fav.saved') : t('fav.savedPlural')}
             </p>
             <div className="h-px w-16 bg-white/20" />
           </div>
@@ -79,9 +82,9 @@ export default function FavoritePage() {
       <div className="border-b border-neutral-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <nav className="flex items-center gap-2 text-xs text-neutral-400 tracking-widest uppercase">
-            <Link href="/" className="hover:text-black transition-colors">Acasă</Link>
+            <Link href="/" className="hover:text-black transition-colors">{t('common.home')}</Link>
             <span>/</span>
-            <span className="text-black">Favorite</span>
+            <span className="text-black">{t('fav.title')}</span>
           </nav>
         </div>
       </div>
@@ -99,7 +102,7 @@ export default function FavoritePage() {
                 {item.image ? (
                   <Image
                     src={item.image}
-                    alt={item.name}
+                    alt={localize(item, 'name', lang)}
                     fill
                     className="object-cover transition-transform duration-700 group-hover:scale-105"
                     sizes="(max-width: 768px) 50vw, 25vw"
@@ -132,12 +135,12 @@ export default function FavoritePage() {
                         : 'bg-black text-white hover:bg-neutral-800 active:scale-[0.99]'
                     }`}
                   >
-                    {addedKey === item.key ? '✓ Adăugat' : 'Adaugă în Coș'}
+                    {addedKey === item.key ? t('fav.added') : t('fav.addToCart')}
                   </button>
                   <button
                     onClick={(e) => { e.preventDefault(); removeFromFavorites(item.key); }}
                     className="w-12 bg-white border-l border-neutral-100 flex items-center justify-center group/rm hover:bg-red-50 transition-colors duration-200 active:scale-90"
-                    title="Șterge din favorite"
+                    title={t('fav.deleteFav')}
                   >
                     <svg className="w-4 h-4 text-neutral-400 group-hover/rm:text-red-500 transition-colors" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -152,14 +155,14 @@ export default function FavoritePage() {
                   href={productUrl}
                   className="font-serif text-sm text-black hover:underline line-clamp-2 leading-snug block mb-1.5"
                 >
-                  {item.name}
+                  {localize(item, 'name', lang)}
                 </Link>
                 <div className="flex items-center gap-2 mb-1.5">
                   <span
                     className="w-3 h-3 rounded-full border border-neutral-200 flex-shrink-0"
                     style={{ backgroundColor: item.colorCode }}
                   />
-                  <span className="text-[10px] text-neutral-400 tracking-wide">{item.colorName}</span>
+                  <span className="text-[10px] text-neutral-400 tracking-wide">{localize(item, 'colorName', lang)}</span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <span className="text-sm font-medium text-black">{item.price} MDL</span>

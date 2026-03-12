@@ -45,10 +45,16 @@ export async function POST(request) {
     const post = await prisma.blogPost.create({
       data: {
         title: body.title,
+        titleRu: body.titleRu || null,
+        titleEn: body.titleEn || null,
         slug: body.slug,
         excerpt: body.excerpt || '',
+        excerptRu: body.excerptRu || null,
+        excerptEn: body.excerptEn || null,
         image: body.image || null,
         category: body.category || 'General',
+        categoryRu: body.categoryRu || null,
+        categoryEn: body.categoryEn || null,
         date: new Date(body.date || Date.now()),
         readTime: body.readTime || '5 min',
         author: body.author || 'Simona',
@@ -58,7 +64,11 @@ export async function POST(request) {
         sections: {
           create: (body.sections || []).map((s, i) => ({
             heading: s.heading,
+            headingRu: s.headingRu || null,
+            headingEn: s.headingEn || null,
             body: s.body,
+            bodyRu: s.bodyRu || null,
+            bodyEn: s.bodyEn || null,
             image: s.image || null,
             videoUrl: s.videoUrl || null,
             order: i,

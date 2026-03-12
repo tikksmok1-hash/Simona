@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useAdmin } from '../../AdminAuthContext';
 import ImageUploader from '../../components/ImageUploader';
+import TranslatableField from '../../components/TranslatableField';
 import { useRouter, useParams } from 'next/navigation';
 
 const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL', '5XL', '34', '36', '38', '40', '42', '44', '46', '48', '50', '52', '54', '56', '58'];
@@ -17,8 +18,12 @@ function EditProductForm() {
   const [categories, setCategories] = useState([]);
 
   const [form, setForm] = useState({
-    name: '', slug: '', description: '', shortDescription: '',
-    materialsInfo: '', shippingInfo: '',
+    name: '', nameRu: '', nameEn: '',
+    slug: '',
+    description: '', descriptionRu: '', descriptionEn: '',
+    shortDescription: '', shortDescriptionRu: '', shortDescriptionEn: '',
+    materialsInfo: '', materialsInfoRu: '', materialsInfoEn: '',
+    shippingInfo: '', shippingInfoRu: '', shippingInfoEn: '',
     price: '', compareAtPrice: '', categoryId: '', subcategoryId: '',
     isActive: true, isFeatured: false, isNew: false, isBestseller: false,
   });
@@ -34,11 +39,21 @@ function EditProductForm() {
       if (product && !product.error) {
         setForm({
           name: product.name || '',
+          nameRu: product.nameRu || '',
+          nameEn: product.nameEn || '',
           slug: product.slug || '',
           description: product.description || '',
+          descriptionRu: product.descriptionRu || '',
+          descriptionEn: product.descriptionEn || '',
           shortDescription: product.shortDescription || '',
+          shortDescriptionRu: product.shortDescriptionRu || '',
+          shortDescriptionEn: product.shortDescriptionEn || '',
           materialsInfo: product.materialsInfo || '',
+          materialsInfoRu: product.materialsInfoRu || '',
+          materialsInfoEn: product.materialsInfoEn || '',
           shippingInfo: product.shippingInfo || '',
+          shippingInfoRu: product.shippingInfoRu || '',
+          shippingInfoEn: product.shippingInfoEn || '',
           price: product.price?.toString() || '',
           compareAtPrice: product.compareAtPrice?.toString() || '',
           categoryId: product.categoryId || '',
@@ -51,6 +66,8 @@ function EditProductForm() {
         setVariants(
           (product.variants || []).map((v) => ({
             colorName: v.colorName,
+            colorNameRu: v.colorNameRu || '',
+            colorNameEn: v.colorNameEn || '',
             colorCode: v.colorCode,
             images: (v.images || []).map((img) => ({ url: img.url, type: img.type || 'FRONT' })),
             sizes: (v.sizes || []).map((s) => ({ size: s.size, stock: s.stock || 0 })),
@@ -65,8 +82,10 @@ function EditProductForm() {
     setForm((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
   };
 
+  const updateField = (key, val) => setForm((prev) => ({ ...prev, [key]: val }));
+
   const updateVariant = (idx, field, value) => setVariants((prev) => prev.map((v, i) => (i === idx ? { ...v, [field]: value } : v)));
-  const addVariant = () => setVariants((prev) => [...prev, { colorName: '', colorCode: '#000000', images: [{ url: '', type: 'FRONT' }, { url: '', type: 'BACK' }], sizes: [{ size: 'S', stock: 0 }, { size: 'M', stock: 0 }, { size: 'L', stock: 0 }] }]);
+  const addVariant = () => setVariants((prev) => [...prev, { colorName: '', colorNameRu: '', colorNameEn: '', colorCode: '#000000', images: [{ url: '', type: 'FRONT' }, { url: '', type: 'BACK' }], sizes: [{ size: 'S', stock: 0 }, { size: 'M', stock: 0 }, { size: 'L', stock: 0 }] }]);
   const removeVariant = (idx) => { if (variants.length > 1) setVariants((prev) => prev.filter((_, i) => i !== idx)); };
 
   const updateVariantImage = (vIdx, imgIdx, url) => {
@@ -126,10 +145,11 @@ function EditProductForm() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <h2 className="text-sm font-medium text-black mb-4">Informații Generale</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1.5">Nume Produs *</label>
-              <input name="name" value={form.name} onChange={handleChange} className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black" required />
-            </div>
+            <TranslatableField
+              label="Nume Produs" fieldKey="name" required
+              value={form.name} valueRu={form.nameRu} valueEn={form.nameEn}
+              onChange={updateField} apiFetch={apiFetch}
+            />
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1.5">Slug</label>
               <input name="slug" value={form.slug} onChange={handleChange} className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black bg-gray-50" />
@@ -159,22 +179,28 @@ function EditProductForm() {
               </div>
             )}
           </div>
-          <div className="mt-4">
-            <label className="block text-xs font-medium text-gray-600 mb-1.5">Descriere scurtă</label>
-            <input name="shortDescription" value={form.shortDescription} onChange={handleChange} className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black" />
-          </div>
-          <div className="mt-4">
-            <label className="block text-xs font-medium text-gray-600 mb-1.5">Descriere completă</label>
-            <textarea name="description" value={form.description} onChange={handleChange} rows={4} className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black resize-none" />
-          </div>
-          <div className="mt-4">
-            <label className="block text-xs font-medium text-gray-600 mb-1.5">Detalii & Materiale</label>
-            <textarea name="materialsInfo" value={form.materialsInfo} onChange={handleChange} rows={3} placeholder="Material de înaltă calitate, produs în România..." className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black resize-none" />
-          </div>
-          <div className="mt-4">
-            <label className="block text-xs font-medium text-gray-600 mb-1.5">Livrare & Returnare</label>
-            <textarea name="shippingInfo" value={form.shippingInfo} onChange={handleChange} rows={3} placeholder="Livrare standard: 70 MDL (3–5 zile lucrătoare)..." className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black resize-none" />
-          </div>
+          <TranslatableField
+            label="Descriere scurtă" fieldKey="shortDescription"
+            value={form.shortDescription} valueRu={form.shortDescriptionRu} valueEn={form.shortDescriptionEn}
+            onChange={updateField} apiFetch={apiFetch} className="mt-4"
+          />
+          <TranslatableField
+            label="Descriere completă" fieldKey="description" multiline rows={4}
+            value={form.description} valueRu={form.descriptionRu} valueEn={form.descriptionEn}
+            onChange={updateField} apiFetch={apiFetch} className="mt-4"
+          />
+          <TranslatableField
+            label="Detalii & Materiale" fieldKey="materialsInfo" multiline rows={3}
+            value={form.materialsInfo} valueRu={form.materialsInfoRu} valueEn={form.materialsInfoEn}
+            onChange={updateField} apiFetch={apiFetch} className="mt-4"
+            placeholder="Material de înaltă calitate, produs în România..."
+          />
+          <TranslatableField
+            label="Livrare & Returnare" fieldKey="shippingInfo" multiline rows={3}
+            value={form.shippingInfo} valueRu={form.shippingInfoRu} valueEn={form.shippingInfoEn}
+            onChange={updateField} apiFetch={apiFetch} className="mt-4"
+            placeholder="Livrare standard: 70 MDL (3–5 zile lucrătoare)..."
+          />
         </div>
 
         {/* Flags */}
@@ -207,9 +233,20 @@ function EditProductForm() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1.5">Nume Culoare</label>
-                  <input value={variant.colorName} onChange={(e) => updateVariant(vIdx, 'colorName', e.target.value)} className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black" />
+                <div className="md:col-span-2">
+                  <TranslatableField
+                    label="Nume Culoare"
+                    value={variant.colorName}
+                    valueRu={variant.colorNameRu}
+                    valueEn={variant.colorNameEn}
+                    onChange={(field, val) => {
+                      if (field === 'colorName') updateVariant(vIdx, 'colorName', val);
+                      else if (field === 'colorNameRu') updateVariant(vIdx, 'colorNameRu', val);
+                      else if (field === 'colorNameEn') updateVariant(vIdx, 'colorNameEn', val);
+                    }}
+                    fieldKey="colorName"
+                    apiFetch={apiFetch}
+                  />
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-gray-600 mb-1.5">Cod Culoare</label>

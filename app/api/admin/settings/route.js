@@ -19,10 +19,12 @@ export async function GET(request) {
   try {
     const settings = await prisma.siteSettings.findMany();
     
-    // Convert to key-value object
+    // Convert to key-value object with i18n
     const settingsObj = {};
     settings.forEach(s => {
       settingsObj[s.key] = s.value;
+      if (s.valueRu) settingsObj[s.key + 'Ru'] = s.valueRu;
+      if (s.valueEn) settingsObj[s.key + 'En'] = s.valueEn;
     });
 
     return NextResponse.json(settingsObj);
@@ -48,12 +50,29 @@ export async function POST(request) {
   try {
     const data = await request.json();
 
+    // Group base keys with their Ru/En translations
+    const grouped = {};
+    Object.entries(data).forEach(([key, value]) => {
+      if (key.endsWith('Ru')) {
+        const base = key.slice(0, -2);
+        if (!grouped[base]) grouped[base] = {};
+        grouped[base].valueRu = String(value || '');
+      } else if (key.endsWith('En')) {
+        const base = key.slice(0, -2);
+        if (!grouped[base]) grouped[base] = {};
+        grouped[base].valueEn = String(value || '');
+      } else {
+        if (!grouped[key]) grouped[key] = {};
+        grouped[key].value = String(value);
+      }
+    });
+
     // Update or create each setting
-    const updates = Object.entries(data).map(([key, value]) => 
+    const updates = Object.entries(grouped).map(([key, vals]) => 
       prisma.siteSettings.upsert({
         where: { key },
-        update: { value: String(value) },
-        create: { key, value: String(value) },
+        update: vals,
+        create: { key, value: vals.value || '', ...vals },
       })
     );
 

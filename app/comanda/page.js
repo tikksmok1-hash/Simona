@@ -2,11 +2,14 @@
 
 import { useState } from 'react';
 import { useCart } from '@/app/context/CartContext';
+import { useTranslation } from '@/app/context/LanguageContext';
+import { localize } from '@/lib/localize';
 import Link from 'next/link';
 import Image from 'next/image';
 
 export default function ComandaPage() {
   const { cart, cartTotal, clearCart, deliveryMethod, setDeliveryMethod } = useCart();
+  const { lang, t } = useTranslation();
   const [step, setStep] = useState('form'); // 'form' | 'success'
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -33,13 +36,13 @@ export default function ComandaPage() {
 
   const validate = () => {
     const errs = {};
-    if (!form.nume.trim()) errs.nume = 'Câmp obligatoriu';
-    if (!form.prenume.trim()) errs.prenume = 'Câmp obligatoriu';
-    if (!form.telefon.trim()) errs.telefon = 'Câmp obligatoriu';
-    else if (!/^[\d\s\+\-\(\)]{7,}$/.test(form.telefon)) errs.telefon = 'Număr invalid';
+    if (!form.nume.trim()) errs.nume = t('checkout.required');
+    if (!form.prenume.trim()) errs.prenume = t('checkout.required');
+    if (!form.telefon.trim()) errs.telefon = t('checkout.required');
+    else if (!/^[\d\s\+\-\(\)]{7,}$/.test(form.telefon)) errs.telefon = t('checkout.invalidPhone');
     if (!isPickup) {
-      if (!form.adresa.trim()) errs.adresa = 'Câmp obligatoriu';
-      if (!form.oras.trim()) errs.oras = 'Câmp obligatoriu';
+      if (!form.adresa.trim()) errs.adresa = t('checkout.required');
+      if (!form.oras.trim()) errs.oras = t('checkout.required');
     }
     return errs;
   };
@@ -82,7 +85,7 @@ export default function ComandaPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        const msg = data.detail ? `${data.error} (${data.detail})` : (data.error || 'Eroare la plasarea comenzii.');
+        const msg = data.detail ? `${data.error} (${data.detail})` : (data.error || t('checkout.error'));
         setApiError(msg);
         setLoading(false);
         return;
@@ -92,7 +95,7 @@ export default function ComandaPage() {
       setStep('success');
       clearCart();
     } catch (err) {
-      setApiError('Eroare de conexiune. Reîncearcă.');
+      setApiError(t('checkout.connectionError'));
       setLoading(false);
     }
   };
@@ -103,10 +106,10 @@ export default function ComandaPage() {
         <svg className="w-16 h-16 text-neutral-200 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
         </svg>
-        <h1 className="font-serif text-3xl font-light text-black mb-3">Coșul tău este gol</h1>
-        <p className="text-neutral-500 text-sm mb-8">Adaugă produse înainte de a plasa comanda.</p>
+        <h1 className="font-serif text-3xl font-light text-black mb-3">{t('checkout.emptyCart')}</h1>
+        <p className="text-neutral-500 text-sm mb-8">{t('checkout.emptyCartDesc')}</p>
         <Link href="/" className="inline-block bg-black text-white px-10 py-3 text-xs tracking-widest uppercase hover:bg-neutral-800 transition-colors">
-          Continuă Cumpărăturile
+          {t('cart.continueShopping')}
         </Link>
       </div>
     );
@@ -120,17 +123,17 @@ export default function ComandaPage() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
           </svg>
         </div>
-        <p className="text-[10px] tracking-[0.5em] uppercase text-neutral-400 mb-3">Confirmat</p>
-        <h1 className="font-serif text-4xl font-light text-black mb-4">Comanda a fost plasată!</h1>
+        <p className="text-[10px] tracking-[0.5em] uppercase text-neutral-400 mb-3">{t('checkout.confirmed')}</p>
+        <h1 className="font-serif text-4xl font-light text-black mb-4">{t('checkout.orderPlaced')}</h1>
         <p className="text-neutral-500 text-sm max-w-sm mx-auto mb-3 leading-relaxed">
-          Te vom contacta în curând la numărul <span className="text-black font-medium">{form.telefon || 'furnizat'}</span> pentru a confirma detaliile comenzii.
+          {t('checkout.orderConfirmation')} <span className="text-black font-medium">{form.telefon || 'furnizat'}</span> {t('checkout.toConfirm')}
         </p>
         <p className="text-neutral-400 text-xs mb-10">
-          Ai întrebări? Sunați la{' '}
+          {t('checkout.questions')}{' '}
           <a href="tel:+37362000160" className="text-black underline underline-offset-2">062 000 160</a>
         </p>
         <Link href="/" className="inline-block bg-black text-white px-10 py-3 text-xs tracking-widest uppercase hover:bg-neutral-800 transition-colors">
-          Înapoi Acasă
+          {t('checkout.backHome')}
         </Link>
       </div>
     );
@@ -146,8 +149,8 @@ export default function ComandaPage() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-12 border-b border-neutral-100 pb-8">
-          <p className="text-[10px] tracking-[0.5em] uppercase text-neutral-400 mb-3">Ultimul pas</p>
-          <h1 className="font-serif text-4xl font-light text-black">Finalizare Comandă</h1>
+          <p className="text-[10px] tracking-[0.5em] uppercase text-neutral-400 mb-3">{t('checkout.lastStep')}</p>
+          <h1 className="font-serif text-4xl font-light text-black">{t('checkout.title')}</h1>
         </div>
 
         <form onSubmit={submit}>
@@ -158,7 +161,7 @@ export default function ComandaPage() {
 
               {/* Delivery method */}
               <div>
-                <h2 className="text-xs tracking-widest uppercase font-medium text-black mb-5">Metoda de livrare</h2>
+                <h2 className="text-xs tracking-widest uppercase font-medium text-black mb-5">{t('checkout.deliveryMethod')}</h2>
                 <div className="space-y-2">
 
                   {/* Standard */}
@@ -174,8 +177,8 @@ export default function ComandaPage() {
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
                       </svg>
                       <div>
-                        <p className="text-xs tracking-widest uppercase font-medium">Standard</p>
-                        <p className={`text-[10px] mt-0.5 ${deliveryMethod === 'standard' ? 'text-white/60' : 'text-neutral-400'}`}>2–4 zile lucrătoare</p>
+                        <p className="text-xs tracking-widest uppercase font-medium">{t('checkout.standard')}</p>
+                        <p className={`text-[10px] mt-0.5 ${deliveryMethod === 'standard' ? 'text-white/60' : 'text-neutral-400'}`}>{t('checkout.standardDays')}</p>
                       </div>
                     </div>
                     <span className="text-xs font-medium">{DELIVERY_STANDARD} MDL</span>
@@ -199,7 +202,7 @@ export default function ComandaPage() {
                         <p className={`text-[10px] mt-0.5 ${deliveryMethod === 'pickup' ? 'text-white/60' : 'text-neutral-400'}`}>str. Ion Creangă 58, Chișinău</p>
                       </div>
                     </div>
-                    <span className={`text-xs font-medium ${deliveryMethod === 'pickup' ? 'text-green-400' : 'text-green-600'}`}>Gratuit</span>
+                    <span className={`text-xs font-medium ${deliveryMethod === 'pickup' ? 'text-green-400' : 'text-green-600'}`}>{t('cart.free')}</span>
                   </button>
 
                 </div>
@@ -209,29 +212,29 @@ export default function ComandaPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    Luni–Vineri 9:00–19:00, Sâmbătă–Duminică 9:00–17:00
+                    {t('checkout.pickupSchedule')}
                   </p>
                 )}
               </div>
 
               {/* Personal info */}
               <div>
-                <h2 className="text-xs tracking-widest uppercase font-medium text-black mb-5">Date personale</h2>
+                <h2 className="text-xs tracking-widest uppercase font-medium text-black mb-5">{t('checkout.personalData')}</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div>
-                    <label className="block text-xs text-neutral-500 mb-1.5 tracking-wide">Nume *</label>
+                    <label className="block text-xs text-neutral-500 mb-1.5 tracking-wide">{t('checkout.lastName')}</label>
                     <input name="nume" value={form.nume} onChange={handle} className={inputCls('nume')} placeholder="Ionescu" />
                   </div>
                   <div>
-                    <label className="block text-xs text-neutral-500 mb-1.5 tracking-wide">Prenume *</label>
+                    <label className="block text-xs text-neutral-500 mb-1.5 tracking-wide">{t('checkout.firstName')}</label>
                     <input name="prenume" value={form.prenume} onChange={handle} className={inputCls('prenume')} placeholder="Maria" />
                   </div>
                   <div>
-                    <label className="block text-xs text-neutral-500 mb-1.5 tracking-wide">Telefon *</label>
+                    <label className="block text-xs text-neutral-500 mb-1.5 tracking-wide">{t('checkout.phone')}</label>
                     <input name="telefon" value={form.telefon} onChange={handle} className={inputCls('telefon')} placeholder="+373 60 000 000" type="tel" />
                   </div>
                   <div>
-                    <label className="block text-xs text-neutral-500 mb-1.5 tracking-wide">Email (opțional)</label>
+                    <label className="block text-xs text-neutral-500 mb-1.5 tracking-wide">{t('checkout.emailOpt')}</label>
                     <input name="email" value={form.email} onChange={handle} className={inputCls('email')} placeholder="email@exemplu.com" type="email" />
                   </div>
                 </div>
@@ -242,11 +245,11 @@ export default function ComandaPage() {
                 <div>
                   <div className="grid grid-cols-1 mt-6 sm:grid-cols-2 gap-5">
                     <div className="sm:col-span-2">
-                      <label className="block text-xs text-neutral-500 mb-1.5 tracking-wide">Adresă *</label>
+                      <label className="block text-xs text-neutral-500 mb-1.5 tracking-wide">{t('checkout.addressField')}</label>
                       <input name="adresa" value={form.adresa} onChange={handle} className={inputCls('adresa')} placeholder="Str. Exemplu 10, ap. 5" />
                     </div>
                     <div>
-                      <label className="block text-xs text-neutral-500 mb-1.5 tracking-wide">Oraș / Localitate *</label>
+                      <label className="block text-xs text-neutral-500 mb-1.5 tracking-wide">{t('checkout.city')}</label>
                       <input name="oras" value={form.oras} onChange={handle} className={inputCls('oras')} placeholder="Chișinău" />
                     </div>
                   </div>
@@ -255,14 +258,14 @@ export default function ComandaPage() {
 
               {/* Notes */}
               <div>
-                <h2 className="text-xs tracking-widest mt-6 uppercase font-medium text-black mb-2">Observații (opțional)</h2>
+                <h2 className="text-xs tracking-widest mt-6 uppercase font-medium text-black mb-2">{t('checkout.notes')}</h2>
                 <textarea
                   name="observatii"
                   value={form.observatii}
                   onChange={handle}
                   rows={4}
                   className="w-full px-4 py-4 border border-neutral-200 text-sm focus:outline-none focus:border-black transition-colors resize-none"
-                  placeholder="Instrucțiuni speciale pentru livrare, talie preferată etc."
+                  placeholder={t('checkout.notesPlaceholder')}
                 />
               </div>
 
@@ -272,9 +275,9 @@ export default function ComandaPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
                 </svg>
                 <div>
-                  <p className="text-sm font-medium text-black mb-1">Plată la livrare (ramburs)</p>
+                  <p className="text-sm font-medium text-black mb-1">{t('checkout.paymentMethod')}</p>
                   <p className="text-xs text-neutral-500 leading-relaxed">
-                    Achitați comanda în numerar sau prin card bancar la primirea coletului. Te contactăm noi pentru confirmare.
+                    {t('checkout.paymentDesc')}
                   </p>
                 </div>
               </div>
@@ -284,7 +287,7 @@ export default function ComandaPage() {
             {/* Right — Order summary */}
             <div className="w-full lg:w-[360px] lg:flex-shrink-0 lg:sticky lg:top-[140px]">
               <div className="bg-neutral-50 border border-neutral-100 p-6">
-                <h2 className="font-serif text-xl font-light text-black mb-6">Sumar Comandă</h2>
+                <h2 className="font-serif text-xl font-light text-black mb-6">{t('cartPage.orderSummary')}</h2>
 
                 {/* Products */}
                 <div className="space-y-5 mb-6 max-h-72 overflow-y-auto pr-1">
@@ -292,7 +295,7 @@ export default function ComandaPage() {
                     <div key={item.key} className="flex gap-3">
                       <div className="relative w-14 h-20 flex-shrink-0 bg-neutral-200 overflow-hidden">
                         {item.image ? (
-                          <Image src={item.image} alt={item.name} fill className="object-cover" sizes="56px" />
+                          <Image src={item.image} alt={localize(item, 'name', lang)} fill className="object-cover" sizes="56px" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
                             <svg className="w-5 h-5 text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
@@ -302,8 +305,8 @@ export default function ComandaPage() {
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm text-black font-light line-clamp-2 leading-snug">{item.name}</p>
-                        <p className="text-xs text-neutral-400 mt-0.5">{item.colorName} · {item.size} · ×{item.quantity}</p>
+                        <p className="text-sm text-black font-light line-clamp-2 leading-snug">{localize(item, 'name', lang)}</p>
+                        <p className="text-xs text-neutral-400 mt-0.5">{localize(item, 'colorName', lang)} · {item.size} · ×{item.quantity}</p>
                         <p className="text-sm font-medium text-black mt-1">{item.price * item.quantity} MDL</p>
                       </div>
                     </div>
@@ -313,19 +316,19 @@ export default function ComandaPage() {
                 {/* Totals */}
                 <div className="space-y-2 text-sm border-t border-neutral-200 pt-4 mb-6">
                   <div className="flex justify-between text-neutral-600">
-                    <span>Subtotal</span>
+                    <span>{t('cart.subtotal')}</span>
                     <span>{cartTotal} MDL</span>
                   </div>
                   <div className="flex justify-between text-neutral-600">
                     <span>
-                      {deliveryMethod === 'pickup' ? 'Pick-up' : 'Livrare Standard'}
+                      {deliveryMethod === 'pickup' ? t('cart.pickup') : t('checkout.deliveryStandard')}
                     </span>
                     <span className={isPickup ? 'text-green-600 font-medium' : ''}>
-                      {isPickup ? 'Gratuit' : `${deliveryCost} MDL`}
+                      {isPickup ? t('cart.free') : `${deliveryCost} MDL`}
                     </span>
                   </div>
                   <div className="flex justify-between font-medium text-black text-base border-t border-neutral-200 pt-3">
-                    <span>Total</span>
+                    <span>{t('cart.total')}</span>
                     <span>{total} MDL</span>
                   </div>
                 </div>
@@ -347,11 +350,11 @@ export default function ComandaPage() {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
                       </svg>
-                      Se procesează...
+                      {t('checkout.processing')}
                     </>
                   ) : (
                     <>
-                      Plasează Comanda
+                      {t('checkout.placeOrder')}
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                       </svg>
@@ -360,7 +363,7 @@ export default function ComandaPage() {
                 </button>
 
                 <Link href="/cos" className="block text-center text-xs text-neutral-400 hover:text-black tracking-wide mt-3 transition-colors">
-                  ← Înapoi la coș
+                  {t('checkout.backToCart')}
                 </Link>
               </div>
             </div>

@@ -5,9 +5,12 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { createPortal } from 'react-dom';
 import { useCart } from '@/app/context/CartContext';
+import { useTranslation } from '@/app/context/LanguageContext';
+import { localize } from '@/lib/localize';
 
 export default function ProductCard({ product, priority = false }) {
-  const [selectedVariant, setSelectedVariant] = useState(product.variants[0]);
+  const variants = product.variants || [];
+  const [selectedVariant, setSelectedVariant] = useState(variants[0] || null);
   const [isHovered, setIsHovered] = useState(false);
   const [addedSize, setAddedSize] = useState(null);
   const [hoveredVariant, setHoveredVariant] = useState(null);
@@ -16,6 +19,8 @@ export default function ProductCard({ product, priority = false }) {
   const colorsScrollRef = useRef(null);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const { addToCart, toggleFavorite, isFavorite } = useCart();
+  const { lang, t } = useTranslation();
+  const productName = localize(product, 'name', lang);
 
   // Detect touch device
   useEffect(() => {
@@ -24,6 +29,7 @@ export default function ProductCard({ product, priority = false }) {
 
   // Auto-scroll to selected color
   useEffect(() => {
+    if (!selectedVariant) return;
     const container = colorsScrollRef.current;
     const btn = colorRefs.current[selectedVariant.id];
     if (container && btn) {
@@ -32,12 +38,12 @@ export default function ProductCard({ product, priority = false }) {
       const containerWidth = container.offsetWidth;
       container.scrollTo({ left: btnLeft - containerWidth / 2 + btnWidth / 2, behavior: 'smooth' });
     }
-  }, [selectedVariant.id]);
-  const favorited = isFavorite(product.id, selectedVariant.id);
+  }, [selectedVariant?.id]);
+  const favorited = selectedVariant ? isFavorite(product.id, selectedVariant.id) : false;
 
   // Get front and back images for current variant
-  const frontImage = selectedVariant.images.find(img => img.type === 'FRONT') || selectedVariant.images[0];
-  const backImage = selectedVariant.images.find(img => img.type === 'BACK') || selectedVariant.images[1];
+  const frontImage = selectedVariant?.images?.find(img => img.type === 'FRONT') || selectedVariant?.images?.[0];
+  const backImage = selectedVariant?.images?.find(img => img.type === 'BACK') || selectedVariant?.images?.[1];
 
   // Calculate discount percentage
   const discountPercentage = product.compareAtPrice 
@@ -45,8 +51,25 @@ export default function ProductCard({ product, priority = false }) {
     : 0;
 
   // Check if product has stock
-  const totalStock = selectedVariant.sizes.reduce((acc, size) => acc + size.stock, 0);
+  const totalStock = selectedVariant?.sizes?.reduce((acc, size) => acc + size.stock, 0) ?? 0;
   const isOutOfStock = totalStock === 0;
+
+  // If no variants at all, render a minimal card
+  if (!selectedVariant) {
+    return (
+      <div className="group bg-white overflow-hidden border border-neutral-200 flex flex-col relative">
+        <Link href={`/produs/${product.slug}`}>
+          <div className="relative bg-neutral-100 aspect-[3/4] md:aspect-[2/3] flex items-center justify-center">
+            <span className="text-neutral-400 text-xs">{t('noImage') || 'Fără imagine'}</span>
+          </div>
+        </Link>
+        <div className="p-3">
+          <h3 className="text-xs font-medium truncate">{productName}</h3>
+          <p className="text-sm font-semibold mt-1">{product.price} MDL</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="group bg-white overflow-hidden border border-neutral-200 hover:border-black transition-all duration-500 flex flex-col relative">
@@ -66,7 +89,7 @@ export default function ProductCard({ product, priority = false }) {
             {frontImage?.url ? (
               <Image
                 src={frontImage.url}
-                alt={`${product.name} - ${selectedVariant.colorName} - Față`}
+                alt={`${productName} - ${localize(selectedVariant, 'colorName', lang)}`}
                 fill
                 priority={priority}
                 className="object-cover"
@@ -77,7 +100,7 @@ export default function ProductCard({ product, priority = false }) {
                 <svg className="w-14 h-14 text-neutral-300 mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.86H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.86l.58-3.57a2 2 0 00-1.34-2.23z" />
                 </svg>
-                <span className="text-xs text-neutral-400 tracking-widest uppercase">Imagine Față</span>
+                <span className="text-xs text-neutral-400 tracking-widest uppercase">{t('product.imageFront')}</span>
               </div>
             )}
           </div>
@@ -92,7 +115,7 @@ export default function ProductCard({ product, priority = false }) {
               {backImage?.url ? (
                 <Image
                   src={backImage.url}
-                  alt={`${product.name} - ${selectedVariant.colorName} - Spate`}
+                  alt={`${productName} - ${localize(selectedVariant, 'colorName', lang)}`}
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
@@ -102,7 +125,7 @@ export default function ProductCard({ product, priority = false }) {
                   <svg className="w-14 h-14 text-neutral-300 mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.86H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.86l.58-3.57a2 2 0 00-1.34-2.23z" />
                   </svg>
-                  <span className="text-xs text-neutral-400 tracking-widest uppercase">Imagine Spate</span>
+                  <span className="text-xs text-neutral-400 tracking-widest uppercase">{t('product.imageBack')}</span>
                 </div>
               )}
             </div>
@@ -117,12 +140,12 @@ export default function ProductCard({ product, priority = false }) {
             )}
             {product.isNew && (
               <span className="bg-white text-black text-xs font-medium px-3 py-1 tracking-wider border border-black">
-                NOU
+                {t('product.new')}
               </span>
             )}
             {isOutOfStock && (
               <span className="bg-neutral-500 text-white text-xs font-medium px-3 py-1 tracking-wider">
-                STOC EPUIZAT
+                {t('product.outOfStock').toUpperCase()}
               </span>
             )}
           </div>
@@ -146,11 +169,11 @@ export default function ProductCard({ product, priority = false }) {
           <div className="absolute bottom-0 left-0 right-0 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-full group-hover:translate-y-0">
             {isOutOfStock ? (
               <div className="w-full bg-neutral-500 text-white py-3.5 text-center text-xs tracking-widest uppercase">
-                Indisponibil
+                {t('product.unavailable')}
               </div>
             ) : (
               <div className="bg-black px-3 pt-2 pb-3">
-                <p className="text-[9px] text-neutral-400 tracking-widest uppercase mb-2 text-center">Selectează Mărimea</p>
+                <p className="text-[9px] text-neutral-400 tracking-widest uppercase mb-2 text-center">{t('product.selectSize')}</p>
                 <div className="flex items-center justify-center gap-1.5 flex-wrap">
                   {selectedVariant.sizes.map((size) => (
                     <button
@@ -192,12 +215,12 @@ export default function ProductCard({ product, priority = false }) {
         {/* Product Name */}
         <Link href={`/produs/${product.slug}`}>
           <h3 className="font-serif text-sm text-black mb-3 group-hover:underline transition-all line-clamp-2">
-            {product.name}
+            {productName}
           </h3>
         </Link>
 
         {/* Color Selector */}
-        <div ref={colorsScrollRef} className="flex items-center gap-2 mb-3 overflow-x-auto scrollbar-hide py-1 pl-1 pr-0.5">
+        <div ref={colorsScrollRef} className="flex items-center gap-2 mb-3 overflow-x-auto overflow-y-visible scrollbar-hide py-1.5 pl-1.5 pr-1">
           {product.variants.map((variant) => {
             const frontImg = variant.images.find(img => img.type === 'FRONT') || variant.images[0];
             return (
@@ -225,7 +248,7 @@ export default function ProductCard({ product, priority = false }) {
                       : 'ring-1 ring-neutral-300 hover:ring-neutral-400'
                   }`}
                   style={{ backgroundColor: variant.colorCode }}
-                  title={variant.colorName}
+                  title={localize(variant, 'colorName', lang)}
                 >
                   {variant.colorCode === '#FFFFFF' && (
                     <span className="block w-full h-full rounded-full border border-neutral-300"></span>
@@ -257,10 +280,10 @@ export default function ProductCard({ product, priority = false }) {
       {/* Mobile Size Buttons — pinned to bottom, hidden on desktop */}
       <div className="md:hidden border-t border-neutral-100 px-3 py-2">
         {isOutOfStock ? (
-          <p className="text-[10px] text-neutral-400 tracking-widest uppercase text-center py-1">Stoc epuizat</p>
+          <p className="text-[10px] text-neutral-400 tracking-widest uppercase text-center py-1">{t('product.outOfStock')}</p>
         ) : (
           <>
-            <p className="text-[9px] text-neutral-400 tracking-widest uppercase mb-1.5 text-center">Adaugă în Coș</p>
+            <p className="text-[9px] text-neutral-400 tracking-widest uppercase mb-1.5 text-center">{t('product.addToCart')}</p>
             <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide pb-0.5">
               {selectedVariant.sizes.map((size) => (
                 <button
@@ -305,13 +328,13 @@ export default function ProductCard({ product, priority = false }) {
                 <div className="w-full aspect-[3/4] overflow-hidden">
                   <img
                     src={frontImg.url}
-                    alt={hv.colorName}
+                    alt={localize(hv, 'colorName', lang)}
                     className="w-full h-full object-cover"
                   />
                 </div>
                 <div className="px-1 py-1 bg-black">
                   <p className="text-[7px] tracking-[0.15em] uppercase text-center text-white truncate">
-                    {hv.colorName}
+                    {localize(hv, 'colorName', lang)}
                   </p>
                 </div>
               </div>

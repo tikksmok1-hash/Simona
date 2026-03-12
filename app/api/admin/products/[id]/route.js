@@ -41,11 +41,21 @@ export async function PATCH(request, { params }) {
 
     const data = {};
     if (body.name !== undefined) data.name = body.name;
+    if (body.nameRu !== undefined) data.nameRu = body.nameRu || null;
+    if (body.nameEn !== undefined) data.nameEn = body.nameEn || null;
     if (body.slug !== undefined) data.slug = body.slug;
     if (body.description !== undefined) data.description = body.description;
+    if (body.descriptionRu !== undefined) data.descriptionRu = body.descriptionRu || '';
+    if (body.descriptionEn !== undefined) data.descriptionEn = body.descriptionEn || '';
     if (body.shortDescription !== undefined) data.shortDescription = body.shortDescription;
+    if (body.shortDescriptionRu !== undefined) data.shortDescriptionRu = body.shortDescriptionRu || null;
+    if (body.shortDescriptionEn !== undefined) data.shortDescriptionEn = body.shortDescriptionEn || null;
     if (body.materialsInfo !== undefined) data.materialsInfo = body.materialsInfo || null;
+    if (body.materialsInfoRu !== undefined) data.materialsInfoRu = body.materialsInfoRu || null;
+    if (body.materialsInfoEn !== undefined) data.materialsInfoEn = body.materialsInfoEn || null;
     if (body.shippingInfo !== undefined) data.shippingInfo = body.shippingInfo || null;
+    if (body.shippingInfoRu !== undefined) data.shippingInfoRu = body.shippingInfoRu || null;
+    if (body.shippingInfoEn !== undefined) data.shippingInfoEn = body.shippingInfoEn || null;
     if (body.price !== undefined) data.price = parseFloat(body.price);
     if (body.compareAtPrice !== undefined) data.compareAtPrice = body.compareAtPrice ? parseFloat(body.compareAtPrice) : null;
     if (body.isActive !== undefined) data.isActive = body.isActive;
@@ -63,6 +73,8 @@ export async function PATCH(request, { params }) {
       data.variants = {
         create: body.variants.map((v) => ({
           colorName: v.colorName,
+          colorNameRu: v.colorNameRu || null,
+          colorNameEn: v.colorNameEn || null,
           colorCode: v.colorCode,
           isActive: true,
           images: {

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useAdmin } from '../../AdminAuthContext';
 import ImageUploader from '../../components/ImageUploader';
+import TranslatableField from '../../components/TranslatableField';
 import { useRouter } from 'next/navigation';
 
 function NewBlogForm() {
@@ -12,10 +13,16 @@ function NewBlogForm() {
 
   const [form, setForm] = useState({
     title: '',
+    titleRu: '',
+    titleEn: '',
     slug: '',
     excerpt: '',
+    excerptRu: '',
+    excerptEn: '',
     image: '',
     category: 'Tendințe',
+    categoryRu: '',
+    categoryEn: '',
     date: new Date().toISOString().split('T')[0],
     readTime: '5 min',
     author: 'Simona',
@@ -24,7 +31,7 @@ function NewBlogForm() {
   });
 
   const [sections, setSections] = useState([
-    { heading: '', body: '', image: '', videoUrl: '' },
+    { heading: '', headingRu: '', headingEn: '', body: '', bodyRu: '', bodyEn: '', image: '', videoUrl: '' },
   ]);
 
   const handleChange = (e) => {
@@ -39,11 +46,21 @@ function NewBlogForm() {
     }
   };
 
+  const updateField = (key, val) => {
+    setForm((prev) => ({ ...prev, [key]: val }));
+    if (key === 'title') {
+      setForm((prev) => ({
+        ...prev,
+        slug: val.toLowerCase().replace(/[ăâ]/g, 'a').replace(/[șş]/g, 's').replace(/[țţ]/g, 't').replace(/[î]/g, 'i').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+      }));
+    }
+  };
+
   const updateSection = (idx, field, value) => {
     setSections((prev) => prev.map((s, i) => (i === idx ? { ...s, [field]: value } : s)));
   };
 
-  const addSection = () => setSections((prev) => [...prev, { heading: '', body: '', image: '', videoUrl: '' }]);
+  const addSection = () => setSections((prev) => [...prev, { heading: '', headingRu: '', headingEn: '', body: '', bodyRu: '', bodyEn: '', image: '', videoUrl: '' }]);
   const removeSection = (idx) => {
     if (sections.length <= 1) return;
     setSections((prev) => prev.filter((_, i) => i !== idx));
@@ -90,18 +107,21 @@ function NewBlogForm() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <h2 className="text-sm font-medium text-black mb-4">Informații Articol</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1.5">Titlu *</label>
-              <input name="title" value={form.title} onChange={handleChange} className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black" required />
-            </div>
+            <TranslatableField
+              label="Titlu" fieldKey="title" required
+              value={form.title} valueRu={form.titleRu} valueEn={form.titleEn}
+              onChange={updateField} apiFetch={apiFetch}
+            />
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1.5">Slug</label>
               <input name="slug" value={form.slug} onChange={handleChange} className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black bg-gray-50" />
             </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1.5">Categorie</label>
-              <input name="category" value={form.category} onChange={handleChange} className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black" placeholder="ex. Tendințe, Sfaturi de Stil..." />
-            </div>
+            <TranslatableField
+              label="Categorie" fieldKey="category"
+              value={form.category} valueRu={form.categoryRu} valueEn={form.categoryEn}
+              onChange={updateField} apiFetch={apiFetch}
+              placeholder="ex. Tendințe, Sfaturi de Stil..."
+            />
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1.5">Data</label>
               <input name="date" type="date" value={form.date} onChange={handleChange} className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black cursor-pointer" />
@@ -115,10 +135,11 @@ function NewBlogForm() {
               <input name="author" value={form.author} onChange={handleChange} className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black" />
             </div>
           </div>
-          <div className="mt-4">
-            <label className="block text-xs font-medium text-gray-600 mb-1.5">Rezumat (excerpt)</label>
-            <textarea name="excerpt" value={form.excerpt} onChange={handleChange} rows={3} className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black resize-none" />
-          </div>
+          <TranslatableField
+            label="Rezumat (excerpt)" fieldKey="excerpt" multiline rows={3}
+            value={form.excerpt} valueRu={form.excerptRu} valueEn={form.excerptEn}
+            onChange={updateField} apiFetch={apiFetch} className="mt-4"
+          />
           <div className="mt-4">
             <ImageUploader value={form.image} onChange={(url) => setForm({ ...form, image: url })} label="Imagine Hero" />
           </div>
@@ -150,14 +171,18 @@ function NewBlogForm() {
                 )}
               </div>
               <div className="space-y-3">
-                <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1.5">Titlu Secțiune</label>
-                  <input value={section.heading} onChange={(e) => updateSection(idx, 'heading', e.target.value)} className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black" />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1.5">Conținut</label>
-                  <textarea value={section.body} onChange={(e) => updateSection(idx, 'body', e.target.value)} rows={5} className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black resize-none" />
-                </div>
+                <TranslatableField
+                  label="Titlu Secțiune" fieldKey="heading"
+                  value={section.heading} valueRu={section.headingRu || ''} valueEn={section.headingEn || ''}
+                  onChange={(key, val) => updateSection(idx, key, val)}
+                  apiFetch={apiFetch}
+                />
+                <TranslatableField
+                  label="Conținut" fieldKey="body" multiline rows={5}
+                  value={section.body} valueRu={section.bodyRu || ''} valueEn={section.bodyEn || ''}
+                  onChange={(key, val) => updateSection(idx, key, val)}
+                  apiFetch={apiFetch}
+                />
                 <ImageUploader value={section.image} onChange={(url) => updateSection(idx, 'image', url)} label="Imagine Secțiune (opțional)" />
                 <div>
                   <label className="block text-xs font-medium text-gray-600 mb-1.5">Link Video YouTube (opțional)</label>

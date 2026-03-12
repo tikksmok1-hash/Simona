@@ -20,10 +20,12 @@ export async function GET(request) {
   try {
     const settings = await prisma.siteSettings.findMany();
     
-    // Convert to key-value object
+    // Convert to key-value object with i18n
     const settingsObj = {};
     settings.forEach(s => {
       settingsObj[s.key] = s.value;
+      if (s.valueRu) settingsObj[s.key + 'Ru'] = s.valueRu;
+      if (s.valueEn) settingsObj[s.key + 'En'] = s.valueEn;
     });
 
     return NextResponse.json(settingsObj, {

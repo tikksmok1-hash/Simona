@@ -4,9 +4,12 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useCart } from '@/app/context/CartContext';
+import { useTranslation } from '@/app/context/LanguageContext';
+import { localize } from '@/lib/localize';
 
 export default function CartSidebar() {
   const { cart, cartCount, cartTotal, isCartOpen, closeCart, removeFromCart, updateQuantity, deliveryMethod, setDeliveryMethod } = useCart();
+  const { lang, t } = useTranslation();
 
   // Close on Escape
   useEffect(() => {
@@ -45,7 +48,7 @@ export default function CartSidebar() {
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-neutral-100">
           <div className="flex items-center gap-3">
-            <h2 className="font-serif text-xl font-light text-black tracking-wide">Coșul Meu</h2>
+            <h2 className="font-serif text-xl font-light text-black tracking-wide">{t('cart.myCart')}</h2>
             {cartCount > 0 && (
               <span className="bg-black text-white text-[10px] tracking-widest px-2 py-0.5">
                 {cartCount}
@@ -65,7 +68,7 @@ export default function CartSidebar() {
         {/* Delivery method */}
         {cartTotal > 0 && (
           <div className="px-6 py-3 bg-neutral-50 border-b border-neutral-100 space-y-2">
-            <p className="text-[10px] tracking-widest uppercase text-neutral-400 mb-1">Livrare</p>
+            <p className="text-[10px] tracking-widest uppercase text-neutral-400 mb-1">{t('cart.delivery')}</p>
 
             {/* Standard */}
             <button
@@ -79,8 +82,8 @@ export default function CartSidebar() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
                 </svg>
                 <div>
-                  <p className="text-[10px] tracking-widest uppercase font-medium">Standard</p>
-                  <p className={`text-[9px] ${deliveryMethod === 'standard' ? 'text-white/60' : 'text-neutral-400'}`}>2–4 zile</p>
+                  <p className="text-[10px] tracking-widest uppercase font-medium">{t('cart.standard')}</p>
+                  <p className={`text-[9px] ${deliveryMethod === 'standard' ? 'text-white/60' : 'text-neutral-400'}`}>{t('cart.standardDays')}</p>
                 </div>
               </div>
               <span className="text-[10px] font-medium">{DELIVERY_STANDARD} MDL</span>
@@ -99,11 +102,11 @@ export default function CartSidebar() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
                 <div>
-                  <p className="text-[10px] tracking-widest uppercase font-medium">Pick-up</p>
+                  <p className="text-[10px] tracking-widest uppercase font-medium">{t('cart.pickup')}</p>
                   <p className={`text-[9px] ${deliveryMethod === 'pickup' ? 'text-white/60' : 'text-neutral-400'}`}>Ion Creangă 58</p>
                 </div>
               </div>
-              <span className={`text-[10px] font-medium ${deliveryMethod === 'pickup' ? 'text-green-400' : 'text-green-600'}`}>Gratuit</span>
+              <span className={`text-[10px] font-medium ${deliveryMethod === 'pickup' ? 'text-green-400' : 'text-green-600'}`}>{t('cart.free')}</span>
             </button>
 
           </div>
@@ -116,13 +119,13 @@ export default function CartSidebar() {
               <svg className="w-14 h-14 text-neutral-200 mb-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
               </svg>
-              <p className="font-serif text-lg font-light text-black mb-2">Coșul este gol</p>
-              <p className="text-neutral-400 text-xs tracking-wide mb-6">Adaugă produse pentru a continua</p>
+              <p className="font-serif text-lg font-light text-black mb-2">{t('cart.empty')}</p>
+              <p className="text-neutral-400 text-xs tracking-wide mb-6">{t('cart.emptyDesc')}</p>
               <button
                 onClick={closeCart}
                 className="border border-black text-black text-xs tracking-widest uppercase px-8 py-2.5 hover:bg-black hover:text-white transition-all duration-300 cursor-pointer"
               >
-                Continuă Cumpărăturile
+                {t('cart.continueShopping')}
               </button>
             </div>
           ) : (
@@ -134,7 +137,7 @@ export default function CartSidebar() {
                     {item.image ? (
                       <Image
                         src={item.image}
-                        alt={item.name}
+                        alt={localize(item, 'name', lang)}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                         sizes="80px"
@@ -156,7 +159,7 @@ export default function CartSidebar() {
                         onClick={closeCart}
                         className="font-serif text-base text-black hover:underline line-clamp-2 leading-snug"
                       >
-                        {item.name}
+                        {localize(item, 'name', lang)}
                       </Link>
                       <div className="flex items-center gap-2 mt-1">
                         <span
@@ -164,7 +167,7 @@ export default function CartSidebar() {
                           style={{ backgroundColor: item.colorCode }}
                         />
                         <span className="text-xs text-neutral-500 tracking-wide">
-                          {item.colorName} · {item.size}
+                          {localize(item, 'colorName', lang)} · {item.size}
                         </span>
                       </div>
                     </div>
@@ -192,7 +195,7 @@ export default function CartSidebar() {
                         <button
                           onClick={() => removeFromCart(item.key)}
                           className="w-7 h-7 flex items-center justify-center text-neutral-400 hover:text-red-500 hover:bg-red-50 active:scale-90 transition-all duration-200 cursor-pointer"
-                          title="Șterge"
+                          title={t('cart.delete')}
                         >
                           <svg className="w-4.5 h-4.5" style={{width:'18px',height:'18px'}} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -211,19 +214,19 @@ export default function CartSidebar() {
         {cart.length > 0 && (
           <div className="border-t border-neutral-100 px-6 py-5 space-y-3">
             <div className="flex justify-between text-xs text-neutral-500 tracking-wide">
-              <span>Subtotal</span>
+              <span>{t('cart.subtotal')}</span>
               <span>{cartTotal} MDL</span>
             </div>
             <div className="flex justify-between text-xs text-neutral-500 tracking-wide">
               <span>
-                {deliveryMethod === 'pickup' ? 'Pick-up' : 'Standard'}
+                {deliveryMethod === 'pickup' ? t('cart.pickup') : t('cart.standard')}
               </span>
               <span className={isPickup ? 'text-green-600 font-medium' : ''}>
-                {isPickup ? 'Gratuit' : `${deliveryCost} MDL`}
+                {isPickup ? t('cart.free') : `${deliveryCost} MDL`}
               </span>
             </div>
             <div className="flex justify-between text-sm font-medium text-black border-t border-neutral-100 pt-3">
-              <span>Total</span>
+              <span>{t('cart.total')}</span>
               <span>{total} MDL</span>
             </div>
 
@@ -232,7 +235,7 @@ export default function CartSidebar() {
               onClick={closeCart}
               className="group flex items-center justify-center gap-3 w-full bg-black text-white py-4 text-xs tracking-widest uppercase hover:bg-neutral-800 active:scale-[0.99] transition-all duration-300 mt-1"
             >
-              Finalizează Comanda
+              {t('cart.checkout')}
               <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
@@ -241,7 +244,7 @@ export default function CartSidebar() {
               onClick={closeCart}
               className="w-full text-center text-xs text-neutral-400 hover:text-black tracking-wide link-underline transition-colors duration-200 cursor-pointer"
             >
-              Continuă Cumpărăturile
+              {t('cart.continueShopping')}
             </button>
           </div>
         )}

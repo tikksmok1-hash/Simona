@@ -1,4 +1,9 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useTranslation } from '@/app/context/LanguageContext';
+import { localizeSettings, localize } from '@/lib/localize';
 
 // Helper: convert display phone like "062 000 160" to international format "37362000160"
 function phoneToInternational(phone) {
@@ -8,14 +13,35 @@ function phoneToInternational(phone) {
   return '373' + local;
 }
 
+// Module-level cache for categories
+let catCache = { data: null, ts: 0 };
+
 export default function Footer({ siteSettings = {} }) {
+  const { lang, t } = useTranslation();
+  const [categories, setCategories] = useState(catCache.data || []);
+
+  useEffect(() => {
+    if (catCache.data && Date.now() - catCache.ts < 5 * 60 * 1000) {
+      setCategories(catCache.data);
+      return;
+    }
+    fetch('/api/categories')
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          catCache = { data, ts: Date.now() };
+          setCategories(data);
+        }
+      })
+      .catch(() => {});
+  }, []);
   const phone1 = siteSettings.phone1 || '062 000 160';
   const phone2 = siteSettings.phone2 || '';
   const siteEmail = siteSettings.email || 'simona.md_info@mail.ru';
-  const siteAddress = siteSettings.address || 'str. Ion Creangă 58, Chișinău';
-  const schedule1 = siteSettings.schedule1 || 'Luni – Vineri: 9:00 – 19:00';
-  const schedule2 = siteSettings.schedule2 || 'Sâmbătă – Duminică: 9:00 – 17:00';
-  const footerDescription = siteSettings.footerDescription || 'Magazinul tău de modă feminină din Chișinău. Cele mai noi tendințe la prețuri accesibile.';
+  const siteAddress = localizeSettings(siteSettings, 'address', lang) || 'str. Ion Creangă 58, Chișinău';
+  const schedule1 = localizeSettings(siteSettings, 'schedule1', lang) || 'Luni – Vineri: 9:00 – 19:00';
+  const schedule2 = localizeSettings(siteSettings, 'schedule2', lang) || 'Sâmbătă – Duminică: 9:00 – 17:00';
+  const footerDescription = localizeSettings(siteSettings, 'footerDescription', lang) || 'Magazinul tău de modă feminină din Chișinău. Cele mai noi tendințe la prețuri accesibile.';
   const phone1Intl = phoneToInternational(phone1);
 
   return (
@@ -54,32 +80,30 @@ export default function Footer({ siteSettings = {} }) {
 
           {/* Categorii */}
           <div>
-            <h3 className="text-xs font-semibold tracking-widest uppercase mb-6">Categorii</h3>
+            <h3 className="text-xs font-semibold tracking-widest uppercase mb-6">{t('footer.categories')}</h3>
             <ul className="space-y-3">
-              <li><Link href="/categorie/rochii" className="text-neutral-400 hover:text-white transition-colors text-sm">Rochii</Link></li>
-              <li><Link href="/categorie/bluze-topuri" className="text-neutral-400 hover:text-white transition-colors text-sm">Bluze & Topuri</Link></li>
-              <li><Link href="/categorie/pantaloni" className="text-neutral-400 hover:text-white transition-colors text-sm">Pantaloni</Link></li>
-              <li><Link href="/categorie/jachete-paltoane" className="text-neutral-400 hover:text-white transition-colors text-sm">Jachete & Paltoane</Link></li>
-              <li><Link href="/categorie/fuste" className="text-neutral-400 hover:text-white transition-colors text-sm">Fuste</Link></li>
-              <li><Link href="/reduceri" className="text-neutral-400 hover:text-white transition-colors text-sm">Reduceri</Link></li>
-              <li><Link href="/bestsellers" className="text-neutral-400 hover:text-white transition-colors text-sm">Bestsellers</Link></li>
+              {categories.map((cat) => (
+                <li key={cat.id}><Link href={`/categorie/${cat.slug}`} className="text-neutral-400 hover:text-white transition-colors text-sm">{localize(cat, 'name', lang)}</Link></li>
+              ))}
+              <li><Link href="/reduceri" className="text-neutral-400 hover:text-white transition-colors text-sm">{t('footer.sales')}</Link></li>
+              <li><Link href="/bestsellers" className="text-neutral-400 hover:text-white transition-colors text-sm">{t('footer.bestsellers')}</Link></li>
             </ul>
           </div>
 
           {/* Informații */}
           <div>
-            <h3 className="text-xs font-semibold tracking-widest uppercase mb-6">Informații</h3>
+            <h3 className="text-xs font-semibold tracking-widest uppercase mb-6">{t('footer.info')}</h3>
             <ul className="space-y-3">
-              <li><Link href="/livrare" className="text-neutral-400 hover:text-white transition-colors text-sm">Livrare & Retur</Link></li>
-              <li><Link href="/noutati" className="text-neutral-400 hover:text-white transition-colors text-sm">Noutăți</Link></li>
-              <li><Link href="/favorite" className="text-neutral-400 hover:text-white transition-colors text-sm">Favorite</Link></li>
-              <li><Link href="/cos" className="text-neutral-400 hover:text-white transition-colors text-sm">Coș</Link></li>
+              <li><Link href="/livrare" className="text-neutral-400 hover:text-white transition-colors text-sm">{t('footer.deliveryReturn')}</Link></li>
+              <li><Link href="/noutati" className="text-neutral-400 hover:text-white transition-colors text-sm">{t('footer.news')}</Link></li>
+              <li><Link href="/favorite" className="text-neutral-400 hover:text-white transition-colors text-sm">{t('footer.favorites')}</Link></li>
+              <li><Link href="/cos" className="text-neutral-400 hover:text-white transition-colors text-sm">{t('footer.cart')}</Link></li>
             </ul>
           </div>
 
           {/* Contact */}
           <div>
-            <h3 className="text-xs font-semibold tracking-widest uppercase mb-6">Contact</h3>
+            <h3 className="text-xs font-semibold tracking-widest uppercase mb-6">{t('footer.contact')}</h3>
             <ul className="space-y-4">
               <li>
                 <a href={`https://www.google.com/maps/search/${encodeURIComponent(siteAddress + ', Moldova')}`}
@@ -133,11 +157,11 @@ export default function Footer({ siteSettings = {} }) {
       <div className="border-t border-neutral-800 py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-neutral-500">
-            <p className="tracking-wide">© 2026 SIMONA Fashion. Toate drepturile rezervate.</p>
+            <p className="tracking-wide">{t('footer.rights')}</p>
             <div className="flex flex-wrap justify-center gap-6">
-              <Link href="/livrare" className="hover:text-white transition-colors tracking-wide">Livrare & Retur</Link>
-              <Link href="/termeni" className="hover:text-white transition-colors tracking-wide">Termeni și Condiții</Link>
-              <Link href="/confidentialitate" className="hover:text-white transition-colors tracking-wide">Confidențialitate</Link>
+              <Link href="/livrare" className="hover:text-white transition-colors tracking-wide">{t('footer.deliveryReturn')}</Link>
+              <Link href="/termeni" className="hover:text-white transition-colors tracking-wide">{t('footer.terms')}</Link>
+              <Link href="/confidentialitate" className="hover:text-white transition-colors tracking-wide">{t('footer.privacy')}</Link>
             </div>
           </div>
         </div>

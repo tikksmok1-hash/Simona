@@ -3,19 +3,13 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import ProductCard from '@/app/components/ProductCard';
+import { useTranslation } from '@/app/context/LanguageContext';
+import { localize } from '@/lib/localize';
 
 const PAGE_SIZE = 8;
 
-const CATEGORY_LABELS = {
-  'rochii': 'Rochii',
-  'bluze-topuri': 'Bluze & Topuri',
-  'pantaloni': 'Pantaloni',
-  'jachete-paltoane': 'Jachete & Paltoane',
-  'fuste': 'Fuste',
-  'accesorii': 'Accesorii',
-};
-
 export default function BestsellersFilters({ products: productsList, totalSavings = 0, availableCategories, categories = [], mode = 'sale' }) {
+  const { lang, t } = useTranslation();
   const isSaleMode = mode === 'sale';
   const defaultSort = isSaleMode ? 'discount-desc' : 'name-asc';
 
@@ -80,7 +74,7 @@ export default function BestsellersFilters({ products: productsList, totalSaving
 
             {/* Category */}
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[9px] tracking-widest uppercase text-gray-400 shrink-0">Categorie:</span>
+              <span className="text-[9px] tracking-widest uppercase text-gray-400 shrink-0">{t('filter.category')}</span>
               <button
                 onClick={() => { setFilterCategory('all'); setFilterSubcategory('all'); setPage(1); }}
                 className={`text-[10px] tracking-widest uppercase px-4 py-1.5 border transition-all duration-200 cursor-pointer active:scale-95 ${
@@ -89,7 +83,7 @@ export default function BestsellersFilters({ products: productsList, totalSaving
                     : 'border-gray-200 text-gray-500 hover:bg-black hover:text-white hover:border-black'
                 }`}
               >
-                Toate ({productsList.length})
+                {t('filter.all')} ({productsList.length})
               </button>
               {availableCategories.map((cat) => {
                 const count = productsList.filter((p) => p.categorySlug === cat).length;
@@ -103,7 +97,7 @@ export default function BestsellersFilters({ products: productsList, totalSaving
                         : 'border-gray-200 text-gray-500 hover:bg-black hover:text-white hover:border-black'
                     }`}
                   >
-                    {CATEGORY_LABELS[cat] || cat} ({count})
+                    {(() => { const c = categories.find(c => c.slug === cat); return c ? localize(c, 'name', lang) : cat; })()} ({count})
                   </button>
                 );
               })}
@@ -121,7 +115,7 @@ export default function BestsellersFilters({ products: productsList, totalSaving
                       : 'border-gray-200 text-gray-400 hover:bg-neutral-800 hover:text-white hover:border-neutral-800'
                   }`}
                 >
-                  Toate
+                  {t('filter.all')}
                 </button>
                 {activeSubcategories.map((sub) => {
                   const count = productsList.filter(
@@ -138,7 +132,7 @@ export default function BestsellersFilters({ products: productsList, totalSaving
                           : 'border-gray-200 text-gray-400 hover:bg-neutral-800 hover:text-white hover:border-neutral-800'
                       }`}
                     >
-                      {sub.name} ({count})
+                      {localize(sub, 'name', lang)} ({count})
                     </button>
                   );
                 })}
@@ -150,7 +144,7 @@ export default function BestsellersFilters({ products: productsList, totalSaving
             {/* Discount tier — only in sale mode */}
             {isSaleMode && (
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[9px] tracking-widest uppercase text-gray-400 shrink-0">Reducere:</span>
+              <span className="text-[9px] tracking-widest uppercase text-gray-400 shrink-0">{t('filter.discount')}</span>
               {[0, 10, 20, 30].map((tier) => (
                 <button
                   key={tier}
@@ -161,7 +155,7 @@ export default function BestsellersFilters({ products: productsList, totalSaving
                       : 'border-gray-200 text-gray-500 hover:bg-black hover:text-white hover:border-black'
                   }`}
                 >
-                  {tier === 0 ? 'Toate' : `-${tier}%+`}
+                  {tier === 0 ? t('filter.all') : `-${tier}%+`}
                 </button>
               ))}
             </div>
@@ -171,16 +165,16 @@ export default function BestsellersFilters({ products: productsList, totalSaving
 
             {/* Sort */}
             <div className="flex items-center gap-2">
-              <span className="text-[9px] tracking-widest uppercase text-gray-400 shrink-0">Sortează:</span>
+              <span className="text-[9px] tracking-widest uppercase text-gray-400 shrink-0">{t('filter.sort')}</span>
               <select
                 value={sortBy}
                 onChange={(e) => { setSortBy(e.target.value); setPage(1); }}
                 className="text-[10px] tracking-widest uppercase border border-gray-200 bg-white text-gray-600 px-3 py-1.5 focus:outline-none focus:border-black transition-colors cursor-pointer"
               >
-                {isSaleMode && <option value="discount-desc">Reducere ↓</option>}
-                <option value="price-asc">Preț ↑</option>
-                <option value="price-desc">Preț ↓</option>
-                <option value="name-asc">Nume A–Z</option>
+                {isSaleMode && <option value="discount-desc">{t('filter.sortDiscount')}</option>}
+                <option value="price-asc">{t('filter.sortPriceAsc')}</option>
+                <option value="price-desc">{t('filter.sortPriceDesc')}</option>
+                <option value="name-asc">{t('filter.sortName')}</option>
               </select>
             </div>
 
@@ -189,15 +183,15 @@ export default function BestsellersFilters({ products: productsList, totalSaving
                 onClick={resetFilters}
                 className="ml-auto text-[9px] tracking-widest uppercase text-gray-400 hover:text-black underline underline-offset-2 transition-colors cursor-pointer active:scale-95"
               >
-                Resetează filtrele
+                {t('filter.reset')}
               </button>
             )}
           </div>
 
           {/* Results count */}
           <div className="mt-2 text-[9px] tracking-widest uppercase text-gray-400">
-            {filtered.length} {filtered.length === 1 ? 'produs' : 'produse'} găsite
-            {totalPages > 1 && ` · Pagina ${page} din ${totalPages}`}
+            {filtered.length} {filtered.length === 1 ? t('cart.product') : t('cart.products')} {t('filter.found')}
+            {totalPages > 1 && ` · ${t('filter.page')} ${page} ${t('filter.of')} ${totalPages}`}
           </div>
         </div>
       </div>
@@ -207,13 +201,13 @@ export default function BestsellersFilters({ products: productsList, totalSaving
         {filtered.length === 0 ? (
           <div className="text-center py-32">
             <div className="w-16 h-px bg-black mx-auto mb-8" />
-            <p className="font-serif text-2xl text-gray-300 mb-4">Niciun produs găsit</p>
-            <p className="text-sm text-gray-400 mb-8">Încearcă să schimbi filtrele</p>
+            <p className="font-serif text-2xl text-gray-300 mb-4">{t('filter.noProducts')}</p>
+            <p className="text-sm text-gray-400 mb-8">{t('filter.changeFilters')}</p>
             <button
               onClick={resetFilters}
               className="border border-black text-black px-8 py-3 text-xs tracking-widest uppercase hover:bg-black hover:text-white transition-all duration-200 cursor-pointer active:scale-95"
             >
-              Resetează filtrele
+              {t('filter.reset')}
             </button>
           </div>
         ) : (

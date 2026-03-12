@@ -6,6 +6,7 @@ import Navbar from './Navbar';
 import Footer from './Footer';
 import CartSidebar from './CartSidebar';
 import { CartProvider } from '../context/CartContext';
+import { LanguageProvider } from '../context/LanguageContext';
 
 // In-memory cache so we don't refetch on every client-side navigation
 let settingsCache = { data: null, ts: 0 };
@@ -43,11 +44,13 @@ export default function LayoutWrapper({ children }) {
   }
 
   return (
-    <CartProvider>
-      <Navbar siteSettings={siteSettings} />
-      <CartSidebar />
-      <main>{children}</main>
-      <Footer siteSettings={siteSettings} />
-    </CartProvider>
+    <LanguageProvider>
+      <CartProvider>
+        <Navbar siteSettings={siteSettings} />
+        <CartSidebar />
+        <main>{children}</main>
+        <Footer siteSettings={siteSettings} />
+      </CartProvider>
+    </LanguageProvider>
   );
 }

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useAdmin } from '../AdminAuthContext';
 import ImageUploader from '../components/ImageUploader';
+import TranslatableField from '../components/TranslatableField';
 
 function CategoriesContent() {
   const { apiFetch } = useAdmin();
@@ -14,13 +15,13 @@ function CategoriesContent() {
   const [editSubId, setEditSubId] = useState(null);
 
   // New Category form
-  const [catForm, setCatForm] = useState({ name: '', slug: '', description: '', image: '', order: 0 });
+  const [catForm, setCatForm] = useState({ name: '', nameRu: '', nameEn: '', slug: '', description: '', descriptionRu: '', descriptionEn: '', image: '', order: 0 });
   // Edit Category form
-  const [editCatForm, setEditCatForm] = useState({ name: '', slug: '', description: '', image: '', order: 0 });
+  const [editCatForm, setEditCatForm] = useState({ name: '', nameRu: '', nameEn: '', slug: '', description: '', descriptionRu: '', descriptionEn: '', image: '', order: 0 });
   // New Subcategory form
-  const [subForm, setSubForm] = useState({ name: '', slug: '', description: '', image: '', order: 0 });
+  const [subForm, setSubForm] = useState({ name: '', nameRu: '', nameEn: '', slug: '', description: '', descriptionRu: '', descriptionEn: '', image: '', order: 0 });
   // Edit Subcategory form
-  const [editSubForm, setEditSubForm] = useState({ name: '', slug: '', description: '', image: '', order: 0 });
+  const [editSubForm, setEditSubForm] = useState({ name: '', nameRu: '', nameEn: '', slug: '', description: '', descriptionRu: '', descriptionEn: '', image: '', order: 0 });
 
   const fetchCategories = async () => {
     try {
@@ -53,7 +54,7 @@ function CategoriesContent() {
   // Edit Category
   const startEditCat = (cat) => {
     setEditId(cat.id);
-    setEditCatForm({ name: cat.name, slug: cat.slug, description: cat.description || '', image: cat.image || '', order: cat.order || 0 });
+    setEditCatForm({ name: cat.name, nameRu: cat.nameRu || '', nameEn: cat.nameEn || '', slug: cat.slug, description: cat.description || '', descriptionRu: cat.descriptionRu || '', descriptionEn: cat.descriptionEn || '', image: cat.image || '', order: cat.order || 0 });
   };
 
   const saveEditCat = async () => {
@@ -95,7 +96,7 @@ function CategoriesContent() {
   // Edit Subcategory
   const startEditSub = (sub) => {
     setEditSubId(sub.id);
-    setEditSubForm({ name: sub.name, slug: sub.slug, description: sub.description || '', image: sub.image || '', order: sub.order || 0 });
+    setEditSubForm({ name: sub.name, nameRu: sub.nameRu || '', nameEn: sub.nameEn || '', slug: sub.slug, description: sub.description || '', descriptionRu: sub.descriptionRu || '', descriptionEn: sub.descriptionEn || '', image: sub.image || '', order: sub.order || 0 });
   };
 
   const saveEditSub = async () => {
@@ -138,18 +139,24 @@ function CategoriesContent() {
         <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
           <h2 className="text-sm font-medium text-black mb-4">Categorie Nouă</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1.5">Nume *</label>
-              <input value={catForm.name} onChange={(e) => setCatForm({ ...catForm, name: e.target.value, slug: autoSlug(e.target.value) })} className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black" />
-            </div>
+            <TranslatableField
+              label="Nume" fieldKey="name" required
+              value={catForm.name} valueRu={catForm.nameRu} valueEn={catForm.nameEn}
+              onChange={(key, val) => {
+                setCatForm(prev => ({ ...prev, [key]: val, ...(key === 'name' ? { slug: autoSlug(val) } : {}) }));
+              }}
+              apiFetch={apiFetch}
+            />
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1.5">Slug</label>
               <input value={catForm.slug} onChange={(e) => setCatForm({ ...catForm, slug: e.target.value })} className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black bg-gray-50" />
             </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1.5">Descriere</label>
-              <input value={catForm.description} onChange={(e) => setCatForm({ ...catForm, description: e.target.value })} className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black" />
-            </div>
+            <TranslatableField
+              label="Descriere" fieldKey="description"
+              value={catForm.description} valueRu={catForm.descriptionRu} valueEn={catForm.descriptionEn}
+              onChange={(key, val) => setCatForm(prev => ({ ...prev, [key]: val }))}
+              apiFetch={apiFetch}
+            />
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1.5">Ordine</label>
               <input type="number" value={catForm.order} onChange={(e) => setCatForm({ ...catForm, order: parseInt(e.target.value) || 0 })} className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black" />
@@ -174,18 +181,22 @@ function CategoriesContent() {
                 <div className="p-6 border-b border-gray-100">
                   <h2 className="text-sm font-medium text-black mb-4">Editează Categorie</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div>
-                      <label className="block text-xs font-medium text-gray-600 mb-1.5">Nume</label>
-                      <input value={editCatForm.name} onChange={(e) => setEditCatForm({ ...editCatForm, name: e.target.value })} className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black" />
-                    </div>
+                    <TranslatableField
+                      label="Nume" fieldKey="name"
+                      value={editCatForm.name} valueRu={editCatForm.nameRu} valueEn={editCatForm.nameEn}
+                      onChange={(key, val) => setEditCatForm(prev => ({ ...prev, [key]: val }))}
+                      apiFetch={apiFetch}
+                    />
                     <div>
                       <label className="block text-xs font-medium text-gray-600 mb-1.5">Slug</label>
                       <input value={editCatForm.slug} onChange={(e) => setEditCatForm({ ...editCatForm, slug: e.target.value })} className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black" />
                     </div>
-                    <div>
-                      <label className="block text-xs font-medium text-gray-600 mb-1.5">Descriere</label>
-                      <input value={editCatForm.description} onChange={(e) => setEditCatForm({ ...editCatForm, description: e.target.value })} className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black" />
-                    </div>
+                    <TranslatableField
+                      label="Descriere" fieldKey="description"
+                      value={editCatForm.description} valueRu={editCatForm.descriptionRu} valueEn={editCatForm.descriptionEn}
+                      onChange={(key, val) => setEditCatForm(prev => ({ ...prev, [key]: val }))}
+                      apiFetch={apiFetch}
+                    />
                     <div>
                       <label className="block text-xs font-medium text-gray-600 mb-1.5">Ordine</label>
                       <input type="number" value={editCatForm.order} onChange={(e) => setEditCatForm({ ...editCatForm, order: parseInt(e.target.value) || 0 })} className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black" />
@@ -227,18 +238,22 @@ function CategoriesContent() {
                 <div className="p-6 bg-gray-50 border-b border-gray-100">
                   <h3 className="text-xs font-medium text-gray-700 mb-3">Subcategorie Nouă în {cat.name}</h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
-                    <div>
-                      <label className="block text-xs text-gray-500 mb-1">Nume *</label>
-                      <input value={subForm.name} onChange={(e) => setSubForm({ ...subForm, name: e.target.value, slug: autoSlug(e.target.value) })} className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black" />
-                    </div>
+                    <TranslatableField
+                      label="Nume" fieldKey="name" required
+                      value={subForm.name} valueRu={subForm.nameRu} valueEn={subForm.nameEn}
+                      onChange={(key, val) => setSubForm(prev => ({ ...prev, [key]: val, ...(key === 'name' ? { slug: autoSlug(val) } : {}) }))}
+                      apiFetch={apiFetch}
+                    />
                     <div>
                       <label className="block text-xs text-gray-500 mb-1">Slug</label>
                       <input value={subForm.slug} onChange={(e) => setSubForm({ ...subForm, slug: e.target.value })} className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black bg-white" />
                     </div>
-                    <div>
-                      <label className="block text-xs text-gray-500 mb-1">Descriere</label>
-                      <input value={subForm.description} onChange={(e) => setSubForm({ ...subForm, description: e.target.value })} className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black" />
-                    </div>
+                    <TranslatableField
+                      label="Descriere" fieldKey="description"
+                      value={subForm.description} valueRu={subForm.descriptionRu} valueEn={subForm.descriptionEn}
+                      onChange={(key, val) => setSubForm(prev => ({ ...prev, [key]: val }))}
+                      apiFetch={apiFetch}
+                    />
                   </div>
                   <ImageUploader value={subForm.image} onChange={(url) => setSubForm({ ...subForm, image: url })} label="Imagine Subcategorie" />
                   <div className="flex gap-3 mt-3">
@@ -256,18 +271,22 @@ function CategoriesContent() {
                       {editSubId === sub.id ? (
                         <div className="p-4 pl-14 bg-gray-50">
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
-                            <div>
-                              <label className="block text-xs text-gray-500 mb-1">Nume</label>
-                              <input value={editSubForm.name} onChange={(e) => setEditSubForm({ ...editSubForm, name: e.target.value })} className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black" />
-                            </div>
+                            <TranslatableField
+                              label="Nume" fieldKey="name"
+                              value={editSubForm.name} valueRu={editSubForm.nameRu} valueEn={editSubForm.nameEn}
+                              onChange={(key, val) => setEditSubForm(prev => ({ ...prev, [key]: val }))}
+                              apiFetch={apiFetch}
+                            />
                             <div>
                               <label className="block text-xs text-gray-500 mb-1">Slug</label>
                               <input value={editSubForm.slug} onChange={(e) => setEditSubForm({ ...editSubForm, slug: e.target.value })} className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black" />
                             </div>
-                            <div>
-                              <label className="block text-xs text-gray-500 mb-1">Descriere</label>
-                              <input value={editSubForm.description} onChange={(e) => setEditSubForm({ ...editSubForm, description: e.target.value })} className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black" />
-                            </div>
+                            <TranslatableField
+                              label="Descriere" fieldKey="description"
+                              value={editSubForm.description} valueRu={editSubForm.descriptionRu} valueEn={editSubForm.descriptionEn}
+                              onChange={(key, val) => setEditSubForm(prev => ({ ...prev, [key]: val }))}
+                              apiFetch={apiFetch}
+                            />
                           </div>
                           <ImageUploader value={editSubForm.image} onChange={(url) => setEditSubForm({ ...editSubForm, image: url })} label="Imagine" />
                           <div className="flex gap-3 mt-3">

@@ -3,10 +3,12 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import ProductCard from '@/app/components/ProductCard';
+import { useTranslation } from '@/app/context/LanguageContext';
 
 const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL', '5XL'];
 
 export default function CategoryFilters({ categoryProducts, category, activeSubslug }) {
+  const { t } = useTranslation();
   const [sortBy, setSortBy] = useState('newest');
   const [selectedSizes, setSelectedSizes] = useState([]);
   const [minInput, setMinInput] = useState('');
@@ -97,32 +99,32 @@ export default function CategoryFilters({ categoryProducts, category, activeSubs
                 d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75"
               />
             </svg>
-            {showFilters ? 'Ascunde filtrele' : 'Filtre'}
+            {showFilters ? t('filter.hideFilters') : t('filter.showFilters')}
           </button>
 
-          <span className="text-sm text-neutral-400">{filtered.length} produse</span>
+          <span className="text-sm text-neutral-400">{filtered.length} {t('cart.products')}</span>
 
           {hasActiveFilters && (
             <button
               onClick={resetFilters}
               className="text-xs text-neutral-400 hover:text-black underline underline-offset-2 transition-colors"
             >
-              Resetează
+              {t('filter.reset')}
             </button>
           )}
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-sm text-neutral-500">Sortează:</span>
+          <span className="text-sm text-neutral-500">{t('filter.sort')}</span>
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
             className="border border-neutral-200 px-4 py-2 text-sm focus:outline-none focus:border-black bg-white"
           >
-            <option value="newest">Cele mai noi</option>
-            <option value="price-asc">Preț: Crescător</option>
-            <option value="price-desc">Preț: Descrescător</option>
-            <option value="name-asc">Alfabetic</option>
+            <option value="newest">{t('filter.newest')}</option>
+            <option value="price-asc">{t('filter.sortPriceAsc')}</option>
+            <option value="price-desc">{t('filter.sortPriceDesc')}</option>
+            <option value="name-asc">{t('filter.alphabetic')}</option>
           </select>
         </div>
       </div>
@@ -137,7 +139,7 @@ export default function CategoryFilters({ categoryProducts, category, activeSubs
             {category.subcategories?.length > 0 && (
               <div>
                 <h3 className="text-xs tracking-widest uppercase text-black font-medium mb-4">
-                  Subcategorii
+                  {t('filter.subcategories')}
                 </h3>
                 <div className="space-y-2">
                   <Link
@@ -148,7 +150,7 @@ export default function CategoryFilters({ categoryProducts, category, activeSubs
                         : 'text-neutral-600 hover:text-black'
                     }`}
                   >
-                    Toate {category.name}
+                    {t('filter.all')} {category.name}
                   </Link>
                   {category.subcategories.map((sub) => (
                     <Link
@@ -170,7 +172,7 @@ export default function CategoryFilters({ categoryProducts, category, activeSubs
             {/* Size Filter */}
             <div>
               <h3 className="text-xs tracking-widest uppercase text-black font-medium mb-4">
-                Mărime
+                {t('filter.size')}
               </h3>
               <div className="flex flex-wrap gap-2">
                 {SIZES.map((size) => (
@@ -192,13 +194,13 @@ export default function CategoryFilters({ categoryProducts, category, activeSubs
             {/* Price Filter */}
             <div>
               <h3 className="text-xs tracking-widest uppercase text-black font-medium mb-4">
-                Preț (MDL)
+                {t('filter.price')}
               </h3>
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
                   <input
                     type="number"
-                    placeholder="Min"
+                    placeholder={t('filter.min')}
                     value={minInput}
                     onChange={(e) => setMinInput(e.target.value)}
                     className="w-full px-3 py-2 border border-neutral-200 text-sm focus:outline-none focus:border-black"
@@ -206,7 +208,7 @@ export default function CategoryFilters({ categoryProducts, category, activeSubs
                   <span className="text-neutral-400">–</span>
                   <input
                     type="number"
-                    placeholder="Max"
+                    placeholder={t('filter.max')}
                     value={maxInput}
                     onChange={(e) => setMaxInput(e.target.value)}
                     className="w-full px-3 py-2 border border-neutral-200 text-sm focus:outline-none focus:border-black"
@@ -216,7 +218,7 @@ export default function CategoryFilters({ categoryProducts, category, activeSubs
                   onClick={applyPrice}
                   className="w-full py-2 border border-black text-sm tracking-wide hover:bg-black hover:text-white active:scale-95 transition-all duration-200"
                 >
-                  Aplică
+                  {t('filter.apply')}
                 </button>
               </div>
             </div>
@@ -227,7 +229,7 @@ export default function CategoryFilters({ categoryProducts, category, activeSubs
                 onClick={resetFilters}
                 className="text-sm text-neutral-500 hover:text-black underline underline-offset-2"
               >
-                Resetează filtrele
+                {t('filter.reset')}
               </button>
             )}
           </div>
@@ -249,26 +251,26 @@ export default function CategoryFilters({ categoryProducts, category, activeSubs
                 </svg>
               </div>
               <h3 className="font-serif text-2xl font-light text-black mb-2">
-                Nu am găsit produse
+                {t('filter.noProductsFound')}
               </h3>
               <p className="text-neutral-500 mb-6">
                 {hasActiveFilters
-                  ? 'Încearcă să schimbi filtrele.'
-                  : 'Nu există produse în această categorie momentan.'}
+                  ? t('filter.tryChangeFilters')
+                  : t('filter.noProductsInCategory')}
               </p>
               {hasActiveFilters ? (
                 <button
                   onClick={resetFilters}
                   className="inline-block border border-black text-black px-8 py-3 text-sm tracking-widest uppercase hover:bg-black hover:text-white transition-colors"
                 >
-                  Resetează filtrele
+                  {t('filter.reset')}
                 </button>
               ) : (
                 <Link
                   href="/"
                   className="inline-block bg-black text-white px-8 py-3 text-sm tracking-widest uppercase hover:bg-neutral-800 transition-colors"
                 >
-                  Acasă
+                  {t('common.home')}
                 </Link>
               )}
             </div>

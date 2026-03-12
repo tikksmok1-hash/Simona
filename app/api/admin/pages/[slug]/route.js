@@ -39,18 +39,20 @@ export async function PUT(request, { params }) {
 
   try {
     const { slug } = await params;
-    const { title, content } = await request.json();
+    const { title, titleRu, titleEn, content, contentRu, contentEn } = await request.json();
 
     if (!title || !content) {
       return NextResponse.json({ error: 'Titlul și conținutul sunt obligatorii' }, { status: 400 });
     }
 
     const safeContent = sanitizeHtml(content);
+    const safeContentRu = contentRu ? sanitizeHtml(contentRu) : null;
+    const safeContentEn = contentEn ? sanitizeHtml(contentEn) : null;
 
     const page = await prisma.staticPage.upsert({
       where: { slug },
-      update: { title, content: safeContent },
-      create: { slug, title, content: safeContent },
+      update: { title, titleRu: titleRu || null, titleEn: titleEn || null, content: safeContent, contentRu: safeContentRu, contentEn: safeContentEn },
+      create: { slug, title, titleRu: titleRu || null, titleEn: titleEn || null, content: safeContent, contentRu: safeContentRu, contentEn: safeContentEn },
     });
 
     // Revalidate the specific frontend page

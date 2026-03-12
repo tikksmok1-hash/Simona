@@ -5,13 +5,32 @@ import { useAdmin } from '../AdminAuthContext';
 import { livrareDefaults } from '@/lib/data/livrareDefaults';
 import Link from 'next/link';
 
+const LANGS = [
+  { key: 'ro', label: 'RO', flag: '🇷🇴' },
+  { key: 'ru', label: 'RU', flag: '🇷🇺' },
+  { key: 'en', label: 'EN', flag: '🇬🇧' },
+];
+
 export default function LivrareEditor() {
   const { apiFetch } = useAdmin();
   const [title, setTitle] = useState('Livrare & Retur');
-  const [data, setData] = useState(livrareDefaults);
+  const [titleRu, setTitleRu] = useState('');
+  const [titleEn, setTitleEn] = useState('');
+  const [dataRo, setDataRo] = useState(livrareDefaults);
+  const [dataRu, setDataRu] = useState(livrareDefaults);
+  const [dataEn, setDataEn] = useState(livrareDefaults);
+  const [activeLang, setActiveLang] = useState('ro');
+  const [translating, setTranslating] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
+
+  const dataMap = { ro: dataRo, ru: dataRu, en: dataEn };
+  const setDataMap = { ro: setDataRo, ru: setDataRu, en: setDataEn };
+  const titleMap = { ro: title, ru: titleRu, en: titleEn };
+  const setTitleMap = { ro: setTitle, ru: setTitleRu, en: setTitleEn };
+  const data = dataMap[activeLang];
+  const currentSetData = setDataMap[activeLang];
 
   useEffect(() => { loadPage(); }, []);
 
@@ -22,18 +41,81 @@ export default function LivrareEditor() {
         const page = await res.json();
         if (page) {
           setTitle(page.title);
-          try {
-            const parsed = JSON.parse(page.content);
-            setData(prev => ({ ...prev, ...parsed }));
-          } catch {
-            // content is not JSON (old HTML format), use defaults
-          }
+          setTitleRu(page.titleRu || '');
+          setTitleEn(page.titleEn || '');
+          try { setDataRo(prev => ({ ...prev, ...JSON.parse(page.content) })); } catch {}
+          try { if (page.contentRu) setDataRu(prev => ({ ...prev, ...JSON.parse(page.contentRu) })); } catch {}
+          try { if (page.contentEn) setDataEn(prev => ({ ...prev, ...JSON.parse(page.contentEn) })); } catch {}
         }
       }
     } catch (error) {
       console.error('Error loading livrare:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const translateText = async (text, to) => {
+    if (!text || typeof text !== 'string' || text.trim() === '') return text;
+    try {
+      const res = await apiFetch('/api/admin/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, from: 'ro', to }),
+      });
+      if (res.ok) return (await res.json()).translated;
+    } catch {}
+    return text;
+  };
+
+  const translateStructuredData = async (sourceData, targetLang) => {
+    const t = JSON.parse(JSON.stringify(sourceData));
+    if (t.heroSubtitle) t.heroSubtitle = await translateText(t.heroSubtitle, targetLang);
+    if (t.returnDescription) t.returnDescription = await translateText(t.returnDescription, targetLang);
+    if (t.contactSubtitle) t.contactSubtitle = await translateText(t.contactSubtitle, targetLang);
+    for (const opt of t.deliveryOptions || []) {
+      if (opt.title) opt.title = await translateText(opt.title, targetLang);
+      if (opt.subtitle) opt.subtitle = await translateText(opt.subtitle, targetLang);
+      if (opt.description) opt.description = await translateText(opt.description, targetLang);
+    }
+    for (const step of t.steps || []) {
+      if (step.title) step.title = await translateText(step.title, targetLang);
+      if (step.description) step.description = await translateText(step.description, targetLang);
+    }
+    for (let i = 0; i < (t.returnItems || []).length; i++) {
+      if (t.returnItems[i]) t.returnItems[i] = await translateText(t.returnItems[i], targetLang);
+    }
+    for (const card of t.returnCards || []) {
+      if (card.title) card.title = await translateText(card.title, targetLang);
+      if (card.description) card.description = await translateText(card.description, targetLang);
+    }
+    for (const faq of t.faqs || []) {
+      if (faq.q) faq.q = await translateText(faq.q, targetLang);
+      if (faq.a) faq.a = await translateText(faq.a, targetLang);
+    }
+    return t;
+  };
+
+  const handleAutoTranslate = async () => {
+    setTranslating(true);
+    try {
+      const [ruTitle, enTitle] = await Promise.all([
+        title ? translateText(title, 'ru') : '',
+        title ? translateText(title, 'en') : '',
+      ]);
+      if (ruTitle) setTitleRu(ruTitle);
+      if (enTitle) setTitleEn(enTitle);
+      const [ruData, enData] = await Promise.all([
+        translateStructuredData(dataRo, 'ru'),
+        translateStructuredData(dataRo, 'en'),
+      ]);
+      setDataRu(ruData);
+      setDataEn(enData);
+    } catch (err) {
+      console.error('Translation error:', err);
+      alert('Eroare la traducere automată');
+    } finally {
+      setTranslating(false);
     }
   };
 
@@ -44,7 +126,12 @@ export default function LivrareEditor() {
       const res = await apiFetch('/api/admin/pages/livrare', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, content: JSON.stringify(data) }),
+        body: JSON.stringify({
+          title, titleRu, titleEn,
+          content: JSON.stringify(dataRo),
+          contentRu: JSON.stringify(dataRu),
+          contentEn: JSON.stringify(dataEn),
+        }),
       });
       if (res.ok) {
         setSuccess(true);
@@ -60,20 +147,20 @@ export default function LivrareEditor() {
     }
   };
 
-  // Helper to update nested data
-  const updateField = (field, value) => setData(prev => ({ ...prev, [field]: value }));
+  // Helper to update nested data (operates on active language)
+  const updateField = (field, value) => currentSetData(prev => ({ ...prev, [field]: value }));
   const updateArrayItem = (field, index, key, value) => {
-    setData(prev => {
+    currentSetData(prev => {
       const arr = [...prev[field]];
       arr[index] = { ...arr[index], [key]: value };
       return { ...prev, [field]: arr };
     });
   };
   const addArrayItem = (field, template) => {
-    setData(prev => ({ ...prev, [field]: [...prev[field], template] }));
+    currentSetData(prev => ({ ...prev, [field]: [...prev[field], template] }));
   };
   const removeArrayItem = (field, index) => {
-    setData(prev => ({ ...prev, [field]: prev[field].filter((_, i) => i !== index) }));
+    currentSetData(prev => ({ ...prev, [field]: prev[field].filter((_, i) => i !== index) }));
   };
 
   const SaveButton = () => (
@@ -119,7 +206,40 @@ export default function LivrareEditor() {
           </Link>
           <h1 className="text-2xl font-serif font-light text-black">Editare: Livrare & Retur</h1>
         </div>
-        <SaveButton />
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleAutoTranslate}
+            disabled={translating}
+            className="px-4 py-2.5 bg-blue-50 text-blue-600 text-sm font-medium rounded-lg hover:bg-blue-100 transition-colors disabled:opacity-50 flex items-center gap-2"
+          >
+            {translating ? (
+              <div className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="m10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 0 1-3.827-5.802" />
+              </svg>
+            )}
+            {translating ? 'Se traduce...' : 'Auto-traducere RU + EN'}
+          </button>
+          <SaveButton />
+        </div>
+      </div>
+
+      {/* Language Tabs */}
+      <div className="flex gap-1 mb-4">
+        {LANGS.map((l) => (
+          <button
+            key={l.key}
+            onClick={() => setActiveLang(l.key)}
+            className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors cursor-pointer ${
+              activeLang === l.key
+                ? 'bg-white border border-b-white border-gray-200 text-black -mb-px relative z-10'
+                : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+            }`}
+          >
+            {l.flag} {l.label}
+          </button>
+        ))}
       </div>
 
       {success && (
@@ -133,7 +253,7 @@ export default function LivrareEditor() {
 
       {/* Page Title */}
       <Section title="Titlu Pagină" icon={<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>}>
-        <Input label="Titlul Paginii" value={title} onChange={setTitle} placeholder="Livrare & Retur" />
+        <Input label={`Titlul Paginii (${activeLang.toUpperCase()})`} value={titleMap[activeLang]} onChange={setTitleMap[activeLang]} placeholder="Livrare & Retur" />
         <Input label="Subtitlu Hero" value={data.heroSubtitle} onChange={(v) => updateField('heroSubtitle', v)} placeholder="Livrăm comenzile cu grijă..." />
       </Section>
 

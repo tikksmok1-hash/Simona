@@ -15,8 +15,12 @@ datasource db {
 model Category {
   id            String        @id @default(auto()) @map("_id") @db.ObjectId
   name          String        @unique
+  nameRu        String?
+  nameEn        String?
   slug          String        @unique
   description   String?
+  descriptionRu String?
+  descriptionEn String?
   image         String?
   isActive      Boolean       @default(true)
   order         Int           @default(0)
@@ -31,8 +35,12 @@ model Category {
 model Subcategory {
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
   name        String
+  nameRu      String?
+  nameEn      String?
   slug        String    @unique
   description String?
+  descriptionRu String?
+  descriptionEn String?
   image       String?
   isActive    Boolean   @default(true)
   order       Int       @default(0)
@@ -53,11 +61,21 @@ model Subcategory {
 model Product {
   id              String          @id @default(auto()) @map("_id") @db.ObjectId
   name            String
+  nameRu          String?
+  nameEn          String?
   slug            String          @unique
   description     String
+  descriptionRu   String?
+  descriptionEn   String?
   shortDescription String?
+  shortDescriptionRu String?
+  shortDescriptionEn String?
   materialsInfo   String?         // Detalii & Materiale (editable from admin)
+  materialsInfoRu String?
+  materialsInfoEn String?
   shippingInfo    String?         // Livrare & Returnare (editable from admin)
+  shippingInfoRu  String?
+  shippingInfoEn  String?
   
   // Pricing
   price           Float
@@ -112,6 +130,8 @@ model ProductVariant {
   
   // Color information
   colorName   String              // e.g., "Roșu", "Negru", "Alb"
+  colorNameRu String?             // Russian translation
+  colorNameEn String?             // English translation
   colorCode   String              // e.g., "#FF0000", "#000000", "#FFFFFF"
   
   // Price override (optional)
@@ -466,6 +486,8 @@ model SiteSettings {
   id              String   @id @default(auto()) @map("_id") @db.ObjectId
   key             String   @unique  // e.g., "heroImage", "heroTitle"
   value           String   // JSON or string value
+  valueRu         String?
+  valueEn         String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
@@ -476,10 +498,16 @@ model BlogPost {
   id          String        @id @default(auto()) @map("_id") @db.ObjectId
   
   title       String
+  titleRu     String?
+  titleEn     String?
   slug        String        @unique
   excerpt     String
+  excerptRu   String?
+  excerptEn   String?
   image       String?       // Hero image URL
   category    String        // e.g., "Tendințe", "Sfaturi de Stil"
+  categoryRu  String?
+  categoryEn  String?
   date        DateTime
   readTime    String        // e.g., "5 min"
   author      String        @default("Simona")
@@ -497,7 +525,11 @@ model BlogSection {
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
   
   heading     String
+  headingRu   String?
+  headingEn   String?
   body        String
+  bodyRu      String?
+  bodyEn      String?
   image       String?   // Optional section image
   videoUrl    String?   // Optional YouTube video URL
   order       Int       @default(0)
@@ -514,7 +546,11 @@ model StaticPage {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   slug      String   @unique  // "confidentialitate", "termeni", "livrare"
   title     String
+  titleRu   String?
+  titleEn   String?
   content   String   // HTML content
+  contentRu String?
+  contentEn String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

@@ -15,10 +15,16 @@ export async function PATCH(request, { params }) {
 
     const data = {};
     if (body.title !== undefined) data.title = body.title;
+    if (body.titleRu !== undefined) data.titleRu = body.titleRu || null;
+    if (body.titleEn !== undefined) data.titleEn = body.titleEn || null;
     if (body.slug !== undefined) data.slug = body.slug;
     if (body.excerpt !== undefined) data.excerpt = body.excerpt;
+    if (body.excerptRu !== undefined) data.excerptRu = body.excerptRu || null;
+    if (body.excerptEn !== undefined) data.excerptEn = body.excerptEn || null;
     if (body.image !== undefined) data.image = body.image;
     if (body.category !== undefined) data.category = body.category;
+    if (body.categoryRu !== undefined) data.categoryRu = body.categoryRu || null;
+    if (body.categoryEn !== undefined) data.categoryEn = body.categoryEn || null;
     if (body.date !== undefined) data.date = new Date(body.date);
     if (body.readTime !== undefined) data.readTime = body.readTime;
     if (body.author !== undefined) data.author = body.author;
@@ -32,7 +38,11 @@ export async function PATCH(request, { params }) {
       data.sections = {
         create: body.sections.map((s, i) => ({
           heading: s.heading,
+          headingRu: s.headingRu || null,
+          headingEn: s.headingEn || null,
           body: s.body,
+          bodyRu: s.bodyRu || null,
+          bodyEn: s.bodyEn || null,
           image: s.image || null,
           videoUrl: s.videoUrl || null,
           order: i,

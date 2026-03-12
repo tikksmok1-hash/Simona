@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCart } from '@/app/context/CartContext';
+import { useTranslation } from '@/app/context/LanguageContext';
+import { localize, localizeSettings } from '@/lib/localize';
 
 // Helper: convert display phone like "062 000 160" to international format "37362000160"
 function phoneToInternational(phone) {
@@ -21,7 +23,6 @@ export default function Navbar({ siteSettings = {} }) {
   const phone1 = siteSettings.phone1 || '062 000 160';
   const phone2 = siteSettings.phone2 || '';
   const siteEmail = siteSettings.email || 'simona.md_info@mail.ru';
-  const siteAddress = siteSettings.address || 'str. Ion Creangă 58, Chișinău';
   const phone1Intl = phoneToInternational(phone1);
   const phone2Intl = phone2 ? phoneToInternational(phone2) : '';
 
@@ -43,6 +44,9 @@ export default function Navbar({ siteSettings = {} }) {
   const pathname = usePathname();
   const router = useRouter();
   const { cartCount, favorites, openCart } = useCart();
+  const { lang, setLang, t } = useTranslation();
+
+  const siteAddress = localizeSettings(siteSettings, 'address', lang) || 'str. Ion Creangă 58, Chișinău';
 
   // Homepage detection — computed directly from pathname (no extra state/effect)
   const isHomepage = pathname === '/' || !pathname;
@@ -163,11 +167,11 @@ export default function Navbar({ siteSettings = {} }) {
   });
 
   const navCategories = [
-    ...activeDbCategories,
-    { id: 'reducere', name: 'Reducere', slug: 'reduceri', subcategories: [], highlight: true },
-    { id: 'bestsellers', name: 'BestSellers', slug: 'bestsellers', subcategories: [] },
-    { id: 'noutati', name: 'Noutăți', slug: 'noutati', subcategories: [] },
-    { id: 'livrare', name: 'Livrare', slug: 'livrare', subcategories: [] },
+    ...activeDbCategories.map(cat => ({ ...cat, localizedName: localize(cat, 'name', lang) })),
+    { id: 'reducere', localizedName: t('nav.reducere'), slug: 'reduceri', subcategories: [], highlight: true },
+    { id: 'bestsellers', localizedName: t('nav.bestsellers'), slug: 'bestsellers', subcategories: [] },
+    { id: 'noutati', localizedName: t('nav.noutati'), slug: 'noutati', subcategories: [] },
+    { id: 'livrare', localizedName: t('nav.livrare'), slug: 'livrare', subcategories: [] },
   ];
 
   return (
@@ -246,21 +250,39 @@ export default function Navbar({ siteSettings = {} }) {
 
           {/* Center message - hidden on mobile */}
           <p className="hidden md:block text-center tracking-widest uppercase text-[10px]">
-            Livrare în Republica Moldova
+            {t('nav.delivery')}
           </p>
 
-          {/* Address - link to Google Maps */}
-          <a
-            href={`https://www.google.com/maps/search/${encodeURIComponent(siteAddress + ', Moldova')}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hidden md:flex items-center gap-1.5 text-[10px] tracking-wide opacity-80 hover:opacity-100 transition-opacity"
-          >
-            <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-            </svg>
-            {siteAddress}
-          </a>
+          {/* Language switcher + Address */}
+          <div className="flex items-center gap-4">
+            {/* Language switcher */}
+            <div className="flex items-center gap-0.5 text-[10px] tracking-wider">
+              {['ro', 'ru', 'en'].map((l) => (
+                <button
+                  key={l}
+                  onClick={() => setLang(l)}
+                  className={`px-1.5 py-0.5 uppercase cursor-pointer transition-opacity duration-200 ${
+                    lang === l ? 'opacity-100 font-semibold' : 'opacity-50 hover:opacity-80'
+                  }`}
+                >
+                  {l}
+                </button>
+              ))}
+            </div>
+
+            {/* Address - link to Google Maps */}
+            <a
+              href={`https://www.google.com/maps/search/${encodeURIComponent(siteAddress + ', Moldova')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden md:flex items-center gap-1.5 text-[10px] tracking-wide opacity-80 hover:opacity-100 transition-opacity"
+            >
+              <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+              </svg>
+              {siteAddress}
+            </a>
+          </div>
         </div>
       </div>
 
@@ -289,7 +311,7 @@ export default function Navbar({ siteSettings = {} }) {
                   onChange={e => setSearchQuery(e.target.value)}
                   onFocus={() => searchQuery.trim().length >= 2 && setShowResults(true)}
                   onKeyDown={e => e.key === 'Escape' && setShowResults(false)}
-                  placeholder="Caută produse..."
+                  placeholder={t('nav.search')}
                   className={`w-full px-4 py-2.5 border focus:outline-none text-sm font-light tracking-wide ${
                     isTransparent 
                       ? 'border-white/30 focus:border-white bg-white/10 backdrop-blur-sm text-white placeholder:text-white/70'
@@ -326,7 +348,7 @@ export default function Navbar({ siteSettings = {} }) {
                         <svg className="w-8 h-8 text-gray-200 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
-                        <p className="text-sm text-gray-400 font-light">Niciun produs găsit pentru</p>
+                        <p className="text-sm text-gray-400 font-light">{t('nav.noResults')}</p>
                         <p className="text-sm text-black font-medium mt-0.5">&ldquo;{searchQuery}&rdquo;</p>
                       </div>
                     )}
@@ -421,7 +443,7 @@ export default function Navbar({ siteSettings = {} }) {
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
                   onKeyDown={e => e.key === 'Escape' && setShowResults(false)}
-                  placeholder="Caută produse..."
+                  placeholder={t('nav.search')}
                   autoFocus
                   className="w-full px-4 py-3 border border-gray-200 focus:outline-none focus:border-black text-sm font-light tracking-wide"
                 />
@@ -453,7 +475,7 @@ export default function Navbar({ siteSettings = {} }) {
                         <svg className="w-8 h-8 text-gray-200 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
-                        <p className="text-sm text-gray-400 font-light">Niciun produs găsit pentru</p>
+                        <p className="text-sm text-gray-400 font-light">{t('nav.noResults')}</p>
                         <p className="text-sm text-black font-medium mt-0.5">&ldquo;{searchQuery}&rdquo;</p>
                       </div>
                     )}
@@ -490,7 +512,7 @@ export default function Navbar({ siteSettings = {} }) {
                         : isTransparent ? 'text-white/80 hover:text-white font-light' : 'text-gray-600 hover:text-black font-light'
                     }`}
                   >
-                    {category.name}
+                    {category.localizedName}
                   </Link>
                   
                   {/* Subcategories Dropdown */}
@@ -504,7 +526,7 @@ export default function Navbar({ siteSettings = {} }) {
                               href={`/categorie/${category.slug}/${sub.slug}`}
                               className="block px-5 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-black text-sm font-light tracking-wide transition-colors"
                             >
-                              {sub.name}
+                              {localize(sub, 'name', lang)}
                             </Link>
                           ))}
                           <div className="border-t border-gray-100 mt-2 pt-2">
@@ -512,7 +534,7 @@ export default function Navbar({ siteSettings = {} }) {
                               href={`/categorie/${category.slug}`}
                               className="block px-5 py-2.5 text-black text-sm font-medium tracking-wide hover:bg-gray-50 transition-colors"
                             >
-                              Vezi toate →
+                              {t('nav.seeAll')}
                             </Link>
                           </div>
                         </div>
@@ -532,7 +554,7 @@ export default function Navbar({ siteSettings = {} }) {
       }`}>
           <div className="px-6 py-4">
             <Link href="/" className="block text-gray-700 hover:text-black text-sm font-light tracking-wider uppercase py-3 border-b border-gray-50">
-              Acasă
+              {t('nav.home')}
             </Link>
             
             {navCategories.map((category) => {
@@ -550,7 +572,7 @@ export default function Navbar({ siteSettings = {} }) {
                             : 'text-gray-700 hover:text-black font-light'
                         }`}
                       >
-                        {category.name}
+                        {category.localizedName}
                         <svg 
                           className={`w-4 h-4 transition-transform ${openMobileCategory === category.id ? 'rotate-180' : ''}`} 
                           fill="none" 
@@ -569,14 +591,14 @@ export default function Navbar({ siteSettings = {} }) {
                               href={`/categorie/${category.slug}/${sub.slug}`}
                               className="block text-gray-500 hover:text-black text-sm font-light py-2"
                             >
-                              {sub.name}
+                              {localize(sub, 'name', lang)}
                             </Link>
                           ))}
                           <Link 
                             href={`/categorie/${category.slug}`}
                             className="block text-black text-sm font-medium py-2 mt-1"
                           >
-                            Vezi toate →
+                            {t('nav.seeAll')}
                           </Link>
                         </div>
                       )}
@@ -596,7 +618,7 @@ export default function Navbar({ siteSettings = {} }) {
                           : 'text-gray-700 hover:text-black font-light uppercase'
                       }`}
                     >
-                      {category.name}
+                      {category.localizedName}
                     </Link>
                   )}
                 </div>

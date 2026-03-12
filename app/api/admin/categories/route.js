@@ -44,8 +44,12 @@ export async function POST(request) {
     const category = await prisma.category.create({
       data: {
         name: body.name,
+        nameRu: body.nameRu || null,
+        nameEn: body.nameEn || null,
         slug: body.slug,
         description: body.description || null,
+        descriptionRu: body.descriptionRu || null,
+        descriptionEn: body.descriptionEn || null,
         image: body.image || null,
         order: body.order || 0,
         isActive: body.isActive !== false,

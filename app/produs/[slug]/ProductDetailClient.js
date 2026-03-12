@@ -5,6 +5,8 @@ import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useCart } from '@/app/context/CartContext';
+import { useTranslation } from '@/app/context/LanguageContext';
+import { localize } from '@/lib/localize';
 import ProductCard from '@/app/components/ProductCard';
 
 export default function ProductDetailClient({ product, similarProducts = [], initialVariantId }) {
@@ -25,6 +27,7 @@ export default function ProductDetailClient({ product, similarProducts = [], ini
   const mainImgRef = useRef(null);
   const colorRefs = useRef({});
   const { addToCart, toggleFavorite, isFavorite } = useCart();
+  const { lang, t } = useTranslation();
 
   const variant = product.variants?.[selectedVariantIndex];
   const favorited = isFavorite(product.id, variant?.id);
@@ -56,18 +59,18 @@ export default function ProductDetailClient({ product, similarProducts = [], ini
   const accordions = [
     {
       id: 'descriere',
-      label: 'Descriere',
-      content: product.description,
+      label: t('detail.description'),
+      content: localize(product, 'description', lang),
     },
     {
       id: 'detalii',
-      label: 'Detalii & Materiale',
-      content: product.materialsInfo || 'Material de înaltă calitate, produs în România. Spălare la 30°C, nu se usucă în uscător. Consultați eticheta pentru instrucțiuni complete de îngrijire.',
+      label: t('detail.materials'),
+      content: localize(product, 'materialsInfo', lang) || t('detail.materialsDefault'),
     },
     {
       id: 'livrare',
-      label: 'Livrare & Returnare',
-      content: product.shippingInfo || 'Livrare standard: 70 MDL (3–5 zile lucrătoare). Ridicare gratuită din magazin. Returnare în 14 zile.',
+      label: t('detail.shipping'),
+      content: localize(product, 'shippingInfo', lang) || t('detail.shippingDefault'),
     },
   ];
 
@@ -82,7 +85,7 @@ export default function ProductDetailClient({ product, similarProducts = [], ini
               <>
                 <span className="text-gray-300">/</span>
                 <Link href={`/categorie/${product.category.slug}`} className="hover:text-black transition-colors whitespace-nowrap">
-                  {product.category.name}
+                  {localize(product.category, 'name', lang)}
                 </Link>
               </>
             )}
@@ -90,12 +93,12 @@ export default function ProductDetailClient({ product, similarProducts = [], ini
               <>
                 <span className="text-gray-300">/</span>
                 <Link href={`/categorie/${product.category?.slug}/${product.subcategory.slug}`} className="hover:text-black transition-colors whitespace-nowrap">
-                  {product.subcategory.name}
+                  {localize(product.subcategory, 'name', lang)}
                 </Link>
               </>
             )}
             <span className="text-gray-300">/</span>
-            <span className="text-black truncate max-w-[120px] md:max-w-[250px]">{product.name}</span>
+            <span className="text-black truncate max-w-[120px] md:max-w-[250px]">{localize(product, 'name', lang)}</span>
           </nav>
         </div>
       </div>
@@ -187,7 +190,7 @@ export default function ProductDetailClient({ product, similarProducts = [], ini
                 {/* Badges */}
                 <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
                   {product.isNew && (
-                    <span className="bg-black text-white text-[10px] tracking-widest uppercase px-3 py-1.5">Nou</span>
+                    <span className="bg-black text-white text-[10px] tracking-widest uppercase px-3 py-1.5">{t('detail.new')}</span>
                   )}
                   {discount && (
                     <span className="bg-white border border-black text-black text-[10px] tracking-widest uppercase px-3 py-1.5">
@@ -221,11 +224,11 @@ export default function ProductDetailClient({ product, similarProducts = [], ini
             {/* Category & Name */}
             {product.category && (
               <p className="text-[10px] text-gray-400 tracking-[0.5em] uppercase mb-3">
-                {product.category.name}
+                {localize(product.category, 'name', lang)}
               </p>
             )}
             <h1 className="font-serif text-3xl md:text-4xl text-black font-light leading-tight mb-4">
-              {product.name}
+              {localize(product, 'name', lang)}
             </h1>
 
             {/* Price */}
@@ -245,7 +248,7 @@ export default function ProductDetailClient({ product, similarProducts = [], ini
             {product.variants && product.variants.length > 0 && (
               <div className="mb-6">
                 <p className="text-xs text-gray-500 tracking-widest uppercase mb-3">
-                  Culoare: <span className="text-black font-medium">{variant?.colorName}</span>
+                  {t('detail.color')} <span className="text-black font-medium">{localize(variant, 'colorName', lang)}</span>
                 </p>
                 <div className="flex gap-2 flex-wrap">
                   {product.variants.map((v, i) => (
@@ -262,7 +265,7 @@ export default function ProductDetailClient({ product, similarProducts = [], ini
                           }
                         }}
                         onMouseLeave={() => { setHoveredVariant(null); setTooltipPos(null); }}
-                        title={v.colorName}
+                        title={localize(v, 'colorName', lang)}
                         className={`w-8 h-8 rounded-full border-2 transition-all cursor-pointer ${
                           selectedVariantIndex === i
                             ? 'border-black scale-110 ring-2 ring-black ring-offset-2'
@@ -281,13 +284,13 @@ export default function ProductDetailClient({ product, similarProducts = [], ini
               <div className="mb-6">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-xs text-gray-500 tracking-widest uppercase">
-                    Mărime: <span className="text-black font-medium">{selectedSize || '—'}</span>
+                    {t('detail.size')} <span className="text-black font-medium">{selectedSize || '—'}</span>
                   </p>
                   <button
                     onClick={() => setSizeGuideOpen(true)}
                     className="text-[10px] text-gray-400 tracking-widest uppercase underline underline-offset-4 hover:text-black transition-colors cursor-pointer"
                   >
-                    Ghid Mărimi
+                    {t('detail.sizeGuide')}
                   </button>
                 </div>
                 <div className="flex gap-2 flex-wrap">
@@ -312,14 +315,14 @@ export default function ProductDetailClient({ product, similarProducts = [], ini
                   })}
                 </div>
                 {!selectedSize && (
-                  <p className="text-[10px] text-red-400 mt-2 tracking-widest">Selectează o mărime</p>
+                  <p className="text-[10px] text-red-400 mt-2 tracking-widest">{t('detail.selectSize')}</p>
                 )}
               </div>
             )}
 
             {/* Quantity */}
             <div className="flex items-center gap-4 mb-6">
-              <p className="text-xs text-gray-500 tracking-widest uppercase">Cantitate:</p>
+              <p className="text-xs text-gray-500 tracking-widest uppercase">{t('detail.quantity')}</p>
               <div className="flex items-center border border-gray-200">
                 <button
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
@@ -350,7 +353,7 @@ export default function ProductDetailClient({ product, similarProducts = [], ini
                     : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                 }`}
               >
-                {addedToCart ? '✓ Adăugat în Coș' : 'Adaugă în Coș'}
+                {addedToCart ? t('detail.addedToCart') : t('detail.addToCart')}
               </button>
               <button
                 onClick={() => toggleFavorite(product, variant)}
@@ -375,9 +378,9 @@ export default function ProductDetailClient({ product, similarProducts = [], ini
             {/* Trust badges */}
             <div className="grid grid-cols-3 gap-3 mb-8 pb-8 border-b border-gray-100">
               {[
-                { icon: <svg className="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" /></svg>, label: 'Livrare Rapidă', sub: '1–5 zile lucrătoare' },
-                { icon: <svg className="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" /></svg>, label: 'Returnare', sub: '30 de zile' },
-                { icon: <svg className="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg>, label: 'Plată Securizată', sub: '100% sigur' },
+                { icon: <svg className="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" /></svg>, label: t('detail.fastDelivery'), sub: t('detail.deliveryDays') },
+                { icon: <svg className="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" /></svg>, label: t('detail.return'), sub: t('detail.returnDays') },
+                { icon: <svg className="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg>, label: t('detail.securePay'), sub: t('detail.securePayDesc') },
               ].map((item) => (
                 <div key={item.label} className="text-center">
                   <div className="mb-1 text-black">{item.icon}</div>
@@ -435,8 +438,8 @@ export default function ProductDetailClient({ product, similarProducts = [], ini
             {/* Header */}
             <div className="sticky top-0 bg-black px-6 py-5 flex items-center justify-between z-10">
               <div>
-                <h3 className="font-serif text-xl text-white">Ghid Mărimi</h3>
-                <p className="text-[10px] text-white/60 tracking-widest uppercase mt-1">Măsurători în centimetri (cm)</p>
+                <h3 className="font-serif text-xl text-white">{t('detail.sizeGuide')}</h3>
+                <p className="text-[10px] text-white/60 tracking-widest uppercase mt-1">{t('detail.sizeGuideMeasurements')}</p>
               </div>
               <button
                 onClick={() => setSizeGuideOpen(false)}
@@ -455,23 +458,23 @@ export default function ProductDetailClient({ product, similarProducts = [], ini
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="bg-gray-50">
-                      <th className="py-3 px-4 text-left tracking-widest uppercase text-[10px] font-semibold text-black border-b border-gray-200">Mărime</th>
+                      <th className="py-3 px-4 text-left tracking-widest uppercase text-[10px] font-semibold text-black border-b border-gray-200">{t('detail.size')}</th>
                       <th className="py-3 px-4 text-center tracking-widest uppercase text-[10px] font-semibold text-black border-b border-gray-200">
                         <div className="flex flex-col items-center gap-0.5">
                           <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}><circle cx="12" cy="8" r="4" /><path d="M5 20c0-4 3.5-7 7-7s7 3 7 7" /></svg>
-                          Bust
+                          {t('detail.bust')}
                         </div>
                       </th>
                       <th className="py-3 px-4 text-center tracking-widest uppercase text-[10px] font-semibold text-black border-b border-gray-200">
                         <div className="flex flex-col items-center gap-0.5">
                           <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}><path d="M12 3v18M8 7l4-4 4 4M8 17l4 4 4-4" /></svg>
-                          Talie
+                          {t('detail.waist')}
                         </div>
                       </th>
                       <th className="py-3 px-4 text-center tracking-widest uppercase text-[10px] font-semibold text-black border-b border-gray-200">
                         <div className="flex flex-col items-center gap-0.5">
                           <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}><path d="M8 20h8M6 12c0-3.3 2.7-6 6-6s6 2.7 6 6" /></svg>
-                          Șold
+                          {t('detail.hips')}
                         </div>
                       </th>
                     </tr>
@@ -505,7 +508,7 @@ export default function ProductDetailClient({ product, similarProducts = [], ini
                             <div className="flex items-center gap-2">
                               {row.size}
                               <span className={`text-[9px] font-normal ${isSelected ? 'text-white/60' : 'text-gray-400'}`}>EU {row.eu}</span>
-                              {isSelected && <span className="ml-auto text-[9px] bg-white/20 px-1.5 py-0.5 tracking-wider">SELECTAT</span>}
+                              {isSelected && <span className="ml-auto text-[9px] bg-white/20 px-1.5 py-0.5 tracking-wider">{t('detail.selected')}</span>}
                             </div>
                           </td>
                           <td className={`py-3 px-4 text-center ${isSelected ? 'text-white/90' : 'text-gray-600'}`}>{row.bust} <span className={`text-[9px] ${isSelected ? 'text-white/40' : 'text-gray-300'}`}>cm</span></td>
@@ -521,9 +524,9 @@ export default function ProductDetailClient({ product, similarProducts = [], ini
               {/* How to measure */}
               <div className="mt-6 grid grid-cols-3 gap-4">
                 {[
-                  { label: 'Bust', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}><circle cx="12" cy="8" r="4" /><path d="M5 20c0-4 3.5-7 7-7s7 3 7 7" /></svg>, desc: 'În jurul celei mai largi părți a bustului' },
-                  { label: 'Talie', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}><path d="M12 3v18M8 7l4-4 4 4M8 17l4 4 4-4" /></svg>, desc: 'În jurul celei mai înguste părți a taliei' },
-                  { label: 'Șold', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}><path d="M8 20h8M6 12c0-3.3 2.7-6 6-6s6 2.7 6 6" /></svg>, desc: 'În jurul celei mai largi părți a șoldurilor' },
+                  { label: t('detail.bust'), icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}><circle cx="12" cy="8" r="4" /><path d="M5 20c0-4 3.5-7 7-7s7 3 7 7" /></svg>, desc: t('detail.bustDesc') },
+                  { label: t('detail.waist'), icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}><path d="M12 3v18M8 7l4-4 4 4M8 17l4 4 4-4" /></svg>, desc: t('detail.waistDesc') },
+                  { label: t('detail.hips'), icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}><path d="M8 20h8M6 12c0-3.3 2.7-6 6-6s6 2.7 6 6" /></svg>, desc: t('detail.hipsDesc') },
                 ].map((item) => (
                   <div key={item.label} className="text-center p-3 border border-gray-100 bg-gray-50/50">
                     <div className="text-gray-400 flex justify-center mb-2">{item.icon}</div>
@@ -538,7 +541,7 @@ export default function ProductDetailClient({ product, similarProducts = [], ini
                 <svg className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
                 </svg>
-                <p className="text-[11px] text-gray-500 leading-relaxed">Dacă ești între două mărimi, recomandăm <span className="font-medium text-black">mărimea mai mare</span> pentru un fit confortabil.</p>
+                <p className="text-[11px] text-gray-500 leading-relaxed">{t('detail.sizeTip')} <span className="font-medium text-black">{t('detail.sizeTipBold')}</span> {t('detail.sizeTipEnd')}</p>
               </div>
             </div>
           </div>
@@ -551,8 +554,8 @@ export default function ProductDetailClient({ product, similarProducts = [], ini
         <div className="border-t border-gray-100">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
             <div className="text-center mb-10">
-              <p className="text-[10px] tracking-[0.4em] uppercase text-gray-400 mb-2">Descoperă mai multe</p>
-              <h2 className="font-serif text-2xl md:text-3xl text-black font-light">Produse Similare</h2>
+              <p className="text-[10px] tracking-[0.4em] uppercase text-gray-400 mb-2">{t('detail.discoverMore')}</p>
+              <h2 className="font-serif text-2xl md:text-3xl text-black font-light">{t('detail.similar')}</h2>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
               {similarProducts.slice(0, 8).map((p) => (
@@ -578,13 +581,13 @@ export default function ProductDetailClient({ product, similarProducts = [], ini
                 <div className="w-full aspect-[3/4] overflow-hidden">
                   <img
                     src={frontImg.url}
-                    alt={hv.colorName}
+                    alt={localize(hv, 'colorName', lang)}
                     className="w-full h-full object-cover"
                   />
                 </div>
                 <div className="px-1 py-1 bg-black">
                   <p className="text-[7px] tracking-[0.15em] uppercase text-center text-white truncate">
-                    {hv.colorName}
+                    {localize(hv, 'colorName', lang)}
                   </p>
                 </div>
               </div>

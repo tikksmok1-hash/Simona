@@ -55,11 +55,21 @@ export async function POST(request) {
     const product = await prisma.product.create({
       data: {
         name: body.name,
+        nameRu: body.nameRu || null,
+        nameEn: body.nameEn || null,
         slug: body.slug,
         description: body.description || '',
+        descriptionRu: body.descriptionRu || '',
+        descriptionEn: body.descriptionEn || '',
         shortDescription: body.shortDescription || null,
+        shortDescriptionRu: body.shortDescriptionRu || null,
+        shortDescriptionEn: body.shortDescriptionEn || null,
         materialsInfo: body.materialsInfo || null,
+        materialsInfoRu: body.materialsInfoRu || null,
+        materialsInfoEn: body.materialsInfoEn || null,
         shippingInfo: body.shippingInfo || null,
+        shippingInfoRu: body.shippingInfoRu || null,
+        shippingInfoEn: body.shippingInfoEn || null,
         price: parseFloat(body.price),
         compareAtPrice: body.compareAtPrice ? parseFloat(body.compareAtPrice) : null,
         isActive: body.isActive !== false,
@@ -71,6 +81,8 @@ export async function POST(request) {
         variants: {
           create: (body.variants || []).map((v) => ({
             colorName: v.colorName,
+            colorNameRu: v.colorNameRu || null,
+            colorNameEn: v.colorNameEn || null,
             colorCode: v.colorCode,
             isActive: true,
             images: {

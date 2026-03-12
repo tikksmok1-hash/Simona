@@ -166,7 +166,7 @@ function LoginForm() {
                   value={code[i] || ''}
                   onChange={(e) => handleCodeChange(i, e.target.value)}
                   onKeyDown={(e) => handleCodeKeyDown(i, e)}
-                  className="w-11 h-14 text-center text-xl text-white bg-white/5 border border-white/10 rounded focus:outline-none focus:border-white/40 transition-colors"
+                  className="w-9 h-11 text-center text-lg text-white bg-white/5 border border-white/10 rounded focus:outline-none focus:border-white/40 transition-colors"
                 />
               ))}
             </div>

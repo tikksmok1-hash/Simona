@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useAdmin } from '../../AdminAuthContext';
 import ImageUploader from '../../components/ImageUploader';
+import TranslatableField from '../../components/TranslatableField';
 import { useRouter } from 'next/navigation';
 
 const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL', '5XL', '34', '36', '38', '40', '42', '44', '46', '48', '50', '52', '54', '56', '58'];
@@ -15,11 +16,21 @@ function ProductForm() {
 
   const [form, setForm] = useState({
     name: '',
+    nameRu: '',
+    nameEn: '',
     slug: '',
     description: '',
+    descriptionRu: '',
+    descriptionEn: '',
     shortDescription: '',
+    shortDescriptionRu: '',
+    shortDescriptionEn: '',
     materialsInfo: '',
+    materialsInfoRu: '',
+    materialsInfoEn: '',
     shippingInfo: '',
+    shippingInfoRu: '',
+    shippingInfoEn: '',
     price: '',
     compareAtPrice: '',
     categoryId: '',
@@ -31,7 +42,7 @@ function ProductForm() {
   });
 
   const [variants, setVariants] = useState([
-    { colorName: '', colorCode: '#000000', images: [{ url: '', type: 'FRONT' }, { url: '', type: 'BACK' }], sizes: [{ size: 'S', stock: 0 }, { size: 'M', stock: 0 }, { size: 'L', stock: 0 }] },
+    { colorName: '', colorNameRu: '', colorNameEn: '', colorCode: '#000000', images: [{ url: '', type: 'FRONT' }, { url: '', type: 'BACK' }], sizes: [{ size: 'S', stock: 0 }, { size: 'M', stock: 0 }, { size: 'L', stock: 0 }] },
   ]);
 
   useEffect(() => {
@@ -54,6 +65,17 @@ function ProductForm() {
     }
   };
 
+  const updateField = (key, val) => {
+    setForm((prev) => ({ ...prev, [key]: val }));
+    // Auto-generate slug when name changes via TranslatableField
+    if (key === 'name') {
+      setForm((prev) => ({
+        ...prev,
+        slug: val.toLowerCase().replace(/[ăâ]/g, 'a').replace(/[șş]/g, 's').replace(/[țţ]/g, 't').replace(/[î]/g, 'i').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+      }));
+    }
+  };
+
   // Variant handlers
   const updateVariant = (idx, field, value) => {
     setVariants((prev) => prev.map((v, i) => (i === idx ? { ...v, [field]: value } : v)));
@@ -62,7 +84,7 @@ function ProductForm() {
   const addVariant = () => {
     setVariants((prev) => [
       ...prev,
-      { colorName: '', colorCode: '#000000', images: [{ url: '', type: 'FRONT' }, { url: '', type: 'BACK' }], sizes: [{ size: 'S', stock: 0 }, { size: 'M', stock: 0 }, { size: 'L', stock: 0 }] },
+      { colorName: '', colorNameRu: '', colorNameEn: '', colorCode: '#000000', images: [{ url: '', type: 'FRONT' }, { url: '', type: 'BACK' }], sizes: [{ size: 'S', stock: 0 }, { size: 'M', stock: 0 }, { size: 'L', stock: 0 }] },
     ]);
   };
 
@@ -168,10 +190,11 @@ function ProductForm() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <h2 className="text-sm font-medium text-black mb-4">Informații Generale</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1.5">Nume Produs *</label>
-              <input name="name" value={form.name} onChange={handleChange} className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black" required />
-            </div>
+            <TranslatableField
+              label="Nume Produs" fieldKey="name" required
+              value={form.name} valueRu={form.nameRu} valueEn={form.nameEn}
+              onChange={updateField} apiFetch={apiFetch}
+            />
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1.5">Slug</label>
               <input name="slug" value={form.slug} onChange={handleChange} className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black bg-gray-50" />
@@ -206,22 +229,28 @@ function ProductForm() {
             )}
           </div>
 
-          <div className="mt-4">
-            <label className="block text-xs font-medium text-gray-600 mb-1.5">Descriere scurtă</label>
-            <input name="shortDescription" value={form.shortDescription} onChange={handleChange} className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black" />
-          </div>
-          <div className="mt-4">
-            <label className="block text-xs font-medium text-gray-600 mb-1.5">Descriere completă</label>
-            <textarea name="description" value={form.description} onChange={handleChange} rows={4} className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black resize-none" />
-          </div>
-          <div className="mt-4">
-            <label className="block text-xs font-medium text-gray-600 mb-1.5">Detalii & Materiale</label>
-            <textarea name="materialsInfo" value={form.materialsInfo} onChange={handleChange} rows={3} placeholder="Material de înaltă calitate, produs în România..." className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black resize-none" />
-          </div>
-          <div className="mt-4">
-            <label className="block text-xs font-medium text-gray-600 mb-1.5">Livrare & Returnare</label>
-            <textarea name="shippingInfo" value={form.shippingInfo} onChange={handleChange} rows={3} placeholder="Livrare standard: 70 MDL (3–5 zile lucrătoare)..." className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black resize-none" />
-          </div>
+          <TranslatableField
+            label="Descriere scurtă" fieldKey="shortDescription"
+            value={form.shortDescription} valueRu={form.shortDescriptionRu} valueEn={form.shortDescriptionEn}
+            onChange={updateField} apiFetch={apiFetch} className="mt-4"
+          />
+          <TranslatableField
+            label="Descriere completă" fieldKey="description" multiline rows={4}
+            value={form.description} valueRu={form.descriptionRu} valueEn={form.descriptionEn}
+            onChange={updateField} apiFetch={apiFetch} className="mt-4"
+          />
+          <TranslatableField
+            label="Detalii & Materiale" fieldKey="materialsInfo" multiline rows={3}
+            value={form.materialsInfo} valueRu={form.materialsInfoRu} valueEn={form.materialsInfoEn}
+            onChange={updateField} apiFetch={apiFetch} className="mt-4"
+            placeholder="Material de înaltă calitate, produs în România..."
+          />
+          <TranslatableField
+            label="Livrare & Returnare" fieldKey="shippingInfo" multiline rows={3}
+            value={form.shippingInfo} valueRu={form.shippingInfoRu} valueEn={form.shippingInfoEn}
+            onChange={updateField} apiFetch={apiFetch} className="mt-4"
+            placeholder="Livrare standard: 70 MDL (3–5 zile lucrătoare)..."
+          />
         </div>
 
         {/* Flags */}
@@ -269,13 +298,20 @@ function ProductForm() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1.5">Nume Culoare</label>
-                  <input
+                <div className="md:col-span-2">
+                  <TranslatableField
+                    label="Nume Culoare"
                     value={variant.colorName}
-                    onChange={(e) => updateVariant(vIdx, 'colorName', e.target.value)}
-                    className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black"
+                    valueRu={variant.colorNameRu}
+                    valueEn={variant.colorNameEn}
+                    onChange={(field, val) => {
+                      if (field === 'colorName') updateVariant(vIdx, 'colorName', val);
+                      else if (field === 'colorNameRu') updateVariant(vIdx, 'colorNameRu', val);
+                      else if (field === 'colorNameEn') updateVariant(vIdx, 'colorNameEn', val);
+                    }}
+                    fieldKey="colorName"
                     placeholder="ex. Negru, Roșu..."
+                    apiFetch={apiFetch}
                   />
                 </div>
                 <div>
