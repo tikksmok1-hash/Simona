@@ -203,9 +203,14 @@ export async function POST(request) {
       });
     }
 
-    // ── Send Telegram notification (fire-and-forget) ───────────
+    // ── Send Telegram notification ────────────────────────────
+    // Must await on serverless (Vercel kills the lambda after response)
     const telegramMsg = buildOrderMessage(order, customer, items, returning, deliveryMethod);
-    sendTelegram(telegramMsg).catch(() => {}); // don't await — order already saved
+    try {
+      await sendTelegram(telegramMsg);
+    } catch {
+      // Telegram failure must not break the order response
+    }
 
     return NextResponse.json({ orderNumber: order.orderNumber, id: order.id }, { status: 201 });
   } catch (error) {
