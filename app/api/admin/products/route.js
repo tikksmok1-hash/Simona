@@ -86,7 +86,7 @@ export async function POST(request) {
             colorCode: v.colorCode,
             isActive: true,
             images: {
-              create: (v.images || []).map((img, i) => ({
+              create: (v.images || []).filter(img => img.url && img.url.trim() !== '').map((img, i) => ({
                 url: img.url,
                 type: img.type || 'FRONT',
                 order: i,
