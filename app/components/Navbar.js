@@ -290,13 +290,13 @@ export default function Navbar({ siteSettings = {} }) {
                   onFocus={() => searchQuery.trim().length >= 2 && setShowResults(true)}
                   onKeyDown={e => e.key === 'Escape' && setShowResults(false)}
                   placeholder="Caută produse..."
-                  className={`w-full px-4 py-2.5 border focus:outline-none text-sm font-light tracking-wide transition-all duration-500 ${
+                  className={`w-full px-4 py-2.5 border focus:outline-none text-sm font-light tracking-wide ${
                     isTransparent 
                       ? 'border-white/30 focus:border-white bg-white/10 backdrop-blur-sm text-white placeholder:text-white/70'
                       : 'border-gray-200 focus:border-black bg-white text-black placeholder:text-gray-400'
                   }`}
                 />
-                <button type="submit" className={`absolute right-3 top-1/2 transform -translate-y-1/2 transition-colors ${
+                <button type="submit" className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${
                   isTransparent ? 'text-white/70 hover:text-white' : 'text-gray-400 hover:text-black'
                 }`}>
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
@@ -339,7 +339,7 @@ export default function Navbar({ siteSettings = {} }) {
             <div className="flex items-center space-x-6">
               {/* Admin */}
               {isAdmin && (
-                <Link href="/admin" className={`relative transition-colors hidden md:block ${
+                <Link href="/admin" className={`relative hidden md:block ${
                   isTransparent ? 'text-white hover:text-white/80' : 'text-gray-700 hover:text-black'
                 }`} title="Admin Panel">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
@@ -352,7 +352,7 @@ export default function Navbar({ siteSettings = {} }) {
               {/* Search - Mobile */}
               <button 
                 onClick={() => setIsSearchOpen(!isSearchOpen)}
-                className={`md:hidden transition-colors ${
+                className={`md:hidden ${
                   isTransparent ? 'text-white hover:text-white/80' : 'text-gray-700 hover:text-black'
                 }`}
               >
@@ -362,7 +362,7 @@ export default function Navbar({ siteSettings = {} }) {
               </button>
 
               {/* Favorites */}
-              <Link href="/favorite" className={`relative transition-colors ${
+              <Link href="/favorite" className={`relative ${
                 isTransparent ? 'text-white hover:text-white/80' : 'text-gray-700 hover:text-black'
               }`}>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
@@ -378,7 +378,7 @@ export default function Navbar({ siteSettings = {} }) {
               {/* Cart */}
               <button
                 onClick={openCart}
-                className={`relative transition-colors cursor-pointer ${
+                className={`relative cursor-pointer ${
                   isTransparent ? 'text-white hover:text-white/80' : 'text-gray-700 hover:text-black'
                 }`}
               >
