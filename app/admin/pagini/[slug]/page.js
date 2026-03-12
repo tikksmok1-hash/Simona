@@ -73,6 +73,13 @@ function RichTextPageEditor({ slug }) {
             setInitialContent(defaults.content);
           }
         }
+      } else {
+        // API returned an error — fall back to defaults
+        const defaults = defaultPages[slug];
+        if (defaults) {
+          setTitle(defaults.title);
+          setInitialContent(defaults.content);
+        }
       }
     } catch (error) {
       console.error('Error loading page:', error);

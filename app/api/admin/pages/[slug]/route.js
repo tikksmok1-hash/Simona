@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { requireAuth } from '@/lib/auth';
 import prisma from '@/lib/db';
-import { sanitizeHtml } from '@/lib/sanitize';
 
 const slugToPath = {
   confidentialitate: '/confidentialitate',
@@ -45,6 +44,7 @@ export async function PUT(request, { params }) {
       return NextResponse.json({ error: 'Titlul și conținutul sunt obligatorii' }, { status: 400 });
     }
 
+    const { sanitizeHtml } = await import('@/lib/sanitize');
     const safeContent = sanitizeHtml(content);
     const safeContentRu = contentRu ? sanitizeHtml(contentRu) : null;
     const safeContentEn = contentEn ? sanitizeHtml(contentEn) : null;
