@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import ProductCard from '@/app/components/ProductCard';
 import { useTranslation } from '@/app/context/LanguageContext';
 
 const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL', '5XL'];
+const PAGE_SIZE = 12;
 
 export default function CategoryFilters({ categoryProducts, category, activeSubslug }) {
   const { t } = useTranslation();
@@ -16,6 +17,7 @@ export default function CategoryFilters({ categoryProducts, category, activeSubs
   const [appliedMin, setAppliedMin] = useState(null);
   const [appliedMax, setAppliedMax] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   const filtered = useMemo(() => {
     let result = [...categoryProducts];
@@ -52,6 +54,9 @@ export default function CategoryFilters({ categoryProducts, category, activeSubs
     return result;
   }, [categoryProducts, selectedSizes, appliedMin, appliedMax, sortBy]);
 
+  // Reset visible count when filters change
+  useEffect(() => { setVisibleCount(PAGE_SIZE); }, [selectedSizes, appliedMin, appliedMax, sortBy]);
+
   const toggleSize = (size) =>
     setSelectedSizes((prev) =>
       prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size]
@@ -69,6 +74,7 @@ export default function CategoryFilters({ categoryProducts, category, activeSubs
     setAppliedMin(null);
     setAppliedMax(null);
     setSortBy('newest');
+    setVisibleCount(PAGE_SIZE);
   };
 
   const hasActiveFilters =
@@ -238,11 +244,37 @@ export default function CategoryFilters({ categoryProducts, category, activeSubs
         {/* Products Grid */}
         <div className="flex-1">
           {filtered.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-              {filtered.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+                {filtered.slice(0, visibleCount).map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+
+              {/* Load More / Progress */}
+              {filtered.length > PAGE_SIZE && (
+                <div className="mt-12 flex flex-col items-center gap-4">
+                  {/* Progress bar */}
+                  <div className="w-48 h-px bg-neutral-200 relative">
+                    <div
+                      className="absolute inset-y-0 left-0 bg-black transition-all duration-500"
+                      style={{ width: `${Math.min(100, (visibleCount / filtered.length) * 100)}%` }}
+                    />
+                  </div>
+                  <p className="text-xs text-neutral-400 tracking-wide">
+                    {t('filter.showing')} {Math.min(visibleCount, filtered.length)} {t('filter.of')} {filtered.length}
+                  </p>
+                  {visibleCount < filtered.length && (
+                    <button
+                      onClick={() => setVisibleCount((prev) => prev + PAGE_SIZE)}
+                      className="border border-black text-black px-10 py-3 text-xs tracking-widest uppercase hover:bg-black hover:text-white transition-all duration-200 cursor-pointer active:scale-95"
+                    >
+                      {t('filter.loadMore')}
+                    </button>
+                  )}
+                </div>
+              )}
+            </>
           ) : (
             <div className="text-center py-16">
               <div className="mb-4">
