@@ -152,7 +152,8 @@ export default function Navbar({ siteSettings = {} }) {
   }
 
   // Transparent only on homepage when not scrolled and menu is closed
-  const isTransparent = isHomepage && !isScrolled && !isMenuOpen;
+  // Transparent only on homepage, not scrolled, menu closed, AND after mount
+  const isTransparent = mounted && isHomepage && !isScrolled && !isMenuOpen;
 
   // Filter out DB categories with 0 products (direct + subcategory products)
   const activeDbCategories = dbCategories.filter((cat) => {
@@ -171,8 +172,6 @@ export default function Navbar({ siteSettings = {} }) {
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-[background-color,backdrop-filter,box-shadow] duration-500 ${
-      !mounted ? 'opacity-0' : ''
-    } ${
       isTransparent 
         ? 'bg-transparent' 
         : 'bg-white/95 backdrop-blur-md shadow-sm'
