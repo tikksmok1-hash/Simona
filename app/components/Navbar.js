@@ -170,13 +170,15 @@ export default function Navbar({ siteSettings = {} }) {
   ];
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 ${mounted ? 'transition-all duration-500' : 'opacity-0'} ${
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-[background-color,backdrop-filter,box-shadow] duration-500 ${
+      !mounted ? 'opacity-0' : ''
+    } ${
       isTransparent 
         ? 'bg-transparent' 
         : 'bg-white/95 backdrop-blur-md shadow-sm'
     }`}>
       {/* Top Bar */}
-      <div className={`py-2 text-xs tracking-wide font-light ${mounted ? 'transition-all duration-500' : ''} ${
+      <div className={`py-2 text-xs tracking-wide font-light transition-[background-color,backdrop-filter] duration-500 ${
         isTransparent 
           ? 'bg-white/10 backdrop-blur-sm text-white'
           : 'bg-black text-white'
@@ -264,7 +266,7 @@ export default function Navbar({ siteSettings = {} }) {
       </div>
 
       {/* Main Header - Logo, Search, Icons */}
-      <div className={`${mounted ? 'transition-all duration-500' : ''} ${
+      <div className={`transition-[border-color] duration-500 ${
         isTransparent ? 'border-b border-white/20' : 'border-b border-gray-100'
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -465,7 +467,7 @@ export default function Navbar({ siteSettings = {} }) {
       </div>
 
       {/* Categories Navigation Bar - Desktop */}
-      <div className={`hidden md:block ${mounted ? 'transition-all duration-500' : ''} ${
+      <div className={`hidden md:block transition-[border-color] duration-500 ${
         isTransparent ? 'border-b border-white/10' : 'border-b border-gray-100'
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -483,7 +485,7 @@ export default function Navbar({ siteSettings = {} }) {
                       category.slug === 'livrare' ? '/livrare' :
                       `/categorie/${category.slug}`
                     }
-                    className={`text-[11px] lg:text-xs xl:text-sm tracking-wider uppercase ${mounted ? 'transition-colors' : ''} py-3 block whitespace-nowrap ${
+                    className={`text-[11px] lg:text-xs xl:text-sm tracking-wider uppercase py-3 block whitespace-nowrap ${
                       category.highlight 
                         ? isTransparent ? 'text-white font-medium' : 'text-black font-medium'
                         : isTransparent ? 'text-white/80 hover:text-white font-light' : 'text-gray-600 hover:text-black font-light'
