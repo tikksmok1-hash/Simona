@@ -13,6 +13,7 @@ function ProductsContent() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
+  const [subcategoryFilter, setSubcategoryFilter] = useState('');
   const [page, setPage] = useState(1);
 
   const fetchProducts = async () => {
@@ -60,7 +61,8 @@ function ProductsContent() {
       p.name.toLowerCase().includes(search.toLowerCase()) ||
       p.slug.toLowerCase().includes(search.toLowerCase());
     const matchCategory = !categoryFilter || p.category?.id === categoryFilter;
-    return matchSearch && matchCategory;
+    const matchSubcategory = !subcategoryFilter || p.subcategory?.id === subcategoryFilter;
+    return matchSearch && matchCategory && matchSubcategory;
   });
 
   // Derive unique categories from loaded products
@@ -72,8 +74,22 @@ function ProductsContent() {
     return [...map.values()].sort((a, b) => a.name.localeCompare(b.name));
   }, [products]);
 
+  // Derive subcategories filtered by selected category
+  const subcategories = useMemo(() => {
+    const map = new Map();
+    products.forEach((p) => {
+      if (!p.subcategory?.id) return;
+      if (categoryFilter && p.category?.id !== categoryFilter) return;
+      map.set(p.subcategory.id, p.subcategory);
+    });
+    return [...map.values()].sort((a, b) => a.name.localeCompare(b.name));
+  }, [products, categoryFilter]);
+
+  // Reset subcategory filter when category changes
+  useEffect(() => { setSubcategoryFilter(''); }, [categoryFilter]);
+
   // Reset to page 1 whenever filters change
-  useEffect(() => { setPage(1); }, [search, categoryFilter]);
+  useEffect(() => { setPage(1); }, [search, categoryFilter, subcategoryFilter]);
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
@@ -93,25 +109,45 @@ function ProductsContent() {
         </Link>
       </div>
 
-      {/* Search + Category filter */}
-      <div className="mb-6 flex flex-col sm:flex-row gap-3">
+      {/* Search + Category + Subcategory filters */}
+      <div className="mb-6 flex flex-col sm:flex-row gap-3 flex-wrap">
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Caută produse..."
-          className="w-full sm:max-w-xs border border-gray-200 rounded px-4 py-2.5 text-sm focus:outline-none focus:border-black"
+          className="w-full sm:w-56 border border-gray-200 rounded px-4 py-2.5 text-sm focus:outline-none focus:border-black"
         />
         <select
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
-          className="w-full sm:max-w-xs border border-gray-200 rounded px-4 py-2.5 text-sm focus:outline-none focus:border-black bg-white"
+          className="w-full sm:w-48 border border-gray-200 rounded px-4 py-2.5 text-sm focus:outline-none focus:border-black bg-white"
         >
           <option value="">Toate categoriile</option>
           {categories.map((cat) => (
             <option key={cat.id} value={cat.id}>{cat.name}</option>
           ))}
         </select>
+        {subcategories.length > 0 && (
+          <select
+            value={subcategoryFilter}
+            onChange={(e) => setSubcategoryFilter(e.target.value)}
+            className="w-full sm:w-48 border border-gray-200 rounded px-4 py-2.5 text-sm focus:outline-none focus:border-black bg-white"
+          >
+            <option value="">Toate subcategoriile</option>
+            {subcategories.map((sub) => (
+              <option key={sub.id} value={sub.id}>{sub.name}</option>
+            ))}
+          </select>
+        )}
+        {(search || categoryFilter || subcategoryFilter) && (
+          <button
+            onClick={() => { setSearch(''); setCategoryFilter(''); setSubcategoryFilter(''); }}
+            className="text-xs text-gray-400 hover:text-black underline underline-offset-2 transition-colors cursor-pointer whitespace-nowrap self-center"
+          >
+            Resetează filtrele
+          </button>
+        )}
       </div>
 
       {loading ? (
