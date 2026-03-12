@@ -11,35 +11,29 @@ const orderLimit = createRateLimit({
 });
 
 /**
- * Generate a unique order number using the highest existing order number.
- * Falls back to a timestamp-based number if a collision still happens.
- * Retries up to 3 times to handle concurrent requests.
+ * Generate a unique order number by scanning ALL existing order numbers
+ * to find the highest numeric one (SM-XXXXX format).
+ * Falls back to a timestamp-based number if something goes wrong.
  */
-async function generateOrderNumber(retries = 3) {
-  for (let attempt = 0; attempt < retries; attempt++) {
-    try {
-      // Find the highest existing order number to avoid collisions
-      const lastOrder = await prisma.order.findFirst({
-        orderBy: { createdAt: 'desc' },
-        select: { orderNumber: true },
-      });
+async function generateOrderNumber() {
+  try {
+    const allOrders = await prisma.order.findMany({
+      select: { orderNumber: true },
+    });
 
-      let nextNum = 1;
-      if (lastOrder?.orderNumber) {
-        const match = lastOrder.orderNumber.match(/SM-(\d+)/);
-        if (match) nextNum = parseInt(match[1], 10) + 1;
-      }
-
-      // Add a small random offset on retry to avoid repeated collisions
-      if (attempt > 0) nextNum += attempt;
-
-      return `SM-${String(nextNum).padStart(5, '0')}`;
-    } catch {
-      if (attempt === retries - 1) {
-        // Last resort: timestamp-based order number
-        return `SM-${Date.now().toString(36).toUpperCase()}`;
+    let maxNum = 0;
+    for (const o of allOrders) {
+      const match = o.orderNumber.match(/SM-(\d+)/);
+      if (match) {
+        const num = parseInt(match[1], 10);
+        if (num > maxNum) maxNum = num;
       }
     }
+
+    return `SM-${String(maxNum + 1).padStart(5, '0')}`;
+  } catch {
+    // Last resort: timestamp-based order number (always unique)
+    return `SM-${Date.now().toString(36).toUpperCase()}`;
   }
 }
 
