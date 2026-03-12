@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCart } from '@/app/context/CartContext';
@@ -294,10 +295,12 @@ export default function Navbar({ siteSettings = {} }) {
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
             <Link href="/" className="flex-shrink-0">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src="/logo.png"
                 alt="SIMONA Fashion"
+                width={160}
+                height={80}
+                priority
                 className="h-20 w-auto object-contain"
               />
             </Link>
@@ -335,8 +338,7 @@ export default function Navbar({ siteSettings = {} }) {
                         className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors text-left"
                       >
                         {p.image && (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={p.image} alt={p.name} className="w-10 h-12 object-cover flex-shrink-0" />
+                          <Image src={p.image} alt={p.name} width={40} height={48} className="w-10 h-12 object-cover flex-shrink-0" />
                         )}
                         <div className="flex-1 min-w-0">
                           <p className="text-sm text-black font-light truncate">{p.name}</p>
@@ -462,8 +464,7 @@ export default function Navbar({ siteSettings = {} }) {
                         className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors text-left"
                       >
                         {p.image && (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={p.image} alt={p.name} className="w-10 h-12 object-cover flex-shrink-0" />
+                          <Image src={p.image} alt={p.name} width={40} height={48} className="w-10 h-12 object-cover flex-shrink-0" />
                         )}
                         <div className="flex-1 min-w-0">
                           <p className="text-sm text-black font-light truncate">{p.name}</p>

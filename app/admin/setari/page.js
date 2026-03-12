@@ -186,6 +186,25 @@ export default function SetariPage() {
     footerDescription: 'Magazinul tău de modă feminină din Chișinău. Cele mai noi tendințe la prețuri accesibile.',
     footerDescriptionRu: '',
     footerDescriptionEn: '',
+    // Trust badges (product page)
+    badge1Label: 'Livrare Rapidă',
+    badge1LabelRu: '',
+    badge1LabelEn: '',
+    badge1Sub: '1–5 zile lucrătoare',
+    badge1SubRu: '',
+    badge1SubEn: '',
+    badge2Label: 'Returnare',
+    badge2LabelRu: '',
+    badge2LabelEn: '',
+    badge2Sub: '30 de zile',
+    badge2SubRu: '',
+    badge2SubEn: '',
+    badge3Label: 'Plată Securizată',
+    badge3LabelRu: '',
+    badge3LabelEn: '',
+    badge3Sub: '100% sigur',
+    badge3SubRu: '',
+    badge3SubEn: '',
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -488,6 +507,48 @@ export default function SetariPage() {
             rows={2}
             placeholder="Magazinul tău de modă feminină din Chișinău..."
           />
+        </div>
+      </div>
+
+      {/* Trust Badges (Product Page) */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+        <h2 className="text-lg font-medium text-black mb-2">Insigne de Încredere (Pagina Produsului)</h2>
+        <p className="text-sm text-gray-500 mb-6">Cele 3 insigne afișate sub butonul „Adaugă în coș" pe fiecare produs.</p>
+
+        {/* Badge 1 — Delivery */}
+        <div className="mb-6 pb-6 border-b border-gray-100">
+          <div className="flex items-center gap-2 mb-3">
+            <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" /></svg>
+            <span className="text-sm font-medium text-gray-700">Insigna 1 — Livrare</span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <TranslatableField label="Titlu" value={settings.badge1Label} valueRu={settings.badge1LabelRu} valueEn={settings.badge1LabelEn} onChange={updateField} fieldKey="badge1Label" apiFetch={apiFetch} placeholder="Livrare Rapidă" />
+            <TranslatableField label="Subtitlu" value={settings.badge1Sub} valueRu={settings.badge1SubRu} valueEn={settings.badge1SubEn} onChange={updateField} fieldKey="badge1Sub" apiFetch={apiFetch} placeholder="1–5 zile lucrătoare" />
+          </div>
+        </div>
+
+        {/* Badge 2 — Returns */}
+        <div className="mb-6 pb-6 border-b border-gray-100">
+          <div className="flex items-center gap-2 mb-3">
+            <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" /></svg>
+            <span className="text-sm font-medium text-gray-700">Insigna 2 — Returnare</span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <TranslatableField label="Titlu" value={settings.badge2Label} valueRu={settings.badge2LabelRu} valueEn={settings.badge2LabelEn} onChange={updateField} fieldKey="badge2Label" apiFetch={apiFetch} placeholder="Returnare" />
+            <TranslatableField label="Subtitlu" value={settings.badge2Sub} valueRu={settings.badge2SubRu} valueEn={settings.badge2SubEn} onChange={updateField} fieldKey="badge2Sub" apiFetch={apiFetch} placeholder="30 de zile" />
+          </div>
+        </div>
+
+        {/* Badge 3 — Secure Payment */}
+        <div>
+          <div className="flex items-center gap-2 mb-3">
+            <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg>
+            <span className="text-sm font-medium text-gray-700">Insigna 3 — Plată Securizată</span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <TranslatableField label="Titlu" value={settings.badge3Label} valueRu={settings.badge3LabelRu} valueEn={settings.badge3LabelEn} onChange={updateField} fieldKey="badge3Label" apiFetch={apiFetch} placeholder="Plată Securizată" />
+            <TranslatableField label="Subtitlu" value={settings.badge3Sub} valueRu={settings.badge3SubRu} valueEn={settings.badge3SubEn} onChange={updateField} fieldKey="badge3Sub" apiFetch={apiFetch} placeholder="100% sigur" />
+          </div>
         </div>
       </div>
 

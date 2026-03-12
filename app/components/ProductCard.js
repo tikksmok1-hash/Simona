@@ -12,6 +12,7 @@ export default function ProductCard({ product, priority = false }) {
   const variants = product.variants || [];
   const [selectedVariant, setSelectedVariant] = useState(variants[0] || null);
   const [isHovered, setIsHovered] = useState(false);
+  const [hasHovered, setHasHovered] = useState(false);
   const [addedSize, setAddedSize] = useState(null);
   const [hoveredVariant, setHoveredVariant] = useState(null);
   const [tooltipPos, setTooltipPos] = useState(null);
@@ -79,7 +80,7 @@ export default function ProductCard({ product, priority = false }) {
       <Link href={`/produs/${product.slug}`}>
         <div 
           className="relative bg-neutral-100 aspect-[3/4] md:aspect-[2/3] overflow-hidden cursor-pointer"
-          onMouseEnter={() => setIsHovered(true)}
+          onMouseEnter={() => { setIsHovered(true); if (!hasHovered) setHasHovered(true); }}
           onMouseLeave={() => setIsHovered(false)}
         >
           {/* Front Image */}
@@ -107,8 +108,8 @@ export default function ProductCard({ product, priority = false }) {
             )}
           </div>
 
-          {/* Back Image (shown on hover) */}
-          {backImage && (
+          {/* Back Image (only mounted after first hover to save bandwidth) */}
+          {backImage && hasHovered && (
             <div 
               className={`absolute inset-0 transition-opacity duration-500 ${
                 isHovered ? 'opacity-100' : 'opacity-0'

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useTranslation } from '@/app/context/LanguageContext';
 import { localizeSettings, localize } from '@/lib/localize';
 
@@ -51,8 +52,7 @@ export default function Footer({ siteSettings = {} }) {
 
           {/* Brand */}
           <div>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.png" alt="SIMONA Fashion" className="h-20 w-auto object-contain mb-5" />
+            <Image src="/logo.png" alt="SIMONA Fashion" width={160} height={80} className="h-20 w-auto object-contain mb-5" />
             <p className="text-neutral-400 text-sm leading-relaxed mb-6">
               {footerDescription}
             </p>

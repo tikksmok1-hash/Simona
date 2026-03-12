@@ -32,6 +32,7 @@ export async function POST(request) {
     // Upload to Vercel Blob
     const blob = await put(`simona/${Date.now()}-${file.name}`, file, {
       access: 'public',
+      cacheControlMaxAge: 31_536_000, // 1 year — CDN caches the blob
     });
 
     return NextResponse.json({ url: blob.url, filename: file.name });
