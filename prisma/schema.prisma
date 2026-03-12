@@ -554,3 +554,27 @@ model StaticPage {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+// ==================== PRODUCT TEMPLATES ====================
+
+model ProductTemplate {
+  id                   String   @id @default(auto()) @map("_id") @db.ObjectId
+  name                 String   // Admin-visible template name, e.g. "Rochii standard"
+  
+  // The four text fields that can be templated
+  shortDescription     String?
+  shortDescriptionRu   String?
+  shortDescriptionEn   String?
+  description          String?
+  descriptionRu        String?
+  descriptionEn        String?
+  materialsInfo        String?
+  materialsInfoRu      String?
+  materialsInfoEn      String?
+  shippingInfo         String?
+  shippingInfoRu       String?
+  shippingInfoEn       String?
+  
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+}

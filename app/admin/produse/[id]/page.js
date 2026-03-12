@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useAdmin } from '../../AdminAuthContext';
 import ImageUploader from '../../components/ImageUploader';
 import TranslatableField from '../../components/TranslatableField';
+import TemplatePicker from '../../components/TemplatePicker';
 import { useRouter, useParams } from 'next/navigation';
 
 const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL', '5XL', '34', '36', '38', '40', '42', '44', '46', '48', '50', '52', '54', '56', '58'];
@@ -83,6 +84,19 @@ function EditProductForm() {
   };
 
   const updateField = (key, val) => setForm((prev) => ({ ...prev, [key]: val }));
+
+  const applyTemplate = (tpl) => {
+    const keys = ['shortDescription', 'description', 'materialsInfo', 'shippingInfo'];
+    setForm((prev) => {
+      const next = { ...prev };
+      for (const k of keys) {
+        if (tpl[k]) next[k] = tpl[k];
+        if (tpl[k + 'Ru']) next[k + 'Ru'] = tpl[k + 'Ru'];
+        if (tpl[k + 'En']) next[k + 'En'] = tpl[k + 'En'];
+      }
+      return next;
+    });
+  };
 
   const updateVariant = (idx, field, value) => setVariants((prev) => prev.map((v, i) => (i === idx ? { ...v, [field]: value } : v)));
   const addVariant = () => setVariants((prev) => [...prev, { colorName: '', colorNameRu: '', colorNameEn: '', colorCode: '#000000', images: [{ url: '', type: 'FRONT' }, { url: '', type: 'BACK' }], sizes: [{ size: 'S', stock: 0 }, { size: 'M', stock: 0 }, { size: 'L', stock: 0 }] }]);
@@ -179,6 +193,12 @@ function EditProductForm() {
               </div>
             )}
           </div>
+
+          <div className="flex items-center justify-between mt-5 mb-1">
+            <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wider">Descrieri</h3>
+            <TemplatePicker apiFetch={apiFetch} onApply={applyTemplate} />
+          </div>
+
           <TranslatableField
             label="Descriere scurtă" fieldKey="shortDescription"
             value={form.shortDescription} valueRu={form.shortDescriptionRu} valueEn={form.shortDescriptionEn}

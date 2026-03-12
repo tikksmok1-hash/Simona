@@ -24,7 +24,9 @@ export default function ProductCard({ product, priority = false }) {
 
   // Detect touch device
   useEffect(() => {
-    setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
+    // Use hover media query — correctly handles hybrid devices (Windows laptop with
+    // touchscreen/pen). navigator.maxTouchPoints > 0 gives false positives on Windows.
+    setIsTouchDevice(!window.matchMedia('(hover: hover)').matches);
   }, []);
 
   // Auto-scroll to selected color
