@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useCart } from '@/app/context/CartContext';
 import ProductCard from '@/app/components/ProductCard';
 
@@ -112,11 +113,11 @@ export default function ProductDetailClient({ product, similarProducts = [], ini
                   <button
                     key={i}
                     onClick={() => setMainImageIndex(i)}
-                    className={`aspect-square overflow-hidden border-2 transition-all cursor-pointer ${
+                    className={`relative aspect-square overflow-hidden border-2 transition-all cursor-pointer ${
                       mainImageIndex === i ? 'border-black' : 'border-transparent opacity-50 hover:opacity-100'
                     }`}
                   >
-                    <img src={img.url} alt={`${product.name} ${i + 1}`} className="w-full h-full object-cover" />
+                    <Image src={img.url} alt={`${product.name} ${i + 1}`} fill className="object-cover" sizes="64px" />
                   </button>
                 ))}
               </div>
@@ -140,10 +141,13 @@ export default function ProductDetailClient({ product, similarProducts = [], ini
                 }}
               >
                 {mainImage?.url ? (
-                  <img
+                  <Image
                     src={mainImage.url}
                     alt={product.name}
-                    className="w-full h-full object-cover transition-all duration-500"
+                    fill
+                    priority
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    className="object-cover transition-all duration-500"
                   />
                 ) : (
                   <div className="w-full h-full bg-gray-100 flex items-center justify-center">
@@ -200,11 +204,11 @@ export default function ProductDetailClient({ product, similarProducts = [], ini
                     <button
                       key={i}
                       onClick={() => setMainImageIndex(i)}
-                      className={`flex-shrink-0 w-16 aspect-square overflow-hidden border-2 transition-all cursor-pointer ${
+                      className={`relative flex-shrink-0 w-16 aspect-square overflow-hidden border-2 transition-all cursor-pointer ${
                         mainImageIndex === i ? 'border-black' : 'border-gray-200'
                       }`}
                     >
-                      <img src={img.url} alt="" className="w-full h-full object-cover" />
+                      <Image src={img.url} alt="" fill className="object-cover" sizes="64px" />
                     </button>
                   ))}
                 </div>

@@ -161,10 +161,12 @@ export default async function BlogPostPage({ params }) {
               })()}
               {section.image && !section.videoUrl && (
                 <div className="relative w-full aspect-[16/7] overflow-hidden bg-neutral-100 mt-8">
-                  <img
+                  <Image
                     src={section.image}
                     alt={section.heading}
-                    className="w-full h-full object-cover"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 800px"
+                    className="object-cover"
                   />
                 </div>
               )}
@@ -230,10 +232,12 @@ export default async function BlogPostPage({ params }) {
               {related.map((rpost) => (
                 <Link key={rpost.id} href={`/noutati/${rpost.slug}`} className="group flex flex-col overflow-hidden bg-white">
                   <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
-                    <img
+                    <Image
                       src={rpost.image}
                       alt={rpost.title}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
                     />
                     <div className="absolute top-4 left-4">
                       <span className="bg-black text-white text-[9px] tracking-widest uppercase px-3 py-1.5">

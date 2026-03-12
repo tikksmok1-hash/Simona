@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { getAllBlogPosts } from '@/lib/db/queries';
 
 export const revalidate = 60;
@@ -66,11 +67,14 @@ export default async function NoutatiPage() {
         {/* Featured post — large hero card */}
         {featured[0] && (
           <Link href={`/noutati/${featured[0].slug}`} className="group relative flex flex-col md:flex-row gap-0 mb-4 overflow-hidden bg-gray-50 hover:bg-gray-100 transition-colors">
-            <div className="relative md:w-1/2 aspect-[4/3] md:aspect-auto overflow-hidden bg-gray-100">
-              <img
+            <div className="relative md:w-1/2 aspect-[4/3] md:aspect-auto md:h-[480px] overflow-hidden bg-gray-100">
+              <Image
                 src={featured[0].image}
                 alt={featured[0].title}
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 md:h-[480px]"
+                fill
+                priority
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-cover transition-transform duration-700 group-hover:scale-105"
               />
               <span className="absolute top-4 left-4 bg-black text-white text-[10px] tracking-[0.3em] uppercase px-3 py-1.5">
                 ★ Featured
@@ -111,10 +115,12 @@ export default async function NoutatiPage() {
             {featured.slice(1).map((post) => (
               <Link key={post.id} href={`/noutati/${post.slug}`} className="group relative overflow-hidden flex flex-col">
                 <div className="relative aspect-[16/9] overflow-hidden bg-gray-100">
-                  <img
+                  <Image
                     src={post.image}
                     alt={post.title}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent"></div>
                   <div className="absolute bottom-0 left-0 right-0 p-6">
@@ -148,10 +154,12 @@ export default async function NoutatiPage() {
               {rest.map((post) => (
                 <Link key={post.id} href={`/noutati/${post.slug}`} className="group flex flex-col overflow-hidden">
                   <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
-                    <img
+                    <Image
                       src={post.image}
                       alt={post.title}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
                     />
                     <div className="absolute top-4 left-4">
                       <span className="bg-black text-white text-[9px] tracking-widest uppercase px-3 py-1.5">

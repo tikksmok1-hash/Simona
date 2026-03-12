@@ -112,10 +112,12 @@ export default async function Home() {
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
             {categories.slice(0, 6).map((cat) => (
               <Link key={cat.slug} href={`/categorie/${cat.slug}`} className="group relative overflow-hidden block aspect-[3/4]">
-                <img
+                <Image
                   src={cat.image || 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=1000&fit=crop&q=80'}
                   alt={cat.name}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  fill
+                  sizes="(max-width: 768px) 50vw, 33vw"
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
                 />
                 {/* Overlay gradient */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"></div>
@@ -267,10 +269,12 @@ export default async function Home() {
               <Link key={post.id} href={`/noutati/${post.slug}`} className="group flex flex-col overflow-hidden">
                 {/* Image */}
                 <div className="relative overflow-hidden aspect-[4/3] bg-neutral-100">
-                  <img
+                  <Image
                     src={post.image}
                     alt={post.title}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
                   />
                   <div className="absolute top-4 left-4">
                     <span className="bg-black text-white text-[10px] tracking-widest uppercase px-3 py-1.5">
