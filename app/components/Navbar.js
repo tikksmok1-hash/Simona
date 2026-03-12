@@ -44,8 +44,8 @@ export default function Navbar({ siteSettings = {} }) {
   const router = useRouter();
   const { cartCount, favorites, openCart } = useCart();
 
-  // Client-verified homepage detection (handles Vercel SSR edge cases)
-  const [clientIsHome, setClientIsHome] = useState(pathname === '/' || !pathname);
+  // Homepage detection — computed directly from pathname (no extra state/effect)
+  const isHomepage = pathname === '/' || !pathname;
 
   // Check scroll position on mount and scroll events
   useEffect(() => {
@@ -54,16 +54,14 @@ export default function Navbar({ siteSettings = {} }) {
     };
     // Check immediately on mount
     handleScroll();
-    // Mark as mounted so transitions can kick in after first paint
-    requestAnimationFrame(() => setMounted(true));
+    // Mark as mounted AFTER first paint so transitions kick in smoothly
+    // Use double-rAF to ensure the browser has painted the initial frame first
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => setMounted(true));
+    });
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  // Verify homepage on client using actual browser location
-  useEffect(() => {
-    setClientIsHome(window.location.pathname === '/');
-  }, [pathname]);
 
   // Fetch categories — use module-level cache to avoid refetching on every navigation
   useEffect(() => {
@@ -152,11 +150,17 @@ export default function Navbar({ siteSettings = {} }) {
   }
 
   // Transparent only on homepage when not scrolled and menu is closed
-  const isHomepage = clientIsHome;
   const isTransparent = isHomepage && !isScrolled && !isMenuOpen;
 
+  // Filter out DB categories with 0 products (direct + subcategory products)
+  const activeDbCategories = dbCategories.filter((cat) => {
+    const directCount = cat._count?.products || 0;
+    const subCount = (cat.subcategories || []).reduce((sum, sub) => sum + (sub._count?.products || 0), 0);
+    return directCount + subCount > 0;
+  });
+
   const navCategories = [
-    ...dbCategories,
+    ...activeDbCategories,
     { id: 'reducere', name: 'Reducere', slug: 'reduceri', subcategories: [], highlight: true },
     { id: 'bestsellers', name: 'BestSellers', slug: 'bestsellers', subcategories: [] },
     { id: 'noutati', name: 'Noutăți', slug: 'noutati', subcategories: [] },
@@ -465,7 +469,7 @@ export default function Navbar({ siteSettings = {} }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-center gap-1 lg:gap-3 xl:gap-6 h-11">
             {navCategories.map((category) => {
-              const subs = category.subcategories || [];
+              const subs = (category.subcategories || []).filter(s => !s._count || s._count.products > 0);
 
               return (
                 <div key={category.id} className="relative group flex-shrink-0 h-full flex items-center">
@@ -529,7 +533,7 @@ export default function Navbar({ siteSettings = {} }) {
             </Link>
             
             {navCategories.map((category) => {
-              const subs = category.subcategories || [];
+              const subs = (category.subcategories || []).filter(s => !s._count || s._count.products > 0);
 
               return (
                 <div key={category.id} className="border-b border-gray-50">
