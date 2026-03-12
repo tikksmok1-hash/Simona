@@ -7,6 +7,7 @@ import { createPortal } from 'react-dom';
 import { useCart } from '@/app/context/CartContext';
 import { useTranslation } from '@/app/context/LanguageContext';
 import { localize } from '@/lib/localize';
+import { sortSizes } from '@/lib/sortSizes';
 
 export default function ProductCard({ product, priority = false }) {
   const variants = product.variants || [];
@@ -54,7 +55,8 @@ export default function ProductCard({ product, priority = false }) {
     : 0;
 
   // Check if product has stock
-  const totalStock = selectedVariant?.sizes?.reduce((acc, size) => acc + size.stock, 0) ?? 0;
+  const sortedSizes = sortSizes(selectedVariant?.sizes || []);
+  const totalStock = sortedSizes.reduce((acc, size) => acc + size.stock, 0) ?? 0;
   const isOutOfStock = totalStock === 0;
 
   // If no variants at all, render a minimal card
@@ -178,7 +180,7 @@ export default function ProductCard({ product, priority = false }) {
               <div className="bg-black px-3 pt-2 pb-3">
                 <p className="text-[9px] text-neutral-400 tracking-widest uppercase mb-2 text-center">{t('product.selectSize')}</p>
                 <div className="flex items-center justify-center gap-1.5 flex-wrap">
-                  {selectedVariant.sizes.map((size) => (
+                  {sortedSizes.map((size) => (
                     <button
                       key={size.id || size.size}
                       disabled={size.stock === 0}
@@ -288,7 +290,7 @@ export default function ProductCard({ product, priority = false }) {
           <>
             <p className="text-[9px] text-neutral-400 tracking-widest uppercase mb-1.5 text-center">{t('product.addToCart')}</p>
             <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide pb-0.5">
-              {selectedVariant.sizes.map((size) => (
+              {sortedSizes.map((size) => (
                 <button
                   key={size.id || size.size}
                   disabled={size.stock === 0}

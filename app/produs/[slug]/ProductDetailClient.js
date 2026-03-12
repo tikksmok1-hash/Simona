@@ -8,6 +8,7 @@ import { useCart } from '@/app/context/CartContext';
 import { useTranslation } from '@/app/context/LanguageContext';
 import { useSiteSettings } from '@/app/context/SiteSettingsContext';
 import { localize, localizeSettings } from '@/lib/localize';
+import { sortSizes } from '@/lib/sortSizes';
 import ProductCard from '@/app/components/ProductCard';
 
 export default function ProductDetailClient({ product, similarProducts = [], initialVariantId }) {
@@ -34,7 +35,7 @@ export default function ProductDetailClient({ product, similarProducts = [], ini
   const variant = product.variants?.[selectedVariantIndex];
   const favorited = isFavorite(product.id, variant?.id);
   const images = variant?.images || [];
-  const sizes = variant?.sizes || [];
+  const sizes = sortSizes(variant?.sizes || []);
   const mainImage = images[mainImageIndex] || images[0];
   const discount = product.compareAtPrice
     ? Math.round((1 - product.price / product.compareAtPrice) * 100)
