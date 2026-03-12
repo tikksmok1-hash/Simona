@@ -59,8 +59,6 @@ export default function Navbar({ siteSettings = {} }) {
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         setMounted(true);
-        // Remove the CSS override — React is now in full control of navbar styles
-        document.documentElement.removeAttribute('data-home');
       });
     });
     window.addEventListener('scroll', handleScroll);
@@ -172,13 +170,13 @@ export default function Navbar({ siteSettings = {} }) {
   ];
 
   return (
-    <nav data-navbar className={`fixed top-0 left-0 right-0 z-50 ${mounted ? 'transition-all duration-500' : ''} ${
+    <nav className={`fixed top-0 left-0 right-0 z-50 ${mounted ? 'transition-all duration-500' : 'opacity-0'} ${
       isTransparent 
         ? 'bg-transparent' 
         : 'bg-white/95 backdrop-blur-md shadow-sm'
     }`}>
       {/* Top Bar */}
-      <div data-navbar-topbar className={`py-2 text-xs tracking-wide font-light ${mounted ? 'transition-all duration-500' : ''} ${
+      <div className={`py-2 text-xs tracking-wide font-light ${mounted ? 'transition-all duration-500' : ''} ${
         isTransparent 
           ? 'bg-white/10 backdrop-blur-sm text-white'
           : 'bg-black text-white'
@@ -266,7 +264,7 @@ export default function Navbar({ siteSettings = {} }) {
       </div>
 
       {/* Main Header - Logo, Search, Icons */}
-      <div data-navbar-border className={`${mounted ? 'transition-all duration-500' : ''} ${
+      <div className={`${mounted ? 'transition-all duration-500' : ''} ${
         isTransparent ? 'border-b border-white/20' : 'border-b border-gray-100'
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -285,7 +283,6 @@ export default function Navbar({ siteSettings = {} }) {
             <div className="hidden md:flex flex-1 max-w-md mx-12" ref={searchRef}>
               <form onSubmit={handleSearchSubmit} className="relative w-full">
                 <input
-                  data-navbar-search
                   type="text"
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
@@ -298,7 +295,7 @@ export default function Navbar({ siteSettings = {} }) {
                       : 'border-gray-200 focus:border-black bg-white text-black placeholder:text-gray-400'
                   }`}
                 />
-                <button data-navbar-search-btn type="submit" className={`absolute right-3 top-1/2 transform -translate-y-1/2 transition-colors ${
+                <button type="submit" className={`absolute right-3 top-1/2 transform -translate-y-1/2 transition-colors ${
                   isTransparent ? 'text-white/70 hover:text-white' : 'text-gray-400 hover:text-black'
                 }`}>
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
@@ -353,7 +350,6 @@ export default function Navbar({ siteSettings = {} }) {
 
               {/* Search - Mobile */}
               <button 
-                data-navbar-icon
                 onClick={() => setIsSearchOpen(!isSearchOpen)}
                 className={`md:hidden transition-colors ${
                   isTransparent ? 'text-white hover:text-white/80' : 'text-gray-700 hover:text-black'
@@ -365,7 +361,7 @@ export default function Navbar({ siteSettings = {} }) {
               </button>
 
               {/* Favorites */}
-              <Link data-navbar-icon href="/favorite" className={`relative transition-colors ${
+              <Link href="/favorite" className={`relative transition-colors ${
                 isTransparent ? 'text-white hover:text-white/80' : 'text-gray-700 hover:text-black'
               }`}>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
@@ -380,7 +376,6 @@ export default function Navbar({ siteSettings = {} }) {
 
               {/* Cart */}
               <button
-                data-navbar-icon
                 onClick={openCart}
                 className={`relative transition-colors cursor-pointer ${
                   isTransparent ? 'text-white hover:text-white/80' : 'text-gray-700 hover:text-black'
@@ -398,7 +393,6 @@ export default function Navbar({ siteSettings = {} }) {
 
               {/* Mobile Menu Button */}
               <button 
-                data-navbar-icon
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className={`md:hidden flex flex-col justify-center items-center w-6 h-6 gap-[5px] ${
                   isTransparent ? 'text-white' : 'text-gray-700'
@@ -471,7 +465,7 @@ export default function Navbar({ siteSettings = {} }) {
       </div>
 
       {/* Categories Navigation Bar - Desktop */}
-      <div data-navbar-catbar className={`hidden md:block ${mounted ? 'transition-all duration-500' : ''} ${
+      <div className={`hidden md:block ${mounted ? 'transition-all duration-500' : ''} ${
         isTransparent ? 'border-b border-white/10' : 'border-b border-gray-100'
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
