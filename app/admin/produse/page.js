@@ -128,7 +128,7 @@ function ProductsContent() {
             <option key={cat.id} value={cat.id}>{cat.name}</option>
           ))}
         </select>
-        {subcategories.length > 0 && (
+        {categoryFilter && subcategories.length > 0 && (
           <select
             value={subcategoryFilter}
             onChange={(e) => setSubcategoryFilter(e.target.value)}
