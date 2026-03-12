@@ -1,14 +1,19 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useAdmin } from '../AdminAuthContext';
 import Link from 'next/link';
+import Image from 'next/image';
+
+const PAGE_SIZE = 20;
 
 function ProductsContent() {
   const { apiFetch } = useAdmin();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('');
+  const [page, setPage] = useState(1);
 
   const fetchProducts = async () => {
     try {
@@ -50,17 +55,35 @@ function ProductsContent() {
     }
   };
 
-  const filtered = products.filter((p) =>
-    p.name.toLowerCase().includes(search.toLowerCase()) ||
-    p.slug.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = products.filter((p) => {
+    const matchSearch =
+      p.name.toLowerCase().includes(search.toLowerCase()) ||
+      p.slug.toLowerCase().includes(search.toLowerCase());
+    const matchCategory = !categoryFilter || p.category?.id === categoryFilter;
+    return matchSearch && matchCategory;
+  });
+
+  // Derive unique categories from loaded products
+  const categories = useMemo(() => {
+    const map = new Map();
+    products.forEach((p) => {
+      if (p.category?.id) map.set(p.category.id, p.category);
+    });
+    return [...map.values()].sort((a, b) => a.name.localeCompare(b.name));
+  }, [products]);
+
+  // Reset to page 1 whenever filters change
+  useEffect(() => { setPage(1); }, [search, categoryFilter]);
+
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   return (
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
         <div>
           <h1 className="text-xl sm:text-2xl font-serif font-light text-black">Produse</h1>
-          <p className="text-sm text-gray-500 mt-1">{products.length} produse în total</p>
+          <p className="text-sm text-gray-500 mt-1">{products.length} produse în total{filtered.length !== products.length && ` · ${filtered.length} filtrate`}</p>
         </div>
         <Link
           href="/admin/produse/nou"
@@ -70,15 +93,25 @@ function ProductsContent() {
         </Link>
       </div>
 
-      {/* Search */}
-      <div className="mb-6">
+      {/* Search + Category filter */}
+      <div className="mb-6 flex flex-col sm:flex-row gap-3">
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Caută produse..."
-          className="w-full max-w-md border border-gray-200 rounded px-4 py-2.5 text-sm focus:outline-none focus:border-black"
+          className="w-full sm:max-w-xs border border-gray-200 rounded px-4 py-2.5 text-sm focus:outline-none focus:border-black"
         />
+        <select
+          value={categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value)}
+          className="w-full sm:max-w-xs border border-gray-200 rounded px-4 py-2.5 text-sm focus:outline-none focus:border-black bg-white"
+        >
+          <option value="">Toate categoriile</option>
+          {categories.map((cat) => (
+            <option key={cat.id} value={cat.id}>{cat.name}</option>
+          ))}
+        </select>
       </div>
 
       {loading ? (
@@ -100,16 +133,18 @@ function ProductsContent() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
-                {filtered.map((product) => {
+                {paginated.map((product) => {
                   const firstImage = product.variants?.[0]?.images?.[0]?.url;
                   return (
                     <tr key={product.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
                           {firstImage ? (
-                            <img src={firstImage} alt="" className="w-10 h-12 object-cover rounded" />
+                            <div className="relative w-10 h-12 flex-shrink-0 rounded overflow-hidden">
+                              <Image src={firstImage} alt="" fill className="object-cover" sizes="40px" />
+                            </div>
                           ) : (
-                            <div className="w-10 h-12 bg-gray-100 rounded flex items-center justify-center text-gray-400 text-xs">?</div>
+                            <div className="w-10 h-12 bg-gray-100 rounded flex items-center justify-center text-gray-400 text-xs flex-shrink-0">?</div>
                           )}
                           <div>
                             <p className="font-medium text-gray-800">{product.name}</p>
@@ -172,20 +207,22 @@ function ProductsContent() {
 
             {filtered.length === 0 && (
               <div className="px-4 py-12 text-center text-gray-400 text-sm">
-                {search ? 'Niciun produs găsit.' : 'Nu există produse. Adaugă primul produs!'}
+                {search || categoryFilter ? 'Niciun produs găsit.' : 'Nu există produse. Adaugă primul produs!'}
               </div>
             )}
           </div>
 
           {/* Mobile Cards - visible only on mobile/tablet */}
           <div className="lg:hidden space-y-3">
-            {filtered.map((product) => {
+            {paginated.map((product) => {
               const firstImage = product.variants?.[0]?.images?.[0]?.url;
               return (
                 <div key={product.id} className="bg-white rounded-lg border border-gray-200 p-4">
                   <div className="flex gap-3">
                     {firstImage ? (
-                      <img src={firstImage} alt="" className="w-16 h-20 object-cover rounded flex-shrink-0" />
+                      <div className="relative w-16 h-20 flex-shrink-0 rounded overflow-hidden">
+                        <Image src={firstImage} alt="" fill className="object-cover" sizes="64px" />
+                      </div>
                     ) : (
                       <div className="w-16 h-20 bg-gray-100 rounded flex items-center justify-center text-gray-400 text-xs flex-shrink-0">?</div>
                     )}
@@ -254,10 +291,48 @@ function ProductsContent() {
             
             {filtered.length === 0 && (
               <div className="bg-white rounded-lg border border-gray-200 px-4 py-12 text-center text-gray-400 text-sm">
-                {search ? 'Niciun produs găsit.' : 'Nu există produse. Adaugă primul produs!'}
+                {search || categoryFilter ? 'Niciun produs găsit.' : 'Nu există produse. Adaugă primul produs!'}
               </div>
             )}
           </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="mt-6 flex items-center justify-between">
+              <p className="text-xs text-gray-400">
+                {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} din {filtered.length} produse
+              </p>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                  className="px-3 py-1.5 text-xs border border-gray-200 rounded hover:border-black disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                >
+                  ← Anterior
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                  <button
+                    key={p}
+                    onClick={() => setPage(p)}
+                    className={`w-8 h-8 text-xs border rounded transition-colors cursor-pointer ${
+                      p === page
+                        ? 'bg-black text-white border-black'
+                        : 'border-gray-200 hover:border-black'
+                    }`}
+                  >
+                    {p}
+                  </button>
+                ))}
+                <button
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={page === totalPages}
+                  className="px-3 py-1.5 text-xs border border-gray-200 rounded hover:border-black disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                >
+                  Următor →
+                </button>
+              </div>
+            </div>
+          )}
         </>
       )}
     </div>
