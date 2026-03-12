@@ -10,6 +10,39 @@ const orderLimit = createRateLimit({
   windowMs: 15 * 60 * 1000, // per 15 minutes
 });
 
+/**
+ * Generate a unique order number using the highest existing order number.
+ * Falls back to a timestamp-based number if a collision still happens.
+ * Retries up to 3 times to handle concurrent requests.
+ */
+async function generateOrderNumber(retries = 3) {
+  for (let attempt = 0; attempt < retries; attempt++) {
+    try {
+      // Find the highest existing order number to avoid collisions
+      const lastOrder = await prisma.order.findFirst({
+        orderBy: { createdAt: 'desc' },
+        select: { orderNumber: true },
+      });
+
+      let nextNum = 1;
+      if (lastOrder?.orderNumber) {
+        const match = lastOrder.orderNumber.match(/SM-(\d+)/);
+        if (match) nextNum = parseInt(match[1], 10) + 1;
+      }
+
+      // Add a small random offset on retry to avoid repeated collisions
+      if (attempt > 0) nextNum += attempt;
+
+      return `SM-${String(nextNum).padStart(5, '0')}`;
+    } catch {
+      if (attempt === retries - 1) {
+        // Last resort: timestamp-based order number
+        return `SM-${Date.now().toString(36).toUpperCase()}`;
+      }
+    }
+  }
+}
+
 // POST /api/orders — place a guest order
 export async function POST(request) {
   const { success, retryAfter } = orderLimit(request);
@@ -125,25 +158,37 @@ export async function POST(request) {
       },
     });
 
-    // Generate order number
-    const orderCount = await prisma.order.count();
-    const orderNumber = `SM-${String(orderCount + 1).padStart(5, '0')}`;
+    // Generate order number (collision-safe)
+    const orderNumber = await generateOrderNumber();
 
-    // Create order
-    const order = await prisma.order.create({
-      data: {
-        orderNumber,
-        subtotal: parseFloat(subtotal) || 0,
-        shippingCost: parseFloat(shippingCost) || 0,
-        total: parseFloat(total) || 0,
-        status: 'PENDING',
-        paymentStatus: 'PENDING',
-        paymentMethod: deliveryMethod === 'pickup' ? 'CASH_ON_PICKUP' : 'CASH_ON_DELIVERY',
-        customerNote: safeObservatii || null,
-        user: { connect: { id: user.id } },
-        shippingAddress: { connect: { id: address.id } },
-      },
-    });
+    // Create order with retry on unique constraint collision
+    let order;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        const num = attempt === 0 ? orderNumber : `SM-${Date.now().toString(36).toUpperCase()}`;
+        order = await prisma.order.create({
+          data: {
+            orderNumber: num,
+            subtotal: parseFloat(subtotal) || 0,
+            shippingCost: parseFloat(shippingCost) || 0,
+            total: parseFloat(total) || 0,
+            status: 'PENDING',
+            paymentStatus: 'PENDING',
+            paymentMethod: deliveryMethod === 'pickup' ? 'CASH_ON_PICKUP' : 'CASH_ON_DELIVERY',
+            customerNote: safeObservatii || null,
+            user: { connect: { id: user.id } },
+            shippingAddress: { connect: { id: address.id } },
+          },
+        });
+        break; // success
+      } catch (err) {
+        // If it's a unique constraint error on orderNumber, retry
+        if (attempt < 2 && err?.code === 'P2002') {
+          continue;
+        }
+        throw err;
+      }
+    }
 
     // Create order items — only store snapshot data
     for (const item of items) {

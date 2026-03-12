@@ -50,8 +50,9 @@ export default async function sitemap() {
   try {
     const categories = await prisma.category.findMany({
       where: { isActive: true },
-      select: { slug: true, updatedAt: true },
-      include: {
+      select: {
+        slug: true,
+        updatedAt: true,
         subcategories: {
           where: { isActive: true },
           select: { slug: true, updatedAt: true },
