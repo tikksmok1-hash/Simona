@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 
 const CartContext = createContext(null);
 
@@ -11,8 +11,8 @@ export function CartProvider({ children }) {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [deliveryMethod, setDeliveryMethod] = useState('standard');
 
-  const openCart = () => setIsCartOpen(true);
-  const closeCart = () => setIsCartOpen(false);
+  const openCart = useCallback(() => setIsCartOpen(true), []);
+  const closeCart = useCallback(() => setIsCartOpen(false), []);
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -40,7 +40,7 @@ export function CartProvider({ children }) {
   }, [favorites, mounted]);
 
   // ── CART ACTIONS ─────────────────────────────────────────────
-  const addToCart = (product, variant, size, quantity = 1) => {
+  const addToCart = useCallback((product, variant, size, quantity = 1) => {
     const key = `${product.id}-${variant.id}-${size}`;
     setCart((prev) => {
       const existing = prev.find((item) => item.key === key);
@@ -70,27 +70,30 @@ export function CartProvider({ children }) {
         },
       ];
     });
-    openCart();
-  };
+    setIsCartOpen(true);
+  }, []);
 
-  const removeFromCart = (key) => {
+  const removeFromCart = useCallback((key) => {
     setCart((prev) => prev.filter((item) => item.key !== key));
-  };
+  }, []);
 
-  const updateQuantity = (key, quantity) => {
-    if (quantity <= 0) return removeFromCart(key);
+  const updateQuantity = useCallback((key, quantity) => {
+    if (quantity <= 0) {
+      setCart((prev) => prev.filter((item) => item.key !== key));
+      return;
+    }
     setCart((prev) =>
       prev.map((item) => (item.key === key ? { ...item, quantity } : item))
     );
-  };
+  }, []);
 
-  const clearCart = () => setCart([]);
+  const clearCart = useCallback(() => setCart([]), []);
 
-  const cartTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const cartTotal = useMemo(() => cart.reduce((sum, item) => sum + item.price * item.quantity, 0), [cart]);
+  const cartCount = useMemo(() => cart.reduce((sum, item) => sum + item.quantity, 0), [cart]);
 
   // ── FAVORITES ACTIONS ─────────────────────────────────────────
-  const addToFavorites = (product, variant) => {
+  const addToFavorites = useCallback((product, variant) => {
     const key = `${product.id}-${variant.id}`;
     setFavorites((prev) => {
       if (prev.find((item) => item.key === key)) return prev;
@@ -114,47 +117,66 @@ export function CartProvider({ children }) {
         },
       ];
     });
-  };
+  }, []);
 
-  const removeFromFavorites = (key) => {
+  const removeFromFavorites = useCallback((key) => {
     setFavorites((prev) => prev.filter((item) => item.key !== key));
-  };
+  }, []);
 
-  const isFavorite = (productId, variantId) => {
+  const isFavorite = useCallback((productId, variantId) => {
     return favorites.some((item) => item.key === `${productId}-${variantId}`);
-  };
+  }, [favorites]);
 
-  const toggleFavorite = (product, variant) => {
+  const toggleFavorite = useCallback((product, variant) => {
     const key = `${product.id}-${variant.id}`;
-    if (favorites.find((item) => item.key === key)) {
-      removeFromFavorites(key);
-    } else {
-      addToFavorites(product, variant);
-    }
-  };
+    setFavorites((prev) => {
+      if (prev.find((item) => item.key === key)) {
+        return prev.filter((item) => item.key !== key);
+      }
+      return [
+        ...prev,
+        {
+          key,
+          productId: product.id,
+          variantId: variant.id,
+          slug: product.slug,
+          name: product.name,
+          nameRu: product.nameRu || '',
+          nameEn: product.nameEn || '',
+          price: product.price,
+          compareAtPrice: product.compareAtPrice,
+          colorName: variant.colorName,
+          colorNameRu: variant.colorNameRu || '',
+          colorNameEn: variant.colorNameEn || '',
+          colorCode: variant.colorCode,
+          image: variant.images?.[0]?.url || null,
+        },
+      ];
+    });
+  }, []);
+
+  const contextValue = useMemo(() => ({
+    cart,
+    cartCount,
+    cartTotal,
+    addToCart,
+    removeFromCart,
+    updateQuantity,
+    clearCart,
+    isCartOpen,
+    openCart,
+    closeCart,
+    deliveryMethod,
+    setDeliveryMethod,
+    favorites,
+    addToFavorites,
+    removeFromFavorites,
+    isFavorite,
+    toggleFavorite,
+  }), [cart, cartCount, cartTotal, addToCart, removeFromCart, updateQuantity, clearCart, isCartOpen, openCart, closeCart, deliveryMethod, setDeliveryMethod, favorites, addToFavorites, removeFromFavorites, isFavorite, toggleFavorite]);
 
   return (
-    <CartContext.Provider
-      value={{
-        cart,
-        cartCount,
-        cartTotal,
-        addToCart,
-        removeFromCart,
-        updateQuantity,
-        clearCart,
-        isCartOpen,
-        openCart,
-        closeCart,
-        deliveryMethod,
-        setDeliveryMethod,
-        favorites,
-        addToFavorites,
-        removeFromFavorites,
-        isFavorite,
-        toggleFavorite,
-      }}
-    >
+    <CartContext.Provider value={contextValue}>
       {children}
     </CartContext.Provider>
   );

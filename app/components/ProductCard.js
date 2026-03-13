@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, memo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { createPortal } from 'react-dom';
@@ -9,7 +9,7 @@ import { useTranslation } from '@/app/context/LanguageContext';
 import { localize } from '@/lib/localize';
 import { sortSizes } from '@/lib/sortSizes';
 
-export default function ProductCard({ product, priority = false }) {
+export default memo(function ProductCard({ product, priority = false }) {
   const variants = product.variants || [];
   const [selectedVariant, setSelectedVariant] = useState(variants[0] || null);
   const [isHovered, setIsHovered] = useState(false);
@@ -77,7 +77,7 @@ export default function ProductCard({ product, priority = false }) {
   }
 
   return (
-    <div className="group bg-white overflow-hidden border border-neutral-200 hover:border-black transition-all duration-500 flex flex-col relative">
+    <div className="group bg-white overflow-hidden border border-neutral-200 hover:border-black transition-colors duration-500 flex flex-col relative">
       {/* Image Container */}
       <Link href={`/produs/${product.slug}`}>
         <div 
@@ -156,9 +156,9 @@ export default function ProductCard({ product, priority = false }) {
           </div>
 
           {/* Wishlist Button */}
-          <div className="absolute top-3 right-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-20">
+          <div className="absolute top-3 right-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-[opacity,visibility] duration-300 z-20">
             <button 
-              className={`p-2.5 border transition-all duration-200 cursor-pointer ${favorited ? 'bg-red-500 border-red-500 scale-110' : 'bg-white border-neutral-200 hover:border-red-400'}`}
+              className={`p-2.5 border transition-colors duration-200 cursor-pointer ${favorited ? 'bg-red-500 border-red-500 scale-110' : 'bg-white border-neutral-200 hover:border-red-400'}`}
               onClick={(e) => {
                 e.preventDefault();
                 toggleFavorite(product, selectedVariant);
@@ -171,7 +171,7 @@ export default function ProductCard({ product, priority = false }) {
           </div>
 
           {/* Quick Add - Size Selector */}
-          <div className="absolute bottom-0 left-0 right-0 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-full group-hover:translate-y-0">
+          <div className="absolute bottom-0 left-0 right-0 opacity-0 group-hover:opacity-100 transition-[opacity,transform] duration-300 translate-y-full group-hover:translate-y-0">
             {isOutOfStock ? (
               <div className="w-full bg-neutral-500 text-white py-3.5 text-center text-xs tracking-widest uppercase">
                 {t('product.unavailable')}
@@ -219,7 +219,7 @@ export default function ProductCard({ product, priority = false }) {
 
         {/* Product Name */}
         <Link href={`/produs/${product.slug}`}>
-          <h3 className="font-serif text-sm text-black mb-3 group-hover:underline transition-all line-clamp-2">
+          <h3 className="font-serif text-sm text-black mb-3 group-hover:underline line-clamp-2">
             {productName}
           </h3>
         </Link>
@@ -247,7 +247,7 @@ export default function ProductCard({ product, priority = false }) {
                     setHoveredVariant(null);
                     setTooltipPos(null);
                   }}
-                  className={`w-5 h-5 rounded-full transition-all cursor-pointer ${
+                  className={`w-5 h-5 rounded-full transition-shadow cursor-pointer ${
                     selectedVariant.id === variant.id
                       ? 'ring-1 ring-black ring-offset-2'
                       : 'ring-1 ring-neutral-300 hover:ring-neutral-400'
@@ -351,4 +351,4 @@ export default function ProductCard({ product, priority = false }) {
       })()}
     </div>
   );
-}
+});

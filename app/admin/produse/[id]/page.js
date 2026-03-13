@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, memo } from 'react';
 import { useAdmin } from '../../AdminAuthContext';
 import ImageUploader from '../../components/ImageUploader';
 import TranslatableField from '../../components/TranslatableField';
@@ -8,6 +8,90 @@ import TemplatePicker from '../../components/TemplatePicker';
 import { useRouter, useParams } from 'next/navigation';
 
 const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL', '5XL', '34', '36', '38', '40', '42', '44', '46', '48', '50', '52', '54', '56', '58'];
+
+/* ── Memoised variant card — only re-renders when its own variant data changes ── */
+const VariantCard = memo(function VariantCard({
+  variant, vIdx, canRemove,
+  updateVariant, removeVariant,
+  updateVariantImage, addVariantImage, removeVariantImage,
+  updateSize, addSize, removeSize,
+  apiFetch,
+}) {
+  const handleColorFieldChange = useCallback((field, val) => {
+    if (field === 'colorName') updateVariant(vIdx, 'colorName', val);
+    else if (field === 'colorNameRu') updateVariant(vIdx, 'colorNameRu', val);
+    else if (field === 'colorNameEn') updateVariant(vIdx, 'colorNameEn', val);
+  }, [vIdx, updateVariant]);
+
+  return (
+    <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-sm font-medium text-gray-700">Culoare #{vIdx + 1}: {variant.colorName || '—'}</h3>
+        {canRemove && (
+          <button type="button" onClick={() => removeVariant(vIdx)} className="text-xs text-red-500 hover:text-red-700 cursor-pointer">Șterge Culoare</button>
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        <div className="md:col-span-2">
+          <TranslatableField
+            label="Nume Culoare"
+            value={variant.colorName}
+            valueRu={variant.colorNameRu}
+            valueEn={variant.colorNameEn}
+            onChange={handleColorFieldChange}
+            fieldKey="colorName"
+            apiFetch={apiFetch}
+          />
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-gray-600 mb-1.5">Cod Culoare</label>
+          <div className="flex items-center gap-2">
+            <input type="color" value={variant.colorCode} onChange={(e) => updateVariant(vIdx, 'colorCode', e.target.value)} className="w-10 h-10 rounded border border-gray-200 cursor-pointer" />
+            <input value={variant.colorCode} onChange={(e) => updateVariant(vIdx, 'colorCode', e.target.value)} className="flex-1 border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black" />
+          </div>
+        </div>
+      </div>
+
+      {/* Images */}
+      <div className="mb-4">
+        <div className="flex items-center justify-between mb-2">
+          <label className="text-xs font-medium text-gray-600">Imagini</label>
+          <button type="button" onClick={() => addVariantImage(vIdx)} className="text-xs text-gray-500 hover:text-black cursor-pointer">+ Imagine</button>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          {variant.images.map((img, imgIdx) => (
+            <div key={imgIdx} className="relative">
+              <ImageUploader value={img.url} onChange={(url) => updateVariantImage(vIdx, imgIdx, url)} label={img.type === 'FRONT' ? 'Față' : img.type === 'BACK' ? 'Spate' : `Imagine ${imgIdx + 1}`} />
+              {variant.images.length > 1 && (
+                <button type="button" onClick={() => removeVariantImage(vIdx, imgIdx)} className="absolute top-0 right-0 text-red-400 hover:text-red-600 text-xs cursor-pointer">×</button>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Sizes */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <label className="text-xs font-medium text-gray-600">Mărimi & Stoc</label>
+          <button type="button" onClick={() => addSize(vIdx)} className="text-xs text-gray-500 hover:text-black cursor-pointer">+ Mărime</button>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
+          {variant.sizes.map((s, sIdx) => (
+            <div key={sIdx} className="flex items-center gap-1 bg-gray-50 rounded px-2 py-1.5">
+              <select value={s.size} onChange={(e) => updateSize(vIdx, sIdx, 'size', e.target.value)} className="bg-transparent text-xs font-medium w-12 focus:outline-none cursor-pointer">
+                {SIZES.map((sz) => (<option key={sz} value={sz}>{sz}</option>))}
+              </select>
+              <input type="number" value={s.stock} onChange={(e) => updateSize(vIdx, sIdx, 'stock', e.target.value)} className="w-12 text-xs text-center bg-white border border-gray-200 rounded px-1 py-1 focus:outline-none focus:border-black" min="0" />
+              <button type="button" onClick={() => removeSize(vIdx, sIdx)} className="text-red-400 hover:text-red-600 text-xs cursor-pointer ml-1">×</button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+});
 
 function EditProductForm() {
   const { apiFetch } = useAdmin();
@@ -98,21 +182,21 @@ function EditProductForm() {
     });
   };
 
-  const updateVariant = (idx, field, value) => setVariants((prev) => prev.map((v, i) => (i === idx ? { ...v, [field]: value } : v)));
-  const addVariant = () => setVariants((prev) => [...prev, { colorName: '', colorNameRu: '', colorNameEn: '', colorCode: '#000000', images: [{ url: '', type: 'FRONT' }, { url: '', type: 'BACK' }], sizes: [{ size: 'S', stock: 0 }, { size: 'M', stock: 0 }, { size: 'L', stock: 0 }] }]);
-  const removeVariant = (idx) => { if (variants.length > 1) setVariants((prev) => prev.filter((_, i) => i !== idx)); };
+  const updateVariant = useCallback((idx, field, value) => setVariants((prev) => prev.map((v, i) => (i === idx ? { ...v, [field]: value } : v))), []);
+  const addVariant = useCallback(() => setVariants((prev) => [...prev, { colorName: '', colorNameRu: '', colorNameEn: '', colorCode: '#000000', images: [{ url: '', type: 'FRONT' }, { url: '', type: 'BACK' }], sizes: [{ size: 'S', stock: 0 }, { size: 'M', stock: 0 }, { size: 'L', stock: 0 }] }]), []);
+  const removeVariant = useCallback((idx) => setVariants((prev) => prev.length > 1 ? prev.filter((_, i) => i !== idx) : prev), []);
 
-  const updateVariantImage = (vIdx, imgIdx, url) => {
+  const updateVariantImage = useCallback((vIdx, imgIdx, url) => {
     setVariants((prev) => prev.map((v, i) => i === vIdx ? { ...v, images: v.images.map((img, j) => j === imgIdx ? { ...img, url } : img) } : v));
-  };
-  const addVariantImage = (vIdx) => setVariants((prev) => prev.map((v, i) => i === vIdx ? { ...v, images: [...v.images, { url: '', type: 'DETAIL' }] } : v));
-  const removeVariantImage = (vIdx, imgIdx) => setVariants((prev) => prev.map((v, i) => i === vIdx ? { ...v, images: v.images.filter((_, j) => j !== imgIdx) } : v));
+  }, []);
+  const addVariantImage = useCallback((vIdx) => setVariants((prev) => prev.map((v, i) => i === vIdx ? { ...v, images: [...v.images, { url: '', type: 'DETAIL' }] } : v)), []);
+  const removeVariantImage = useCallback((vIdx, imgIdx) => setVariants((prev) => prev.map((v, i) => i === vIdx ? { ...v, images: v.images.filter((_, j) => j !== imgIdx) } : v)), []);
 
-  const updateSize = (vIdx, sIdx, field, value) => {
+  const updateSize = useCallback((vIdx, sIdx, field, value) => {
     setVariants((prev) => prev.map((v, i) => i === vIdx ? { ...v, sizes: v.sizes.map((s, j) => j === sIdx ? { ...s, [field]: field === 'stock' ? (value === '' ? '' : Math.max(0, parseInt(value, 10) || 0)) : value } : s) } : v));
-  };
-  const addSize = (vIdx) => setVariants((prev) => prev.map((v, i) => i === vIdx ? { ...v, sizes: [...v.sizes, { size: 'M', stock: 0 }] } : v));
-  const removeSize = (vIdx, sIdx) => setVariants((prev) => prev.map((v, i) => i === vIdx ? { ...v, sizes: v.sizes.filter((_, j) => j !== sIdx) } : v));
+  }, []);
+  const addSize = useCallback((vIdx) => setVariants((prev) => prev.map((v, i) => i === vIdx ? { ...v, sizes: [...v.sizes, { size: 'M', stock: 0 }] } : v)), []);
+  const removeSize = useCallback((vIdx, sIdx) => setVariants((prev) => prev.map((v, i) => i === vIdx ? { ...v, sizes: v.sizes.filter((_, j) => j !== sIdx) } : v)), []);
 
   const selectedCategory = categories.find((c) => c.id === form.categoryId);
 
@@ -244,76 +328,21 @@ function EditProductForm() {
           </div>
 
           {variants.map((variant, vIdx) => (
-            <div key={vIdx} className="bg-white rounded-lg border border-gray-200 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-medium text-gray-700">Culoare #{vIdx + 1}: {variant.colorName || '—'}</h3>
-                {variants.length > 1 && (
-                  <button type="button" onClick={() => removeVariant(vIdx)} className="text-xs text-red-500 hover:text-red-700 cursor-pointer">Șterge Culoare</button>
-                )}
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <div className="md:col-span-2">
-                  <TranslatableField
-                    label="Nume Culoare"
-                    value={variant.colorName}
-                    valueRu={variant.colorNameRu}
-                    valueEn={variant.colorNameEn}
-                    onChange={(field, val) => {
-                      if (field === 'colorName') updateVariant(vIdx, 'colorName', val);
-                      else if (field === 'colorNameRu') updateVariant(vIdx, 'colorNameRu', val);
-                      else if (field === 'colorNameEn') updateVariant(vIdx, 'colorNameEn', val);
-                    }}
-                    fieldKey="colorName"
-                    apiFetch={apiFetch}
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1.5">Cod Culoare</label>
-                  <div className="flex items-center gap-2">
-                    <input type="color" value={variant.colorCode} onChange={(e) => updateVariant(vIdx, 'colorCode', e.target.value)} className="w-10 h-10 rounded border border-gray-200 cursor-pointer" />
-                    <input value={variant.colorCode} onChange={(e) => updateVariant(vIdx, 'colorCode', e.target.value)} className="flex-1 border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:border-black" />
-                  </div>
-                </div>
-              </div>
-
-              {/* Images */}
-              <div className="mb-4">
-                <div className="flex items-center justify-between mb-2">
-                  <label className="text-xs font-medium text-gray-600">Imagini</label>
-                  <button type="button" onClick={() => addVariantImage(vIdx)} className="text-xs text-gray-500 hover:text-black cursor-pointer">+ Imagine</button>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {variant.images.map((img, imgIdx) => (
-                    <div key={imgIdx} className="relative">
-                      <ImageUploader value={img.url} onChange={(url) => updateVariantImage(vIdx, imgIdx, url)} label={img.type === 'FRONT' ? 'Față' : img.type === 'BACK' ? 'Spate' : `Imagine ${imgIdx + 1}`} />
-                      {variant.images.length > 1 && (
-                        <button type="button" onClick={() => removeVariantImage(vIdx, imgIdx)} className="absolute top-0 right-0 text-red-400 hover:text-red-600 text-xs cursor-pointer">×</button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Sizes */}
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label className="text-xs font-medium text-gray-600">Mărimi & Stoc</label>
-                  <button type="button" onClick={() => addSize(vIdx)} className="text-xs text-gray-500 hover:text-black cursor-pointer">+ Mărime</button>
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
-                  {variant.sizes.map((s, sIdx) => (
-                    <div key={sIdx} className="flex items-center gap-1 bg-gray-50 rounded px-2 py-1.5">
-                      <select value={s.size} onChange={(e) => updateSize(vIdx, sIdx, 'size', e.target.value)} className="bg-transparent text-xs font-medium w-12 focus:outline-none cursor-pointer">
-                        {SIZES.map((sz) => (<option key={sz} value={sz}>{sz}</option>))}
-                      </select>
-                      <input type="number" value={s.stock} onChange={(e) => updateSize(vIdx, sIdx, 'stock', e.target.value)} className="w-12 text-xs text-center bg-white border border-gray-200 rounded px-1 py-1 focus:outline-none focus:border-black" min="0" />
-                      <button type="button" onClick={() => removeSize(vIdx, sIdx)} className="text-red-400 hover:text-red-600 text-xs cursor-pointer ml-1">×</button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+            <VariantCard
+              key={vIdx}
+              variant={variant}
+              vIdx={vIdx}
+              canRemove={variants.length > 1}
+              updateVariant={updateVariant}
+              removeVariant={removeVariant}
+              updateVariantImage={updateVariantImage}
+              addVariantImage={addVariantImage}
+              removeVariantImage={removeVariantImage}
+              updateSize={updateSize}
+              addSize={addSize}
+              removeSize={removeSize}
+              apiFetch={apiFetch}
+            />
           ))}
         </div>
 

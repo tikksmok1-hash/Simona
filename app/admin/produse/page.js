@@ -1,11 +1,23 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback, memo } from 'react';
 import { useAdmin } from '../AdminAuthContext';
 import Link from 'next/link';
 import Image from 'next/image';
 
 const PAGE_SIZE = 20;
+
+/* ── Toggle switch — memoised so only the toggled row re-renders ── */
+const Toggle = memo(function Toggle({ on, onToggle }) {
+  return (
+    <button
+      onClick={onToggle}
+      className={`w-8 h-5 rounded-full transition-colors cursor-pointer ${on ? 'bg-green-500' : 'bg-gray-200'}`}
+    >
+      <div className={`w-4 h-4 bg-white rounded-full shadow transition-transform ${on ? 'translate-x-3.5' : 'translate-x-0.5'}`} />
+    </button>
+  );
+});
 
 function ProductsContent() {
   const { apiFetch } = useAdmin();
@@ -29,15 +41,15 @@ function ProductsContent() {
 
   useEffect(() => { fetchProducts(); }, []);
 
-  const deleteProduct = async (id) => {
+  const deleteProduct = useCallback(async (id) => {
     if (!confirm('Sigur vrei să ștergi acest produs?')) return;
     try {
       await apiFetch(`/api/admin/products/${id}`, { method: 'DELETE' });
       setProducts((prev) => prev.filter((p) => p.id !== id));
     } catch {}
-  };
+  }, [apiFetch]);
 
-  const toggleField = async (id, field, current) => {
+  const toggleField = useCallback(async (id, field, current) => {
     // Optimistic update — instant UI toggle
     setProducts((prev) =>
       prev.map((p) => (p.id === id ? { ...p, [field]: !current } : p))
@@ -54,16 +66,19 @@ function ProductsContent() {
         prev.map((p) => (p.id === id ? { ...p, [field]: current } : p))
       );
     }
-  };
+  }, [apiFetch]);
 
-  const filtered = products.filter((p) => {
-    const matchSearch =
-      p.name.toLowerCase().includes(search.toLowerCase()) ||
-      p.slug.toLowerCase().includes(search.toLowerCase());
-    const matchCategory = !categoryFilter || p.category?.id === categoryFilter;
-    const matchSubcategory = !subcategoryFilter || p.subcategory?.id === subcategoryFilter;
-    return matchSearch && matchCategory && matchSubcategory;
-  });
+  const filtered = useMemo(() => {
+    const q = search.toLowerCase();
+    return products.filter((p) => {
+      const matchSearch =
+        p.name.toLowerCase().includes(q) ||
+        p.slug.toLowerCase().includes(q);
+      const matchCategory = !categoryFilter || p.category?.id === categoryFilter;
+      const matchSubcategory = !subcategoryFilter || p.subcategory?.id === subcategoryFilter;
+      return matchSearch && matchCategory && matchSubcategory;
+    });
+  }, [products, search, categoryFilter, subcategoryFilter]);
 
   // Derive unique categories from loaded products
   const categories = useMemo(() => {
@@ -92,7 +107,10 @@ function ProductsContent() {
   useEffect(() => { setPage(1); }, [search, categoryFilter, subcategoryFilter]);
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
-  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const paginated = useMemo(
+    () => filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
+    [filtered, page]
+  );
 
   return (
     <div>

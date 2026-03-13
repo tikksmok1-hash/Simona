@@ -1,10 +1,44 @@
 'use client';
 
+import { useState, useEffect, useRef, memo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import ProductCard from './components/ProductCard';
 import { useTranslation } from '@/app/context/LanguageContext';
 import { localize, localizeSettings } from '@/lib/localize';
+
+/* Lazy Google Maps — only mounts the iframe when the section scrolls into view */
+const LazyMap = memo(function LazyMap() {
+  const ref = useRef(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setVisible(true); io.disconnect(); } },
+      { rootMargin: '200px' },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  return (
+    <div ref={ref} className="w-full h-80 lg:h-full min-h-[320px] bg-neutral-100 overflow-hidden">
+      {visible && (
+        <iframe
+          src="https://maps.google.com/maps?q=str.+Ion+Creang%C4%83+58,+Chi%C8%99in%C4%83u,+Moldova&output=embed"
+          width="100%"
+          height="100%"
+          style={{ border: 0, minHeight: '320px' }}
+          allowFullScreen
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+        />
+      )}
+    </div>
+  );
+});
 
 export default function HomeClient({
   featuredProducts,
@@ -345,18 +379,8 @@ export default function HomeClient({
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-            {/* Google Maps embed */}
-            <div className="w-full h-80 lg:h-full min-h-[320px] bg-neutral-100 overflow-hidden">
-              <iframe
-                src="https://maps.google.com/maps?q=str.+Ion+Creang%C4%83+58,+Chi%C8%99in%C4%83u,+Moldova&output=embed"
-                width="100%"
-                height="100%"
-                style={{ border: 0, minHeight: '320px' }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-              />
-            </div>
+            {/* Google Maps embed — lazy loaded */}
+            <LazyMap />
 
             {/* Contact info */}
             <div className="flex flex-col justify-center gap-6">

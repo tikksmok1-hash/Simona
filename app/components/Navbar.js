@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCart } from '@/app/context/CartContext';
 import { useTranslation } from '@/app/context/LanguageContext';
@@ -52,10 +52,16 @@ export default function Navbar({ siteSettings = {} }) {
   // Homepage detection — computed directly from pathname (no extra state/effect)
   const isHomepage = pathname === '/' || !pathname;
 
-  // Check scroll position on mount and scroll events
+  // Check scroll position on mount and scroll events (throttled via rAF)
   useEffect(() => {
+    let ticking = false;
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        setIsScrolled(window.scrollY > 50);
+        ticking = false;
+      });
     };
     // Check immediately on mount
     handleScroll();
@@ -66,7 +72,7 @@ export default function Navbar({ siteSettings = {} }) {
         setMounted(true);
       });
     });
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -142,38 +148,38 @@ export default function Navbar({ siteSettings = {} }) {
     return () => { if (searchTimerRef.current) clearTimeout(searchTimerRef.current); };
   }, [searchQuery]);
 
-  function handleSearchSubmit(e) {
+  const handleSearchSubmit = useCallback((e) => {
     e.preventDefault();
     if (searchQuery.trim().length >= 2) {
       setShowResults(true);
     }
-  }
+  }, [searchQuery]);
 
-  function handleResultClick(slug) {
+  const handleResultClick = useCallback((slug) => {
     setSearchQuery('');
     setShowResults(false);
     setIsSearchOpen(false);
     router.push(`/produs/${slug}`);
-  }
+  }, [router]);
 
   // Transparent only on homepage when not scrolled and menu is closed
   // Transparent only on homepage, not scrolled, menu closed, AND after mount
   const isTransparent = mounted && isHomepage && !isScrolled && !isMenuOpen;
 
   // Filter out DB categories with 0 products (direct + subcategory products)
-  const activeDbCategories = dbCategories.filter((cat) => {
+  const activeDbCategories = useMemo(() => dbCategories.filter((cat) => {
     const directCount = cat._count?.products || 0;
     const subCount = (cat.subcategories || []).reduce((sum, sub) => sum + (sub._count?.products || 0), 0);
     return directCount + subCount > 0;
-  });
+  }), [dbCategories]);
 
-  const navCategories = [
+  const navCategories = useMemo(() => [
     ...activeDbCategories.map(cat => ({ ...cat, localizedName: localize(cat, 'name', lang) })),
     { id: 'reducere', localizedName: t('nav.reducere'), slug: 'reduceri', subcategories: [], highlight: true },
     { id: 'bestsellers', localizedName: t('nav.bestsellers'), slug: 'bestsellers', subcategories: [] },
     { id: 'noutati', localizedName: t('nav.noutati'), slug: 'noutati', subcategories: [] },
     { id: 'livrare', localizedName: t('nav.livrare'), slug: 'livrare', subcategories: [] },
-  ];
+  ], [activeDbCategories, lang, t]);
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-[background-color,backdrop-filter,box-shadow] duration-500 ${
