@@ -109,7 +109,7 @@ function EditProductForm() {
   const removeVariantImage = (vIdx, imgIdx) => setVariants((prev) => prev.map((v, i) => i === vIdx ? { ...v, images: v.images.filter((_, j) => j !== imgIdx) } : v));
 
   const updateSize = (vIdx, sIdx, field, value) => {
-    setVariants((prev) => prev.map((v, i) => i === vIdx ? { ...v, sizes: v.sizes.map((s, j) => j === sIdx ? { ...s, [field]: field === 'stock' ? parseInt(value) || 0 : value } : s) } : v));
+    setVariants((prev) => prev.map((v, i) => i === vIdx ? { ...v, sizes: v.sizes.map((s, j) => j === sIdx ? { ...s, [field]: field === 'stock' ? (value === '' ? '' : Math.max(0, parseInt(value, 10) || 0)) : value } : s) } : v));
   };
   const addSize = (vIdx) => setVariants((prev) => prev.map((v, i) => i === vIdx ? { ...v, sizes: [...v.sizes, { size: 'M', stock: 0 }] } : v));
   const removeSize = (vIdx, sIdx) => setVariants((prev) => prev.map((v, i) => i === vIdx ? { ...v, sizes: v.sizes.filter((_, j) => j !== sIdx) } : v));

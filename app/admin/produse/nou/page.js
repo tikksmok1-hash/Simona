@@ -135,7 +135,7 @@ function ProductForm() {
     setVariants((prev) =>
       prev.map((v, i) =>
         i === vIdx
-          ? { ...v, sizes: v.sizes.map((s, j) => (j === sIdx ? { ...s, [field]: field === 'stock' ? parseInt(value) || 0 : value } : s)) }
+          ? { ...v, sizes: v.sizes.map((s, j) => (j === sIdx ? { ...s, [field]: field === 'stock' ? (value === '' ? '' : Math.max(0, parseInt(value, 10) || 0)) : value } : s)) }
           : v
       )
     );
