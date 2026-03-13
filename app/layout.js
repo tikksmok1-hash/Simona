@@ -8,13 +8,17 @@ import { Analytics } from "@vercel/analytics/next";
 const playfair = Playfair_Display({
   variable: "--font-playfair",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600"],
+  display: "swap",
+  preload: true,
 });
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["300", "400", "500", "600"],
+  display: "swap",
+  preload: true,
 });
 
 export const metadata = {
@@ -52,8 +56,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="ro">
       <head>
-        {/* Meta Pixel Code */}
-        <Script id="meta-pixel" strategy="afterInteractive">
+        {/* DNS-prefetch image CDN — wildcard subdomain, so dns-prefetch only */}
+        <link rel="dns-prefetch" href="https://public.blob.vercel-storage.com" />
+        {/* Meta Pixel Code — lazyOnload to avoid blocking FCP */}
+        <Script id="meta-pixel" strategy="lazyOnload">
           {`
             !function(f,b,e,v,n,t,s)
             {if(f.fbq)return;n=f.fbq=function(){n.callMethod?

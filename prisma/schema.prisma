@@ -121,6 +121,10 @@ model Product {
   @@index([categoryId])
   @@index([subcategoryId])
   @@index([isActive, isFeatured])
+  @@index([isActive, categoryId])
+  @@index([isActive, subcategoryId])
+  @@index([isActive, isBestseller])
+  @@index([isActive, createdAt])
 }
 
 // ==================== PRODUCT VARIANTS (Colors) ====================

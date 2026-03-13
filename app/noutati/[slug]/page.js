@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import { getBlogPostBySlug, getAllBlogPosts, getAllBlogSlugs } from '@/lib/db/queries';
 import BlogPostClient from './BlogPostClient';
 
-export const revalidate = 60;
+export const revalidate = 300;
 
 export async function generateStaticParams() {
   try {

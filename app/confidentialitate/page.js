@@ -3,7 +3,7 @@ import { defaultPages } from '@/lib/data/defaultPages';
 import { sanitizeHtml } from '@/lib/sanitize';
 import LegalPageClient from '@/app/components/LegalPageClient';
 
-export const revalidate = 60;
+export const revalidate = 300;
 
 export async function generateMetadata() {
   const page = await getStaticPage('confidentialitate');

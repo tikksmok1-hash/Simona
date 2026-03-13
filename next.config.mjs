@@ -66,11 +66,11 @@ const nextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://connect.facebook.net",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://connect.facebook.net https://va.vercel-scripts.com",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com data:",
               "img-src 'self' data: blob: https://*.public.blob.vercel-storage.com https://images.unsplash.com https://api.qrserver.com https://www.facebook.com",
-              "connect-src 'self' https://*.public.blob.vercel-storage.com https://vitals.vercel-insights.com https://connect.facebook.net https://www.facebook.com https://translate.googleapis.com",
+              "connect-src 'self' https://*.public.blob.vercel-storage.com https://vitals.vercel-insights.com https://va.vercel-scripts.com https://connect.facebook.net https://www.facebook.com https://translate.googleapis.com",
               "frame-src 'self' https://www.youtube.com https://youtube.com https://www.google.com https://maps.google.com",
               "frame-ancestors 'none'",
               "base-uri 'self'",

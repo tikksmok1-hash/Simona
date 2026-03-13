@@ -1,13 +1,16 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
 import Navbar from './Navbar';
-import Footer from './Footer';
-import CartSidebar from './CartSidebar';
 import { CartProvider } from '../context/CartContext';
 import { LanguageProvider } from '../context/LanguageContext';
 import { SiteSettingsProvider } from '../context/SiteSettingsContext';
+
+// Lazy-load below-fold / off-screen components to improve FCP
+const Footer = dynamic(() => import('./Footer'), { ssr: true });
+const CartSidebar = dynamic(() => import('./CartSidebar'), { ssr: false });
 
 // In-memory cache so we don't refetch on every client-side navigation
 let settingsCache = { data: null, ts: 0 };

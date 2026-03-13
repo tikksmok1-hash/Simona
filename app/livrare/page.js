@@ -3,7 +3,7 @@ import { getSiteSettings } from '@/lib/db/queries';
 import { livrareDefaults } from '@/lib/data/livrareDefaults';
 import LivrarePageClient from './LivrarePageClient';
 
-export const revalidate = 60;
+export const revalidate = 300;
 
 function parseLivrareData(page) {
   if (!page) return { title: 'Livrare & Retur', ...livrareDefaults };

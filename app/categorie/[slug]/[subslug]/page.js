@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import { getCategoryBySlug, getProductsByCategory, getProductsByCategoryAndSubcategory, getAllCategories } from '@/lib/db/queries';
 import SubcategoryPageClient from '../../SubcategoryPageClient';
 
-export const revalidate = 60;
+export const revalidate = 300;
 
 export async function generateStaticParams() {
   try {

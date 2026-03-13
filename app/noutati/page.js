@@ -1,7 +1,7 @@
 import { getAllBlogPosts } from '@/lib/db/queries';
 import NoutatiClient from './NoutatiClient';
 
-export const revalidate = 60;
+export const revalidate = 300;
 
 export const metadata = {
   title: 'Noutăți — SIMONA Fashion',

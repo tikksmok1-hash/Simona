@@ -11,9 +11,8 @@ import {
   getAllCategories,
 } from '@/lib/db/queries';
 
-// ISR — regenerate at most every 60s so new products appear fast
-// Admin panel can also trigger instant revalidation via /api/revalidate
-export const revalidate = 60;
+// ISR — cache for 5 min; admin triggers /api/revalidate for instant updates
+export const revalidate = 300;
 
 export default async function Home() {
   // Fetch data from DB in parallel

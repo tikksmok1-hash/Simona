@@ -1,8 +1,8 @@
 import { getBestsellerProducts, getAllCategories } from '@/lib/db/queries';
 import BestsellersPageClient from './BestsellersPageClient';
 
-// ISR — regenerate at most every 60s; admin can trigger /api/revalidate instantly
-export const revalidate = 60;
+// ISR — regenerate at most every 300s; admin can trigger /api/revalidate instantly
+export const revalidate = 300;
 
 export const metadata = {
   title: 'Bestsellers — SIMONA Fashion',

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, lazy, Suspense } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -9,7 +9,9 @@ import { useTranslation } from '@/app/context/LanguageContext';
 import { useSiteSettings } from '@/app/context/SiteSettingsContext';
 import { localize, localizeSettings } from '@/lib/localize';
 import { sortSizes } from '@/lib/sortSizes';
-import ProductCard from '@/app/components/ProductCard';
+
+// Lazy-load ProductCard — only needed for "similar products" section below the fold
+const ProductCard = lazy(() => import('@/app/components/ProductCard'));
 
 export default function ProductDetailClient({ product, similarProducts = [], initialVariantId }) {
   const initialIndex = initialVariantId
@@ -152,8 +154,8 @@ export default function ProductDetailClient({ product, similarProducts = [], ini
                     alt={product.name}
                     fill
                     priority
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                    className="object-cover transition-all duration-500"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 640px"
+                    className="object-cover"
                   />
                 ) : (
                   <div className="w-full h-full bg-gray-100 flex items-center justify-center">
@@ -216,7 +218,7 @@ export default function ProductDetailClient({ product, similarProducts = [], ini
                         mainImageIndex === i ? 'border-black' : 'border-gray-200'
                       }`}
                     >
-                      <Image src={img.url} alt="" fill className="object-cover" sizes="64px" />
+                      <Image src={img.url} alt="" fill className="object-cover" sizes="64px" loading="lazy" />
                     </button>
                   ))}
                 </div>
@@ -562,11 +564,13 @@ export default function ProductDetailClient({ product, similarProducts = [], ini
               <p className="text-[10px] tracking-[0.4em] uppercase text-gray-400 mb-2">{t('detail.discoverMore')}</p>
               <h2 className="font-serif text-2xl md:text-3xl text-black font-light">{t('detail.similar')}</h2>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-              {similarProducts.slice(0, 8).map((p) => (
-                <ProductCard key={p.id} product={p} />
-              ))}
-            </div>
+            <Suspense fallback={<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="aspect-[3/4] bg-gray-100 animate-pulse" />)}</div>}>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                {similarProducts.slice(0, 8).map((p) => (
+                  <ProductCard key={p.id} product={p} />
+                ))}
+              </div>
+            </Suspense>
           </div>
         </div>
       )}
