@@ -3,6 +3,7 @@ import Script from "next/script";
 import "./globals.css";
 import LayoutWrapper from "./components/LayoutWrapper";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -83,6 +84,7 @@ export default function RootLayout({ children }) {
           {children}
         </LayoutWrapper>
         <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );
