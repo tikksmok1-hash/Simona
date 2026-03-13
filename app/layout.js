@@ -2,6 +2,7 @@ import { Playfair_Display, Montserrat } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import LayoutWrapper from "./components/LayoutWrapper";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -81,6 +82,7 @@ export default function RootLayout({ children }) {
         <LayoutWrapper>
           {children}
         </LayoutWrapper>
+        <SpeedInsights />
       </body>
     </html>
   );
