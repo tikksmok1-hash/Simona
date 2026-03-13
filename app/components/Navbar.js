@@ -49,6 +49,13 @@ export default function Navbar({ siteSettings = {} }) {
 
   const siteAddress = localizeSettings(siteSettings, 'address', lang) || 'str. Ion Creangă 58, Chișinău';
 
+  // Close mobile menu & search on navigation
+  useEffect(() => {
+    setIsMenuOpen(false);
+    setIsSearchOpen(false);
+    setOpenMobileCategory(null);
+  }, [pathname]);
+
   // Homepage detection — computed directly from pathname (no extra state/effect)
   const isHomepage = pathname === '/' || !pathname;
 

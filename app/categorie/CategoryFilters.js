@@ -65,6 +65,8 @@ export default function CategoryFilters({ categoryProducts, category, activeSubs
   const applyPrice = () => {
     setAppliedMin(minInput !== '' ? Number(minInput) : null);
     setAppliedMax(maxInput !== '' ? Number(maxInput) : null);
+    // On mobile, close the filters panel so products are visible
+    if (window.innerWidth < 1024) setShowFilters(false);
   };
 
   const resetFilters = () => {

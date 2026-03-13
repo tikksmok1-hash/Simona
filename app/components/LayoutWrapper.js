@@ -22,6 +22,11 @@ export default function LayoutWrapper({ children }) {
   const [siteSettings, setSiteSettings] = useState(settingsCache.data || {});
   const fetched = useRef(false);
 
+  // Scroll to top on every client-side navigation
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
   useEffect(() => {
     if (isAdmin || fetched.current) return;
     fetched.current = true;
