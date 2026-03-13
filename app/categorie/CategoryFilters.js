@@ -224,7 +224,7 @@ export default function CategoryFilters({ categoryProducts, category, activeSubs
                 </div>
                 <button
                   onClick={applyPrice}
-                  className="w-full py-2 border border-black text-sm tracking-wide hover:bg-black hover:text-white active:scale-95 transition-all duration-200"
+                  className="w-full py-2 border border-black text-sm tracking-wide hover:bg-black hover:text-white active:scale-95 transition-[color,background-color,border-color,transform] duration-200"
                 >
                   {t('filter.apply')}
                 </button>
@@ -259,7 +259,7 @@ export default function CategoryFilters({ categoryProducts, category, activeSubs
                   {/* Progress bar */}
                   <div className="w-48 h-px bg-neutral-200 relative">
                     <div
-                      className="absolute inset-y-0 left-0 bg-black transition-all duration-500"
+                      className="absolute inset-y-0 left-0 bg-black transition-[width] duration-500"
                       style={{ width: `${Math.min(100, (visibleCount / filtered.length) * 100)}%` }}
                     />
                   </div>
@@ -269,7 +269,7 @@ export default function CategoryFilters({ categoryProducts, category, activeSubs
                   {visibleCount < filtered.length && (
                     <button
                       onClick={() => setVisibleCount((prev) => prev + PAGE_SIZE)}
-                      className="border border-black text-black px-10 py-3 text-xs tracking-widest uppercase hover:bg-black hover:text-white transition-all duration-200 cursor-pointer active:scale-95"
+                      className="border border-black text-black px-10 py-3 text-xs tracking-widest uppercase hover:bg-black hover:text-white transition-[color,background-color,border-color,transform] duration-200 cursor-pointer active:scale-95"
                     >
                       {t('filter.loadMore')}
                     </button>

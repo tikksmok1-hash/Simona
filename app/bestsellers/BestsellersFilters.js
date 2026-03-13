@@ -68,7 +68,7 @@ export default function BestsellersFilters({ products: productsList, totalSaving
   return (
     <>
       {/* Sticky filters bar */}
-      <div className="bg-neutral-50 border-b border-gray-100 sticky top-[112px] z-20">
+      <div className="bg-neutral-50 border-b border-gray-100 sticky z-20" style={{ top: 'var(--navbar-height)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-wrap items-center gap-x-8 gap-y-3">
 
@@ -77,7 +77,7 @@ export default function BestsellersFilters({ products: productsList, totalSaving
               <span className="text-[9px] tracking-widest uppercase text-gray-400 shrink-0">{t('filter.category')}</span>
               <button
                 onClick={() => { setFilterCategory('all'); setFilterSubcategory('all'); setPage(1); }}
-                className={`text-[10px] tracking-widest uppercase px-4 py-1.5 border transition-all duration-200 cursor-pointer active:scale-95 ${
+                className={`text-[10px] tracking-widest uppercase px-4 py-1.5 border transition-[color,background-color,border-color,transform] duration-200 cursor-pointer active:scale-95 ${
                   filterCategory === 'all'
                     ? 'bg-black text-white border-black'
                     : 'border-gray-200 text-gray-500 hover:bg-black hover:text-white hover:border-black'
@@ -91,7 +91,7 @@ export default function BestsellersFilters({ products: productsList, totalSaving
                   <button
                     key={cat}
                     onClick={() => { setFilterCategory(cat); setFilterSubcategory('all'); setPage(1); }}
-                    className={`text-[10px] tracking-widest uppercase px-4 py-1.5 border transition-all duration-200 cursor-pointer active:scale-95 ${
+                    className={`text-[10px] tracking-widest uppercase px-4 py-1.5 border transition-[color,background-color,border-color,transform] duration-200 cursor-pointer active:scale-95 ${
                       filterCategory === cat
                         ? 'bg-black text-white border-black'
                         : 'border-gray-200 text-gray-500 hover:bg-black hover:text-white hover:border-black'
@@ -109,7 +109,7 @@ export default function BestsellersFilters({ products: productsList, totalSaving
                 <span className="text-[9px] tracking-widest uppercase text-gray-300 shrink-0">↳</span>
                 <button
                   onClick={() => { setFilterSubcategory('all'); setPage(1); }}
-                  className={`text-[10px] tracking-widest uppercase px-3 py-1 border transition-all duration-200 cursor-pointer active:scale-95 ${
+                  className={`text-[10px] tracking-widest uppercase px-3 py-1 border transition-[color,background-color,border-color,transform] duration-200 cursor-pointer active:scale-95 ${
                     filterSubcategory === 'all'
                       ? 'bg-neutral-800 text-white border-neutral-800'
                       : 'border-gray-200 text-gray-400 hover:bg-neutral-800 hover:text-white hover:border-neutral-800'
@@ -126,7 +126,7 @@ export default function BestsellersFilters({ products: productsList, totalSaving
                     <button
                       key={sub.slug}
                       onClick={() => { setFilterSubcategory(sub.slug); setPage(1); }}
-                      className={`text-[10px] tracking-widest uppercase px-3 py-1 border transition-all duration-200 cursor-pointer active:scale-95 ${
+                      className={`text-[10px] tracking-widest uppercase px-3 py-1 border transition-[color,background-color,border-color,transform] duration-200 cursor-pointer active:scale-95 ${
                         filterSubcategory === sub.slug
                           ? 'bg-neutral-800 text-white border-neutral-800'
                           : 'border-gray-200 text-gray-400 hover:bg-neutral-800 hover:text-white hover:border-neutral-800'
@@ -149,7 +149,7 @@ export default function BestsellersFilters({ products: productsList, totalSaving
                 <button
                   key={tier}
                   onClick={() => { setFilterDiscount(tier); setPage(1); }}
-                  className={`text-[10px] tracking-widest uppercase px-4 py-1.5 border transition-all duration-200 cursor-pointer active:scale-95 ${
+                  className={`text-[10px] tracking-widest uppercase px-4 py-1.5 border transition-[color,background-color,border-color,transform] duration-200 cursor-pointer active:scale-95 ${
                     filterDiscount === tier
                       ? 'bg-black text-white border-black'
                       : 'border-gray-200 text-gray-500 hover:bg-black hover:text-white hover:border-black'
@@ -205,7 +205,7 @@ export default function BestsellersFilters({ products: productsList, totalSaving
             <p className="text-sm text-gray-400 mb-8">{t('filter.changeFilters')}</p>
             <button
               onClick={resetFilters}
-              className="border border-black text-black px-8 py-3 text-xs tracking-widest uppercase hover:bg-black hover:text-white transition-all duration-200 cursor-pointer active:scale-95"
+              className="border border-black text-black px-8 py-3 text-xs tracking-widest uppercase hover:bg-black hover:text-white transition-[color,background-color,border-color,transform] duration-200 cursor-pointer active:scale-95"
             >
               {t('filter.reset')}
             </button>
@@ -224,7 +224,7 @@ export default function BestsellersFilters({ products: productsList, totalSaving
                 <button
                   onClick={() => goToPage(Math.max(1, page - 1))}
                   disabled={page === 1}
-                  className="w-10 h-10 border border-gray-200 flex items-center justify-center text-gray-400 hover:bg-black hover:text-white hover:border-black transition-all duration-200 cursor-pointer active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed disabled:active:scale-100"
+                  className="w-10 h-10 border border-gray-200 flex items-center justify-center text-gray-400 hover:bg-black hover:text-white hover:border-black transition-[color,background-color,border-color,transform] duration-200 cursor-pointer active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed disabled:active:scale-100"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -250,7 +250,7 @@ export default function BestsellersFilters({ products: productsList, totalSaving
                     <button
                       key={p}
                       onClick={() => goToPage(p)}
-                      className={`w-10 h-10 border text-xs tracking-widest transition-all duration-200 cursor-pointer active:scale-95 ${
+                      className={`w-10 h-10 border text-xs tracking-widest transition-[color,background-color,border-color,transform] duration-200 cursor-pointer active:scale-95 ${
                         p === page
                           ? 'bg-black text-white border-black'
                           : 'border-gray-200 text-gray-500 hover:bg-black hover:text-white hover:border-black'
@@ -264,7 +264,7 @@ export default function BestsellersFilters({ products: productsList, totalSaving
                 <button
                   onClick={() => goToPage(Math.min(totalPages, page + 1))}
                   disabled={page === totalPages}
-                  className="w-10 h-10 border border-gray-200 flex items-center justify-center text-gray-400 hover:bg-black hover:text-white hover:border-black transition-all duration-200 cursor-pointer active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed disabled:active:scale-100"
+                  className="w-10 h-10 border border-gray-200 flex items-center justify-center text-gray-400 hover:bg-black hover:text-white hover:border-black transition-[color,background-color,border-color,transform] duration-200 cursor-pointer active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed disabled:active:scale-100"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />

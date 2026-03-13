@@ -218,7 +218,7 @@ export default function Navbar({ siteSettings = {} }) {
             </button>
 
             {/* Dropdown */}
-            <div className={`absolute left-0 top-full mt-1 w-52 bg-white shadow-xl border border-gray-100 transition-all duration-200 z-[100] ${isPhoneOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
+            <div className={`absolute left-0 top-full mt-1 w-52 bg-white shadow-xl border border-gray-100 transition-[opacity,visibility] duration-200 z-[100] ${isPhoneOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
               <a
                 href={`https://wa.me/${phone1Intl}`}
                 target="_blank"
@@ -436,13 +436,13 @@ export default function Navbar({ siteSettings = {} }) {
                   isTransparent ? 'text-white' : 'text-gray-700'
                 }`}
               >
-                <span className={`block w-5 h-px bg-current transition-all duration-300 origin-center ${
+                <span className={`block w-5 h-px bg-current transition-transform duration-300 origin-center ${
                   isMenuOpen ? 'translate-y-[6px] rotate-45' : ''
                 }`} />
-                <span className={`block w-5 h-px bg-current transition-all duration-200 ${
+                <span className={`block w-5 h-px bg-current transition-[opacity,transform] duration-200 ${
                   isMenuOpen ? 'opacity-0 scale-x-0' : ''
                 }`} />
-                <span className={`block w-5 h-px bg-current transition-all duration-300 origin-center ${
+                <span className={`block w-5 h-px bg-current transition-transform duration-300 origin-center ${
                   isMenuOpen ? '-translate-y-[6px] -rotate-45' : ''
                 }`} />
               </button>
@@ -531,7 +531,7 @@ export default function Navbar({ siteSettings = {} }) {
                   
                   {/* Subcategories Dropdown */}
                   {subs.length > 0 && (
-                    <div className="absolute left-1/2 -translate-x-1/2 top-full w-56 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                    <div className="absolute left-1/2 -translate-x-1/2 top-full w-56 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-[opacity,visibility] duration-200 z-50">
                       <div className="bg-white border border-gray-100 shadow-xl rounded-md">
                         <div className="py-2">
                           {subs.map((sub) => (
@@ -563,7 +563,7 @@ export default function Navbar({ siteSettings = {} }) {
       </div>
 
       {/* Mobile Menu */}
-      <div className={`md:hidden bg-white border-t border-gray-100 overflow-hidden scrollbar-hide transition-all duration-300 ease-in-out ${
+      <div className={`md:hidden bg-white border-t border-gray-100 overflow-hidden scrollbar-hide transition-[max-height,opacity] duration-300 ease-in-out ${
         isMenuOpen ? 'max-h-[70vh] opacity-100 overflow-y-auto' : 'max-h-0 opacity-0'
       }`}>
           <div className="px-6 py-4">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, lazy, Suspense } from 'react';
+import { useState, useRef, useCallback, lazy, Suspense } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -30,6 +30,7 @@ export default function ProductDetailClient({ product, similarProducts = [], ini
   const [zoomPos, setZoomPos] = useState({ x: 0, y: 0, px: 0, py: 0 });
   const mainImgRef = useRef(null);
   const colorRefs = useRef({});
+  const zoomRaf = useRef(null);
   const { addToCart, toggleFavorite, isFavorite } = useCart();
   const { lang, t } = useTranslation();
   const siteSettings = useSiteSettings();
@@ -43,18 +44,34 @@ export default function ProductDetailClient({ product, similarProducts = [], ini
     ? Math.round((1 - product.price / product.compareAtPrice) * 100)
     : null;
 
-  const handleVariantChange = (index) => {
+  const handleVariantChange = useCallback((index) => {
     setSelectedVariantIndex(index);
     setMainImageIndex(0);
     setSelectedSize(null);
-  };
+  }, []);
 
-  const handleAddToCart = () => {
+  const handleAddToCart = useCallback(() => {
     if (!selectedSize) return;
     addToCart(product, variant, selectedSize, quantity);
     setAddedToCart(true);
     setTimeout(() => setAddedToCart(false), 2000);
-  };
+  }, [selectedSize, addToCart, product, variant, quantity]);
+
+  // Throttled zoom handler — avoids React re-render on every mouse pixel
+  const handleZoomMove = useCallback((e) => {
+    if (zoomRaf.current) return;
+    zoomRaf.current = requestAnimationFrame(() => {
+      zoomRaf.current = null;
+      const el = mainImgRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const px = e.clientX - rect.left;
+      const py = e.clientY - rect.top;
+      const x = (px / rect.width) * 100;
+      const y = (py / rect.height) * 100;
+      setZoomPos({ x, y, px, py });
+    });
+  }, []);
 
   const sizeInStock = (size) => {
     const s = sizes.find((s) => s.size === size);
@@ -121,7 +138,7 @@ export default function ProductDetailClient({ product, similarProducts = [], ini
                   <button
                     key={i}
                     onClick={() => setMainImageIndex(i)}
-                    className={`relative aspect-square overflow-hidden border-2 transition-all cursor-pointer ${
+                    className={`relative aspect-square overflow-hidden border-2 transition-[border-color,opacity] cursor-pointer ${
                       mainImageIndex === i ? 'border-black' : 'border-transparent opacity-50 hover:opacity-100'
                     }`}
                   >
@@ -138,15 +155,7 @@ export default function ProductDetailClient({ product, similarProducts = [], ini
                 className="relative aspect-[3/4] overflow-hidden bg-gray-50 cursor-crosshair"
                 onMouseEnter={() => mainImage?.url && setZoomActive(true)}
                 onMouseLeave={() => setZoomActive(false)}
-                onMouseMove={(e) => {
-                  if (!mainImgRef.current || !mainImage?.url) return;
-                  const rect = mainImgRef.current.getBoundingClientRect();
-                  const px = e.clientX - rect.left;
-                  const py = e.clientY - rect.top;
-                  const x = (px / rect.width) * 100;
-                  const y = (py / rect.height) * 100;
-                  setZoomPos({ x, y, px, py });
-                }}
+                onMouseMove={handleZoomMove}
               >
                 {mainImage?.url ? (
                   <Image
@@ -214,7 +223,7 @@ export default function ProductDetailClient({ product, similarProducts = [], ini
                     <button
                       key={i}
                       onClick={() => setMainImageIndex(i)}
-                      className={`relative flex-shrink-0 w-16 aspect-square overflow-hidden border-2 transition-all cursor-pointer ${
+                      className={`relative flex-shrink-0 w-16 aspect-square overflow-hidden border-2 transition-[border-color] cursor-pointer ${
                         mainImageIndex === i ? 'border-black' : 'border-gray-200'
                       }`}
                     >
@@ -262,8 +271,9 @@ export default function ProductDetailClient({ product, similarProducts = [], ini
                     <div key={v.id} className="relative">
                       <button
                         ref={(el) => { colorRefs.current[v.id] = el; }}
-                        onClick={() => handleVariantChange(i)}
+                        onClick={() => { handleVariantChange(i); setHoveredVariant(null); setTooltipPos(null); }}
                         onMouseEnter={() => {
+                          if (window.matchMedia('(hover: none)').matches) return;
                           setHoveredVariant(v.id);
                           const el = colorRefs.current[v.id];
                           if (el) {
@@ -273,7 +283,7 @@ export default function ProductDetailClient({ product, similarProducts = [], ini
                         }}
                         onMouseLeave={() => { setHoveredVariant(null); setTooltipPos(null); }}
                         title={localize(v, 'colorName', lang)}
-                        className={`w-8 h-8 rounded-full border-2 transition-all cursor-pointer ${
+                        className={`w-8 h-8 rounded-full border-2 transition-[border-color,transform,box-shadow] cursor-pointer ${
                           selectedVariantIndex === i
                             ? 'border-black scale-110 ring-2 ring-black ring-offset-2'
                             : 'border-gray-200 hover:border-gray-400'
@@ -308,7 +318,7 @@ export default function ProductDetailClient({ product, similarProducts = [], ini
                         key={s.id || s.size}
                         onClick={() => inStock && setSelectedSize(s.size)}
                         disabled={!inStock}
-                        className={`w-12 h-12 border text-xs font-medium tracking-wide transition-all duration-200 ${
+                        className={`w-12 h-12 border text-xs font-medium tracking-wide transition-[color,background-color,border-color,transform,box-shadow] duration-200 ${
                           selectedSize === s.size
                             ? 'bg-black text-white border-black scale-105 shadow-md cursor-pointer'
                             : inStock
@@ -333,14 +343,14 @@ export default function ProductDetailClient({ product, similarProducts = [], ini
               <div className="flex items-center border border-gray-200">
                 <button
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  className="w-10 h-10 flex items-center justify-center hover:bg-neutral-100 hover:text-black active:scale-90 transition-all duration-150 text-lg cursor-pointer"
+                  className="w-10 h-10 flex items-center justify-center hover:bg-neutral-100 hover:text-black active:scale-90 transition-[color,background-color,transform] duration-150 text-lg cursor-pointer"
                 >
                   −
                 </button>
                 <span className="w-10 text-center text-sm font-medium">{quantity}</span>
                 <button
                   onClick={() => setQuantity((q) => q + 1)}
-                  className="w-10 h-10 flex items-center justify-center hover:bg-neutral-100 hover:text-black active:scale-90 transition-all duration-150 text-lg cursor-pointer"
+                  className="w-10 h-10 flex items-center justify-center hover:bg-neutral-100 hover:text-black active:scale-90 transition-[color,background-color,transform] duration-150 text-lg cursor-pointer"
                 >
                   +
                 </button>
@@ -352,7 +362,7 @@ export default function ProductDetailClient({ product, similarProducts = [], ini
               <button
                 onClick={handleAddToCart}
                 disabled={!selectedSize}
-                className={`flex-1 py-4 text-sm tracking-widest uppercase font-medium transition-all duration-300 ${
+                className={`flex-1 py-4 text-sm tracking-widest uppercase font-medium transition-[color,background-color,transform,box-shadow] duration-300 ${
                   addedToCart
                     ? 'bg-green-600 text-white scale-[0.99]'
                     : selectedSize
@@ -414,7 +424,7 @@ export default function ProductDetailClient({ product, similarProducts = [], ini
                     </svg>
                   </button>
                   <div
-                    className="overflow-hidden transition-all duration-500 ease-in-out"
+                    className="overflow-hidden transition-[grid-template-rows,opacity] duration-500 ease-in-out"
                     style={{
                       display: 'grid',
                       gridTemplateRows: openAccordion === acc.id ? '1fr' : '0fr',

@@ -57,7 +57,7 @@ export default function CartSidebar() {
           </div>
           <button
             onClick={closeCart}
-            className="w-8 h-8 flex items-center justify-center text-neutral-400 hover:text-black hover:bg-neutral-100 transition-all duration-200 active:scale-90 cursor-pointer"
+            className="w-8 h-8 flex items-center justify-center text-neutral-400 hover:text-black hover:bg-neutral-100 transition-[color,background-color,transform] duration-200 active:scale-90 cursor-pointer"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -73,7 +73,7 @@ export default function CartSidebar() {
             {/* Standard */}
             <button
               onClick={() => setDeliveryMethod('standard')}
-              className={`w-full flex items-center justify-between px-3 py-2.5 border text-left transition-all duration-200 cursor-pointer ${
+              className={`w-full flex items-center justify-between px-3 py-2.5 border text-left transition-[color,background-color,border-color] duration-200 cursor-pointer ${
                 deliveryMethod === 'standard' ? 'border-black bg-black text-white' : 'border-neutral-200 bg-white text-neutral-600 hover:border-neutral-400'
               }`}
             >
@@ -92,7 +92,7 @@ export default function CartSidebar() {
             {/* Pick-up */}
             <button
               onClick={() => setDeliveryMethod('pickup')}
-              className={`w-full flex items-center justify-between px-3 py-2.5 border text-left transition-all duration-200 cursor-pointer ${
+              className={`w-full flex items-center justify-between px-3 py-2.5 border text-left transition-[color,background-color,border-color] duration-200 cursor-pointer ${
                 deliveryMethod === 'pickup' ? 'border-black bg-black text-white' : 'border-neutral-200 bg-white text-neutral-600 hover:border-neutral-400'
               }`}
             >
@@ -123,7 +123,7 @@ export default function CartSidebar() {
               <p className="text-neutral-400 text-xs tracking-wide mb-6">{t('cart.emptyDesc')}</p>
               <button
                 onClick={closeCart}
-                className="border border-black text-black text-xs tracking-widest uppercase px-8 py-2.5 hover:bg-black hover:text-white transition-all duration-300 cursor-pointer"
+                className="border border-black text-black text-xs tracking-widest uppercase px-8 py-2.5 hover:bg-black hover:text-white transition-[color,background-color,border-color] duration-300 cursor-pointer"
               >
                 {t('cart.continueShopping')}
               </button>
@@ -177,14 +177,14 @@ export default function CartSidebar() {
                       <div className="flex items-center border border-neutral-200">
                         <button
                           onClick={() => updateQuantity(item.key, item.quantity - 1)}
-                          className="w-8 h-8 flex items-center justify-center text-neutral-500 hover:bg-neutral-100 hover:text-black active:scale-90 transition-all text-base cursor-pointer"
+                          className="w-8 h-8 flex items-center justify-center text-neutral-500 hover:bg-neutral-100 hover:text-black active:scale-90 transition-[color,background-color,transform] text-base cursor-pointer"
                         >
                           −
                         </button>
                         <span className="w-8 text-center text-sm font-medium">{item.quantity}</span>
                         <button
                           onClick={() => updateQuantity(item.key, item.quantity + 1)}
-                          className="w-8 h-8 flex items-center justify-center text-neutral-500 hover:bg-neutral-100 hover:text-black active:scale-90 transition-all text-base cursor-pointer"
+                          className="w-8 h-8 flex items-center justify-center text-neutral-500 hover:bg-neutral-100 hover:text-black active:scale-90 transition-[color,background-color,transform] text-base cursor-pointer"
                         >
                           +
                         </button>
@@ -194,7 +194,7 @@ export default function CartSidebar() {
                         <span className="text-sm font-medium text-black">{item.price * item.quantity} MDL</span>
                         <button
                           onClick={() => removeFromCart(item.key)}
-                          className="w-7 h-7 flex items-center justify-center text-neutral-400 hover:text-red-500 hover:bg-red-50 active:scale-90 transition-all duration-200 cursor-pointer"
+                          className="w-7 h-7 flex items-center justify-center text-neutral-400 hover:text-red-500 hover:bg-red-50 active:scale-90 transition-[color,background-color,transform] duration-200 cursor-pointer"
                           title={t('cart.delete')}
                         >
                           <svg className="w-4.5 h-4.5" style={{width:'18px',height:'18px'}} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
@@ -233,7 +233,7 @@ export default function CartSidebar() {
             <Link
               href="/comanda"
               onClick={closeCart}
-              className="group flex items-center justify-center gap-3 w-full bg-black text-white py-4 text-xs tracking-widest uppercase hover:bg-neutral-800 active:scale-[0.99] transition-all duration-300 mt-1"
+              className="group flex items-center justify-center gap-3 w-full bg-black text-white py-4 text-xs tracking-widest uppercase hover:bg-neutral-800 active:scale-[0.99] transition-[color,background-color,transform] duration-300 mt-1"
             >
               {t('cart.checkout')}
               <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>

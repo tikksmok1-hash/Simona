@@ -95,13 +95,13 @@ export default function HomeClient({
               <span className="block font-normal italic">{localHeroSubtitle}</span>
             </h1>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-              <Link href="/bestsellers" className="group inline-flex items-center justify-center gap-3 bg-white text-black px-8 sm:px-12 py-3.5 sm:py-4 font-medium text-xs sm:text-sm tracking-widest uppercase transition-all duration-300 hover:-translate-y-1 hover:shadow-xl active:translate-y-0 active:shadow-none">
+              <Link href="/bestsellers" className="group inline-flex items-center justify-center gap-3 bg-white text-black px-8 sm:px-12 py-3.5 sm:py-4 font-medium text-xs sm:text-sm tracking-widest uppercase transition-[color,background-color,transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-xl active:translate-y-0 active:shadow-none">
                 {t('home.seeCollection')}
                 <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
               </Link>
-              <Link href="/reduceri" className="inline-flex items-center justify-center gap-3 bg-transparent hover:bg-white hover:text-black text-white px-8 sm:px-12 py-3.5 sm:py-4 font-medium text-xs sm:text-sm tracking-widest uppercase transition-all duration-300 border-2 border-white backdrop-blur-sm hover:-translate-y-1 hover:shadow-xl active:translate-y-0 active:shadow-none">
+              <Link href="/reduceri" className="inline-flex items-center justify-center gap-3 bg-transparent hover:bg-white hover:text-black text-white px-8 sm:px-12 py-3.5 sm:py-4 font-medium text-xs sm:text-sm tracking-widest uppercase transition-[color,background-color,border-color,transform,box-shadow] duration-300 border-2 border-white backdrop-blur-sm hover:-translate-y-1 hover:shadow-xl active:translate-y-0 active:shadow-none">
                 {t('home.salePercent')} {maxDiscount}%
               </Link>
             </div>
@@ -149,7 +149,7 @@ export default function HomeClient({
                     </p>
                     <h3 className="font-serif text-base sm:text-xl lg:text-2xl text-white font-light truncate">{localize(cat, 'name', lang)}</h3>
                   </div>
-                  <span className="hidden sm:inline-block border border-white/60 text-white text-[10px] tracking-widest uppercase px-4 py-2 group-hover:bg-white group-hover:text-black transition-all duration-300 flex-shrink-0 ml-2">
+                  <span className="hidden sm:inline-block border border-white/60 text-white text-[10px] tracking-widest uppercase px-4 py-2 group-hover:bg-white group-hover:text-black transition-[color,background-color,border-color] duration-300 flex-shrink-0 ml-2">
                     {t('home.see')}
                   </span>
                 </div>
@@ -202,7 +202,7 @@ export default function HomeClient({
               <p className="text-base sm:text-lg text-neutral-400 mb-6 sm:mb-8 leading-relaxed">
                 {`${maxDiscount}% ${t('home.springSaleDesc')}`}
               </p>
-              <Link href="/reduceri" className="group inline-flex items-center gap-3 bg-white text-black hover:bg-neutral-100 px-8 sm:px-10 py-3.5 sm:py-4 font-medium text-xs sm:text-sm tracking-widest uppercase transition-all duration-300 hover:-translate-y-1 hover:shadow-lg active:translate-y-0 active:shadow-none">
+              <Link href="/reduceri" className="group inline-flex items-center gap-3 bg-white text-black hover:bg-neutral-100 px-8 sm:px-10 py-3.5 sm:py-4 font-medium text-xs sm:text-sm tracking-widest uppercase transition-[color,background-color,transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-lg active:translate-y-0 active:shadow-none">
                 {t('home.buyNow')}
                 <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
               </Link>
@@ -238,7 +238,7 @@ export default function HomeClient({
             ))}
           </div>
           <div className="text-center mt-12">
-            <Link href="/bestsellers" className="inline-flex items-center gap-3 border border-black text-black px-10 py-3 text-xs tracking-widest uppercase hover:bg-black hover:text-white transition-all duration-300">
+            <Link href="/bestsellers" className="inline-flex items-center gap-3 border border-black text-black px-10 py-3 text-xs tracking-widest uppercase hover:bg-black hover:text-white transition-[color,background-color,border-color] duration-300">
               {t('home.seeAllBestsellers')}
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -264,7 +264,7 @@ export default function HomeClient({
             ))}
           </div>
           <div className="text-center mt-12">
-            <Link href="/reduceri" className="inline-flex items-center gap-3 border border-black text-black px-10 py-3 text-xs tracking-widest uppercase hover:bg-black hover:text-white transition-all duration-300">
+            <Link href="/reduceri" className="inline-flex items-center gap-3 border border-black text-black px-10 py-3 text-xs tracking-widest uppercase hover:bg-black hover:text-white transition-[color,background-color,border-color] duration-300">
               {t('home.seeAllSale')}
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -326,7 +326,7 @@ export default function HomeClient({
             ))}
           </div>
           <div className="text-center mt-12">
-            <Link href="/noutati" className="inline-flex items-center gap-3 border border-black text-black px-10 py-3 text-xs tracking-widest uppercase hover:bg-black hover:text-white transition-all duration-300">
+            <Link href="/noutati" className="inline-flex items-center gap-3 border border-black text-black px-10 py-3 text-xs tracking-widest uppercase hover:bg-black hover:text-white transition-[color,background-color,border-color] duration-300">
               {t('home.allNews')}
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />

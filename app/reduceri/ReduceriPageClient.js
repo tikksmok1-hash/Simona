@@ -8,10 +8,10 @@ export default function ReduceriPageClient({ saleProducts, categories, available
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-screen bg-white pt-[112px] md:pt-[160px]">
+    <div className="min-h-screen bg-white" style={{ paddingTop: 'var(--navbar-height)' }}>
 
       {/* Hero */}
-      <div className="relative bg-black overflow-hidden py-24">
+      <div className="relative bg-black overflow-hidden py-24 min-h-[280px] md:min-h-[320px]">
         <div className="absolute left-8 top-0 bottom-0 w-px bg-white/10" />
         <div className="absolute right-8 top-0 bottom-0 w-px bg-white/10" />
         <div className="absolute left-1/2 top-0 bottom-0 w-px bg-white/5 hidden md:block" />

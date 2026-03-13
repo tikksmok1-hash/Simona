@@ -59,6 +59,12 @@ export default memo(function ProductCard({ product, priority = false }) {
   const totalStock = sortedSizes.reduce((acc, size) => acc + size.stock, 0) ?? 0;
   const isOutOfStock = totalStock === 0;
 
+  // Build product URL — include variant param when a non-default color is selected
+  const isDefaultVariant = selectedVariant?.id === variants[0]?.id;
+  const productUrl = isDefaultVariant
+    ? `/produs/${product.slug}`
+    : `/produs/${product.slug}?variant=${selectedVariant.id}`;
+
   // If no variants at all, render a minimal card
   if (!selectedVariant) {
     return (
@@ -79,7 +85,7 @@ export default memo(function ProductCard({ product, priority = false }) {
   return (
     <div className="group bg-white overflow-hidden border border-neutral-200 hover:border-black transition-colors duration-500 flex flex-col relative">
       {/* Image Container */}
-      <Link href={`/produs/${product.slug}`}>
+      <Link href={productUrl}>
         <div 
           className="relative bg-neutral-100 aspect-[3/4] md:aspect-[2/3] overflow-hidden cursor-pointer"
           onMouseEnter={() => { setIsHovered(true); if (!hasHovered) setHasHovered(true); }}
@@ -192,7 +198,7 @@ export default memo(function ProductCard({ product, priority = false }) {
                           setTimeout(() => setAddedSize(null), 1500);
                         }
                       }}
-                      className={`min-w-[34px] h-8 px-1 text-xs font-medium border transition-all duration-200 ${
+                      className={`min-w-[34px] h-8 px-1 text-xs font-medium border transition-[color,background-color,border-color,transform] duration-200 ${
                         size.stock === 0
                           ? 'border-neutral-700 text-neutral-600 line-through cursor-not-allowed'
                           : addedSize === size.size
@@ -218,7 +224,7 @@ export default memo(function ProductCard({ product, priority = false }) {
         </p>
 
         {/* Product Name */}
-        <Link href={`/produs/${product.slug}`}>
+        <Link href={productUrl}>
           <h3 className="font-serif text-sm text-black mb-3 group-hover:underline line-clamp-2">
             {productName}
           </h3>
@@ -232,9 +238,9 @@ export default memo(function ProductCard({ product, priority = false }) {
               <div key={variant.id} className="relative flex-shrink-0">
                 <button
                   ref={(el) => { colorRefs.current[variant.id] = el; }}
-                  onClick={() => setSelectedVariant(variant)}
+                  onClick={() => { setSelectedVariant(variant); setHoveredVariant(null); setTooltipPos(null); }}
                   onMouseEnter={() => {
-                    if (isTouchDevice) return;
+                    if (isTouchDevice || window.matchMedia('(hover: none)').matches) return;
                     setHoveredVariant(variant.id);
                     const el = colorRefs.current[variant.id];
                     if (el) {
@@ -243,7 +249,6 @@ export default memo(function ProductCard({ product, priority = false }) {
                     }
                   }}
                   onMouseLeave={() => {
-                    if (isTouchDevice) return;
                     setHoveredVariant(null);
                     setTooltipPos(null);
                   }}
@@ -302,7 +307,7 @@ export default memo(function ProductCard({ product, priority = false }) {
                       setTimeout(() => setAddedSize(null), 1500);
                     }
                   }}
-                  className={`flex-shrink-0 min-w-[34px] h-8 px-1 text-[11px] font-medium border transition-all duration-200 ${
+                  className={`flex-shrink-0 min-w-[34px] h-8 px-1 text-[11px] font-medium border transition-[color,background-color,border-color] duration-200 ${
                     size.stock === 0
                       ? 'border-neutral-200 text-neutral-300 line-through cursor-not-allowed'
                       : addedSize === size.size
